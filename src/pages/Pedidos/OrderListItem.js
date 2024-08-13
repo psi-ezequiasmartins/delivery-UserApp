@@ -1,0 +1,77 @@
+/**
+ * src/components/Order/OrderListItem.js
+ */
+
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+
+export default function OrderListItem({ order }) {
+  const navigation = useNavigation();
+
+  const showOrderDetails = () => {
+    navigation.navigate("StkPedido", { PedidoID: order?.PedidoID });
+  };
+
+  return (
+    <View style={styles.card}>
+      <TouchableOpacity onPress={showOrderDetails}>
+        <Text style={{fontWeight: 'bold'}}>Pedido Nº {order?.PedidoID}</Text>
+        <Text style={{fontWeight: 'normal'}}>Data/Hora do Pedido: {order?.Data}</Text>
+        <Text style={{fontWeight: 'normal'}}>Qtd. de Itens: {order?.QtdItens} &#8226; Total: R$ { parseFloat(order?.VrTotal).toFixed(2) }</Text>
+        <View style={{flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginBottom: 5}}>
+          { order.Status === "NOVO" ? <Text style={[styles.status, {backgroundColor: 'red'}]}> NOVO </Text> : null }
+          { order.Status === "AGUARDANDO" ? <Text style={[styles.status, {backgroundColor: 'yellow', color: 'black'}]}> AGUARDANDO </Text> : null }
+          { order.Status === "PREPARANDO" ? <Text style={[styles.status, {backgroundColor: 'orange', color: 'black'}]}> PREPARANDO </Text> : null }
+          { order.Status === "PRONTO_PARA_RETIRADA" ? <Text style={[styles.status, {backgroundColor: 'green'}]}> PRONTO PARA RETIRADA </Text> : null }
+          { order.Status === "SAIU_PARA_ENTREGA" ? <Text style={[styles.status, {backgroundColor: 'lime', color: 'black'}]}> SAIU PARA ENTREGA </Text> : null }
+          { order.Status === "RECEBIDO" ? <Text style={[styles.status, {backgroundColor: 'purple'}]}> RECEBIDO </Text> : null }
+          { order.Status === "FINALIZADO" ? <Text style={[styles.status, {backgroundColor: 'black'}]}> FINALIZADO </Text> : null }
+          { order.Status === "CANCELADO" ? <Text style={[styles.status, {backgroundColor: 'gray'}]}> CANCELADO </Text> : null }
+          <Text><FontAwesome color="#000" name='folder-open' size={28}/></Text>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container:{
+    flex: 1,
+    backgroundColor: "#FFF",
+    padding: 10,
+  },
+  card:{
+    borderBottomWidth: 0.5,
+    borderColor: "#9C9C9C",
+    padding: 5,
+  },
+  title:{
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    borderBottomColor: '#E2E2E2',
+    borderBottomWidth: 1,
+    paddingBottom: 10
+  },
+  subtitle:{
+    color: '#000',
+    fontSize: 15,
+    fontWeight: 'bold'
+  },
+  status:{
+    color: '#FFF',
+    borderRadius: 5,
+    marginTop: 5,
+    padding: 3
+  },
+  line18:{ 
+    color: '#000', 
+    fontSize: 18 
+  },
+  line13:{
+    color: '#000',
+    fontSize: 13,
+    marginBottom: 10
+  },
+})
