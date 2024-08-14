@@ -7,12 +7,13 @@ import { SafeAreaView, View, Text, TextInput, Image, TouchableOpacity, ActivityI
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
 
-import logo from '../../../assets/logo.png';
+import icon from '../../../assets/icon.png';
 import marca from '../../../assets/logomarca.png';
 
 export default function SignIn() {
   const navigation = useNavigation();
   const { signIn, loading } = useContext(AuthContext);
+
   const [ email, setEmail ] = useState('');
   const [ password, setPassword]  = useState('');
 
@@ -21,10 +22,10 @@ export default function SignIn() {
       <View style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
 
         <View style={styles.header}>
-          <Image style={styles.logo} source={logo} resizeMode="contain" />
+          <Image style={styles.logo} source={icon} resizeMode="contain" />
           <Image style={styles.marca} source={marca} resizeMode="contain" />
           <Text style={styles.title}>Seja bem vindo!</Text>
-          <Text style={styles.subtitle}>UserApp v1.0</Text>
+          <Text style={styles.subtitle}>UserApp v2.0</Text>
         </View>
 
         <View style={styles.areaInput}>
@@ -103,8 +104,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   logo:{
-    width: 70, 
-    height: 70
+    width: 100, 
+    height: 100
   },
   marca:{
     width: 200, 
@@ -115,7 +116,8 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     alignItems: "flex-start",
-    margin: 5,
+    marginLeft: 10,
+    marginBottom: 10
   },
   input:{
     width: "95%",

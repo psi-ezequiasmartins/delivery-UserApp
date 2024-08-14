@@ -18,7 +18,7 @@ export default function App() {
       <AuthProvider>
         <CartProvider>
           <OrderProvider>
-            <StatusBar style="dark" backgroundColor='#FCFC00'/>
+            <StatusBar style="auto" backgroundColor='#FFA092'/>
             <Routes/>
           </OrderProvider>
         </CartProvider>

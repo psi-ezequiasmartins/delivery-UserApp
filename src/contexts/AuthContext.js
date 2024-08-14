@@ -24,16 +24,18 @@ function AuthProvider({ children }) {
   const [ user, setUser ] = useState(null);
   const [ token_msg, setTokenMSG ] = useState("");
   const [ notify, setNotify ] = useState(false);
+  
+  const token = '';
 
-  useEffect(() => {
-    setLoading(true);
-    const token = AsyncStorage.getItem("token");
-    if (token) {
-      api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
-      setAuthenticated(true);
-    }
-    setLoading(false);
-  }, []);
+  // useEffect(() => {
+  //   setLoading(true);
+  //   const token = AsyncStorage.getItem("token");
+  //   if (token) {
+  //     api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
+  //     setAuthenticated(true);
+  //   }
+  //   setLoading(false);
+  // }, []);
 
   function SetNotificationSMS(notification) {
     setNotify(notification);
@@ -121,20 +123,20 @@ function AuthProvider({ children }) {
   }
 
   function signUp(
-    nome, sobrenome, endereco, complemento, bairro, cidade, UF, CEP, telefone, 
-    email, password, confirm_password
+    nome, sobrenome, CEP, endereco, complemento, bairro, cidade, UF, telefone, email, 
+    password, confirm_password
   ) {
     setLoading(true);
     registerForPushNotificationsAsync().then((token_msg) => {
       setTokenMSG(token_msg);
     });
-  
+
     if (!email || !password) {
       Alert.alert('Favor preencher todos os campos!');
       setLoading(false); // Para garantir que o loading seja desativado
       return;
     }
-  
+
     if (password !== confirm_password) {
       Alert.alert('As senhas não conferem! Digite-as novamente');
       setLoading(false); // Para garantir que o loading seja desativado

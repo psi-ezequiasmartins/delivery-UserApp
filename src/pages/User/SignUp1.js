@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SafeAreaView, View, Image, Text, TextInput, TouchableOpacity, Keyboard, Platform, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import logo from '../../../assets/logo.png';
+import icon from '../../../assets/icon.png';
 import marca from '../../../assets/logomarca.png';
 
 export default function SignUp1() {
@@ -35,7 +35,7 @@ export default function SignUp1() {
       <View style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
 
         <View style={styles.header}>
-          <Image source={logo} style={styles.logo} resizeMode="contain" />
+          <Image source={icon} style={styles.logo} resizeMode="contain" />
           <Image source={marca} style={styles.marca} resizeMode="contain" />
           <Text style={styles.title}>Seja bem vindo!</Text>
           <Text style={styles.subtitle}>Cadastre-se! É simples e rápido.</Text>
@@ -48,7 +48,7 @@ export default function SignUp1() {
             onChangeText={(input) => setNome(input)}
             placeholder="Ex.: José"
             autoCorrect={true}
-            autoCapitalize="none"
+            autoCapitalize="setences"
             onSubmitEditing={() => Keyboard.dismiss()}
             style={styles.input}
           />
@@ -61,7 +61,7 @@ export default function SignUp1() {
             onChangeText={(input) => setSobrenome(input)}
             placeholder="Ex.: Silva"
             autoCorrect={true}
-            autoCapitalize="none"
+            autoCapitalize="sentences"
             onSubmitEditing={() => Keyboard.dismiss()}
             style={styles.input}
           />
@@ -118,7 +118,8 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     alignItems: "flex-start",
-    margin: 5,
+    marginLeft: 10,
+    marginBottom: 10
   },
   input:{
     width: "95%",

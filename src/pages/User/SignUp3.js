@@ -43,11 +43,12 @@ export default function SignUp3(props) {
       signUp(
         nome.trim(),
         sobrenome.trim(),
+        CEP,
         endereco.trim(),
         complemento.trim(),
         bairro.trim(),
         cidade.trim(),
-        UF, CEP,
+        UF,
         telefone.trim(),
         email.trim(),
         password.trim()

@@ -6,33 +6,33 @@ export default function SelectUF({onChange, uf}) {
   return (
     <View style={styles.picker}>
       <Select selectedValue={uf} onValueChange={(valor) => onChange(valor)} uf={uf}>
-        <Select.Item label='Acre' value='AC' />
-        <Select.Item label='Alagoas' value='AL' />
-        <Select.Item label='Amapá' value='AP' />
-        <Select.Item label='Amazonas' value='AM' />
-        <Select.Item label='Bahia' value='BA' />
-        <Select.Item label='Ceará' value='CE' />
-        <Select.Item label='Distrito Federal' value='DF' />
-        <Select.Item label='Espírito Santo' value='ES' />
-        <Select.Item label='Goiás' value='GO' />
-        <Select.Item label='Maranhão' value='MA' />
-        <Select.Item label='Mato Grosso' value='MT' />
-        <Select.Item label='Mato Grosso do Sul' value='MS' />
-        <Select.Item label='Minas Gerais' value='MG' />
-        <Select.Item label='Pará' value='PA' />
-        <Select.Item label='Paraíba' value='PB' />
-        <Select.Item label='Paraná' value='PR' />
-        <Select.Item label='Pernambuco' value='PE' />
-        <Select.Item label='Piauí' value='PI' />
-        <Select.Item label='Rio de Janeiro' value='RJ' />
-        <Select.Item label='Rio Grande do Norte' value='RN' />
-        <Select.Item label='Rio Grande do Sul' value='RS' />
-        <Select.Item label='Rondônia' value='RO' />
-        <Select.Item label='Roraima' value='RR' />
-        <Select.Item label='Santa Catarina' value='SC' />
-        <Select.Item label='São Paulo' value='SP' />
-        <Select.Item label='Sergipe' value='SE' />
-        <Select.Item label='Tocantins' value='TO' />
+        <Select.Item label='AC' value='AC' />
+        <Select.Item label='AL' value='AL' />
+        <Select.Item label='AP' value='AP' />
+        <Select.Item label='AM' value='AM' />
+        <Select.Item label='BA' value='BA' />
+        <Select.Item label='CE' value='CE' />
+        <Select.Item label='DF' value='DF' />
+        <Select.Item label='ES' value='ES' />
+        <Select.Item label='GO' value='GO' />
+        <Select.Item label='MA' value='MA' />
+        <Select.Item label='MT' value='MT' />
+        <Select.Item label='MS' value='MS' />
+        <Select.Item label='MG' value='MG' />
+        <Select.Item label='PA' value='PA' />
+        <Select.Item label='PB' value='PB' />
+        <Select.Item label='PR' value='PR' />
+        <Select.Item label='PE' value='PE' />
+        <Select.Item label='PI' value='PI' />
+        <Select.Item label='RJ' value='RJ' />
+        <Select.Item label='RN' value='RN' />
+        <Select.Item label='RS' value='RS' />
+        <Select.Item label='RO' value='RO' />
+        <Select.Item label='RR' value='RR' />
+        <Select.Item label='SC' value='SC' />
+        <Select.Item label='SP' value='SP' />
+        <Select.Item label='SE' value='SE' />
+        <Select.Item label='TO' value='TO' />
       </Select>
     </View>
   )

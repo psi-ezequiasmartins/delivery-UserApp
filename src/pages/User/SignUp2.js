@@ -1,3 +1,7 @@
+/**
+ * src/pages/User/SignUp.js
+ */
+
 import React, { useState } from 'react';
 import { SafeAreaView, View, Image, Text, TextInput, TouchableOpacity, Keyboard, Platform, StyleSheet } from 'react-native';
 import { ScrollView } from "react-native-virtualized-view";
@@ -5,17 +9,19 @@ import { TextInputMask } from 'react-native-masked-text';
 import { useNavigation } from '@react-navigation/native';
 
 import SelectUF from '../../components/SelectUF';
-import logo from '../../../assets/logo.png';
+import icon from '../../../assets/icon.png';
 
 export default function SignUp2(props) {
   const navigation = useNavigation();
+
   const nome = props.route.params.nome;
   const sobrenome = props.route.params.sobrenome;
 
   const [endereco, setEndereco] = useState('');
+  const [numero, setNumero] = useState('');
   const [complemento, setComplemento] = useState('');
   const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
+  const [cidade, setCidade] = useState('Belo Horizonte');
   const [UF, setUf] = useState('MG');
   const [CEP, setCep] = useState('');
 
@@ -27,15 +33,42 @@ export default function SignUp2(props) {
     }
   }
 
+  async function SearchAddressByCEP(cep) {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      if (!response.ok) throw new Error('Erro na consulta do CEP');
+      const data = await response.json();
+      if (data.erro) throw new Error('CEP não encontrado');
+      return data;
+    } catch (error) {
+      console.error('Erro na busca do endereço pelo CEP:', error);
+      return null;
+    }
+  }
+
+  async function handleEditCEP(e) {
+    const { name, value } = e.target;
+    if (value.length === 9) {
+      const cleanedCEP = value.replace(/\D/g, ''); // Remove non-numeric characters
+      const addressData = await SearchAddressByCEP(cleanedCEP);
+      if (addressData) {
+        setCep(value);
+        setEndereco(addressData.logradouro);
+        setBairro(addressData.bairro);
+        setCidade(addressData.localidade);
+        setUf(addressData.uf);
+      } else {
+        setMsg({text: 'CEP não encontrado ou inválido', type: 1});
+      }
+    }
+  }
+
   function avancar(){
-    const vEndereco = checkEmptyField(endereco);
-    const vBairro = checkEmptyField(bairro);
-    const vCidade = checkEmptyField(cidade);
-    const vCEP = checkEmptyField(CEP)
-    if(!vEndereco || !vBairro || !vCidade || !vCEP) {
+    const vCEP = checkEmptyField(CEP);
+    if(!vCEP) {
       alert('Dados obrigatórios');
     } else {
-      navigation.navigate('SignUp3', {nome, sobrenome, endereco, complemento, bairro, cidade, UF, CEP})
+      navigation.navigate('SignUp3', {nome, sobrenome, CEP, endereco, numero, complemento, bairro, cidade, UF})
     }
   }
 
@@ -44,52 +77,91 @@ export default function SignUp2(props) {
     <View style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
 
       <View style={styles.header}>
-        <Image style={styles.logo} source={logo} resizeMode="contain" />
         <Text style={styles.title}>Olá! {nome + ' ' + sobrenome}</Text>
         <Text style={styles.subtitle}>Por favor, preencha o formulário abaixo com o endereço completo para suas entregas.</Text>
       </View>
 
-      <ScrollView style={{width: "98%", padding: 2, backgroundColor: "#FCFCFC"}}>
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Endereço:</Text>
+      <View style={styles.row}>
+        <View style={[styles.areaInput, { width: "40%" }]}>
+          <View style={styles.areaInput}>
+            <Text style={{ marginBottom: 5 }}>CEP</Text>
+            <TextInputMask
+              type={'custom'}
+              options={{
+                mask: "99999-999",
+              }}
+              value={CEP}
+              placeholder="31000-000"
+              onChangeText={(input) => setCep(input)}
+              onSubmitEditing={() => Keyboard.dismiss()}
+              keyboardType="numeric"
+              style={styles.input}
+            />
+          </View>
+        </View>
+
+        <View style={[styles.areaInput, { width: "60%" }]}>
+          <Text></Text>
+          <TouchableOpacity style={styles.btnSubmit} onPress={() => handleEditCEP(CEP)}>
+            <Text style={styles.btnTxt}> PESQUISAR CEP </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.row}>
+        <View style={[styles.areaInput, {width: "80%"}]}>
+          <Text style={{ marginBottom: 5 }}>Endereço</Text>
           <TextInput
             value={endereco}
             onChangeText={(input) => setEndereco(input)}
-            placeholder="Ex.: Rua/Av/Travessa, Nº, etc"
+            placeholder="Av/Rua/Travessa, etc"
             autoCorrect={true}
             autoCapitalize="sentences"
             onSubmitEditing={() => Keyboard.dismiss()}
             style={styles.input}
           />
         </View>
-
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Complemento:</Text>
+        <View style={[styles.areaInput, {width: "20%"}]}>
+          <Text style={{ marginBottom: 5 }}>Número</Text>
           <TextInput
-            value={complemento}
-            onChangeText={(input) => setComplemento(input)}
-            placeholder="Ex.: Apto, Casa, Loja Nº etc."
-            autoCorrect={true}
-            autoCapitalize="sentences"
+            value={numero}
+            onChangeText={(input) => setNumero(input)}
+            placeholder="Nº"
+            keyboardType="numeric"
             onSubmitEditing={() => Keyboard.dismiss()}
             style={styles.input}
           />
         </View>
+      </View>
 
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Bairro:</Text>
-          <TextInput
-            value={bairro}
-            onChangeText={(input) => setBairro(input)}
-            placeholder="Ex.: Santa Mônica"
-            autoCorrect={true}
-            autoCapitalize="sentences"
-            onSubmitEditing={() => Keyboard.dismiss()}
-            style={styles.input}
-          />
-        </View>
+      <View style={styles.areaInput}>
+        <Text style={{marginBottom: 5}}>Complemento</Text>
+        <TextInput
+          value={complemento}
+          onChangeText={(input) => setComplemento(input)}
+          placeholder="Ex.: Apto, Casa, Loja Nº etc."
+          autoCorrect={true}
+          autoCapitalize="sentences"
+          onSubmitEditing={() => Keyboard.dismiss()}
+          style={styles.input}
+        />
+      </View>
 
-        <View style={styles.areaInput}>
+      <View style={styles.areaInput}>
+        <Text style={{marginBottom: 5}}>Bairro</Text>
+        <TextInput
+          value={bairro}
+          onChangeText={(input) => setBairro(input)}
+          placeholder="Ex.: Santa Mônica"
+          autoCorrect={true}
+          autoCapitalize="sentences"
+          onSubmitEditing={() => Keyboard.dismiss()}
+          style={styles.input}
+        />
+      </View>
+
+      <View style={styles.row}>
+        <View style={[styles.areaInput, {width: "60%"}]}>
           <Text style={{marginBottom: 5}}>Cidade:</Text>
           <TextInput
             value={cidade}
@@ -101,31 +173,14 @@ export default function SignUp2(props) {
             style={styles.input}
           />
         </View>
-
-        <View style={styles.areaInput}>
+        <View style={[styles.areaInput, {width: "40%"}]}>
           <Text style={{marginBottom: 5}}>UF:</Text>
           <SelectUF
             onChange={setUf}
             uf={UF}
           />
         </View>
-
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>CEP:</Text>
-          <TextInputMask
-            type={'custom'}
-            options={{
-              mask: "99999-999",
-            }}
-            value={CEP}
-            placeholder="31000-000"
-            onChangeText={ (input) => setCep(input) }
-            onSubmitEditing={() => Keyboard.dismiss()}
-            keyboardType="numeric"
-            style={styles.input}
-          />
-        </View>
-      </ScrollView>
+      </View>
 
       <TouchableOpacity style={styles.btnSubmit} onPress={avancar}>
         <Text style={styles.btnTxt}> AVANÇAR </Text>
@@ -194,6 +249,13 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     fontSize: 17,
     color: "#000",
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: "flex-start",
+    marginLeft: 5,
+    marginRight: 20,
   },
   btnSubmit:{
     width: "95%",
