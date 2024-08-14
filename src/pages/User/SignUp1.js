@@ -1,3 +1,7 @@
+/**
+ * src/pages/User/SignUp1.js
+ */
+
 import React, { useState } from 'react';
 import { SafeAreaView, View, Image, Text, TextInput, TouchableOpacity, Keyboard, Platform, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';

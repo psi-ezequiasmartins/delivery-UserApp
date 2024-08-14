@@ -16,6 +16,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AuthContext = createContext();
 
+/**
+ * src/contexts/AuthContext.js
+ */
+
 function AuthProvider({ children }) {
   const auth = getAuth(firebase_app);
   const db = getDatabase();

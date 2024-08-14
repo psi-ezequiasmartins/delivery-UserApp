@@ -1,5 +1,5 @@
 /**
- * src/pages/User/SignUp.js
+ * src/pages/User/SignUp2.js
  */
 
 import React, { useState } from 'react';
@@ -46,8 +46,7 @@ export default function SignUp2(props) {
     }
   }
 
-  async function handleEditCEP(e) {
-    const { name, value } = e.target;
+  async function handleEditCEP(value) {
     if (value.length === 9) {
       const cleanedCEP = value.replace(/\D/g, ''); // Remove non-numeric characters
       const addressData = await SearchAddressByCEP(cleanedCEP);

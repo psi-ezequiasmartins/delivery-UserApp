@@ -1,10 +1,14 @@
+/**
+ * src/pages/User/SignUp3.js
+ */
+
 import React, {useState, useContext} from 'react';
 import { SafeAreaView, View, Image, Text, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, Platform, StyleSheet } from 'react-native';
 import { TextInputMask } from 'react-native-masked-text';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
 
-import logo from '../../../assets/logo.png';
+import icon from '../../../assets/icon.png';
 
 export default function SignUp3(props) {
   const navigation = useNavigation();
@@ -61,7 +65,7 @@ export default function SignUp3(props) {
       <View style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
 
         <View style={styles.header}>
-          <Image style={styles.logo} source={logo} resizeMode="contain" />
+          <Image style={styles.logo} source={icon} resizeMode="contain" />
           <Text style={styles.subtitle}>Já estamos concluindo, só mais um pouquinho...</Text>
           <Text style={styles.subtitle}>Informe seu telefone e email, defina um senha com 6 dígitos numéricos.</Text>
         </View>
