@@ -27,7 +27,7 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     setLoading(true);
-    const token = sessionStorage.getItem('token');
+    const token = AsyncStorage.getItem("token");
     if (token) {
       api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
       setAuthenticated(true);
@@ -83,7 +83,6 @@ function AuthProvider({ children }) {
         console.log(data);
         setTokenMSG(data.TOKEN_MSG);
         setUser(data);
-        
         await AsyncStorage.setItem("vID", data.USER_ID);
         await AsyncStorage.setItem("vNome", data.NOME);
         await AsyncStorage.setItem("vSobrenome", data.SOBRENOME);
@@ -190,7 +189,6 @@ function AuthProvider({ children }) {
             await AsyncStorage.setItem("vTelefone", json.TELEFONE);
             await AsyncStorage.setItem("vEmail", json.EMAIL);
             await AsyncStorage.setItem("vTokenMSG", json.TOKEN_MSG);
-  
             api.defaults.headers.Authorization = `Bearer ${token}`;
             setLoading(false);
             setUser(response.data);
@@ -283,14 +281,3 @@ function AuthProvider({ children }) {
 }
 
 export { AuthContext, AuthProvider }
-
-
-/**
- * referência 
-      const A = sessionStorage.getItem("flag") === "true";
-      setHideFooter(A);
-  
-      if (!A) {
-        sessionStorage.setItem("flag", "true");
-      }
- */
