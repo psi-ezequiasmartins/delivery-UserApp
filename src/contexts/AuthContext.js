@@ -12,6 +12,7 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 
 import api from '../config/apiAxios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AuthContext = createContext();
 
@@ -70,55 +71,54 @@ function AuthProvider({ children }) {
     }
   }
 
-  function signIn(email, password) {
+  async function signIn(email, password) {
     setLoading(true);
-    signInWithEmailAndPassword(auth, email, password).then(async(result) => {
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
       const id = result.user.uid;
 
-      const useData = ref(db, 'users/'+id);
-      onValue(useData, (snapshot)=> {
+      const useData = ref(db, 'users/' + id);
+      onValue(useData, async (snapshot) => {
         const data = snapshot.val();
         console.log(data);
         setTokenMSG(data.TOKEN_MSG);
         setUser(data);
-        sessionStorage.setItem("vID", data.USER_ID)
-        sessionStorage.setItem("vNome", data.NOME);
-        sessionStorage.setItem("vSobrenome", data.SOBRENOME);
-        sessionStorage.setItem("vTelefone", data.TELEFONE);
-        sessionStorage.setItem("vEmail", data.EMAIL);
-        sessionStorage.setItem("vTokenMSG", data.TOKEN_MSG);
+        
+        await AsyncStorage.setItem("vID", data.USER_ID);
+        await AsyncStorage.setItem("vNome", data.NOME);
+        await AsyncStorage.setItem("vSobrenome", data.SOBRENOME);
+        await AsyncStorage.setItem("vTelefone", data.TELEFONE);
+        await AsyncStorage.setItem("vEmail", data.EMAIL);
+        await AsyncStorage.setItem("vTokenMSG", data.TOKEN_MSG);
       });
 
       const isTokenValid = await checkValidateTokenMSG(token_msg);
       if (!isTokenValid) {
-        await registerForPushNotificationsAsync().then(async(result) => {
-          setTokenMSG(result);
-          await update(child(db, `users/${id}`), {
-            "TOKEN_MSG": token_msg
-          });
+        const result = await registerForPushNotificationsAsync();
+        setTokenMSG(result);
+        await update(child(db, `users/${id}`), {
+          "TOKEN_MSG": token_msg
         });
       }
 
-      try {
-        const response = await api.post('/authenticate', { USER_ID: id, CHV: 1 });
-        // console.log({ USER_ID: id, CHV: 1 });
-        const token = response.data?.token; // Verifica se 'data' e 'token' estão definidos
-        // console.log(`Tamanho do token: ${token.length}`);
-        if (token) {
-          sessionStorage.setItem('token', JSON.stringify(token));
-          api.defaults.headers.Authorization = `Bearer ${token}`;
-          setAuthenticated(true);
-          setLoading(false);
-        } else {
-          throw new Error('Token não encontrado na resposta');
-        }
-      } catch(error) {
-        console.log('Erro ao autenticar:', error);
-        setAuthenticated(false);
+      const response = await api.post('/authenticate', { USER_ID: id, CHV: 1 });
+      // console.log({ USER_ID: id, CHV: 1 });
+      const token = response.data?.token;
+      // console.log(`Tamanho do token: ${token.length}`);
+      if (token) {
+        await AsyncStorage.setItem('token', JSON.stringify(token));
+        api.defaults.headers.Authorization = `Bearer ${token}`;
+        setAuthenticated(true);
         setLoading(false);
-        Alert.alert('E-mail e/ou senha inválidos!');
-      };
-    });
+      } else {
+        throw new Error('Token não encontrado na resposta');
+      }
+    } catch (error) {
+      console.log('Erro ao autenticar:', error);
+      setAuthenticated(false);
+      setLoading(false);
+      Alert.alert('E-mail e/ou senha inválidos!');
+    }
   }
 
   function signUp(
@@ -129,17 +129,19 @@ function AuthProvider({ children }) {
     registerForPushNotificationsAsync().then((token_msg) => {
       setTokenMSG(token_msg);
     });
-
+  
     if (!email || !password) {
       Alert.alert('Favor preencher todos os campos!');
+      setLoading(false); // Para garantir que o loading seja desativado
       return;
     }
-
+  
     if (password !== confirm_password) {
       Alert.alert('As senhas não conferem! Digite-as novamente');
+      setLoading(false); // Para garantir que o loading seja desativado
       return;
     }
-
+  
     const json = {
       "USER_ID": null, 
       "NOME": nome, 
@@ -155,14 +157,14 @@ function AuthProvider({ children }) {
       "UF": UF,
       "URL_IMAGEM": "https://via.placeholder.com/200x200",
       "TOKEN_MSG": token_msg
-    }
-
+    };
+  
     api.post('/add/usuario/', json).then(response => {
       createUserWithEmailAndPassword(auth, email, password).then(async(value) => {
         // SIGNED IN
         const id = value.user.uid;
-
-        set(ref(db, 'users/'+id), {
+  
+        set(ref(db, 'users/' + id), {
           UserID: id,
           Nome: json.NOME,
           Sobrenome: json.SOBRENOME,
@@ -176,40 +178,47 @@ function AuthProvider({ children }) {
           Cidade: json.CIDADE,
           UF: json.UF
         });
-
-        const response = await api.post('/authenticate', { USER_ID: id, CHV: 1 });
-        const token = response.data?.token;
-        if (token) {
-          sessionStorage.setItem("token", JSON.stringify(token));
-          sessionStorage.setItem("vID", data.USER_ID)
-          sessionStorage.setItem("vNome", data.NOME);
-          sessionStorage.setItem("vSobrenome", data.SOBRENOME);
-          sessionStorage.setItem("vTelefone", data.TELEFONE);
-          sessionStorage.setItem("vEmail", data.EMAIL);
-          sessionStorage.setItem("vTokenMSG", data.TOKEN_MSG);
-
-          api.defaults.headers.Authorization = `Bearer ${token}`;
+  
+        try {
+          const response = await api.post('/authenticate', { USER_ID: id, CHV: 1 });
+          const token = response.data?.token;
+          if (token) {
+            await AsyncStorage.setItem("token", JSON.stringify(token));
+            await AsyncStorage.setItem("vID", id);
+            await AsyncStorage.setItem("vNome", json.NOME);
+            await AsyncStorage.setItem("vSobrenome", json.SOBRENOME);
+            await AsyncStorage.setItem("vTelefone", json.TELEFONE);
+            await AsyncStorage.setItem("vEmail", json.EMAIL);
+            await AsyncStorage.setItem("vTokenMSG", json.TOKEN_MSG);
+  
+            api.defaults.headers.Authorization = `Bearer ${token}`;
+            setLoading(false);
+            setUser(response.data);
+            setAuthenticated(true);
+          } else {
+            throw new Error('Token não encontrado na resposta');
+          }
+        } catch (error) {
+          setAuthenticated(false);
           setLoading(false);
-          setUser(response.data);
-          setAuthenticated(true);
-        } else {
-          throw new Error('Token não encontrado na resposta');
+          Alert.alert('Erro ao autenticar:', error.message);
         }
       }).catch(error => {
         setAuthenticated(false);
         setLoading(false);
         if (error.message === 'Password should be at least 6 characters') {
           Alert.alert('A senha deverá conter pelo menos 6 caracteres'); 
-        } else 
-        if (error.message === 'The email address is badly formatted.') {
+        } else if (error.message === 'The email address is badly formatted.') {
           Alert.alert('O formato do E-mail está incorreto') 
-        } else
-        if (error.message === 'The email address is already in use by another account.') {
+        } else if (error.message === 'The email address is already in use by another account.') {
           Alert.alert('E-mail já em uso por outra conta');
         } else {
           Alert.alert('Erro ao criar conta: ' + error.message);
         }
-      })
+      });
+    }).catch(error => {
+      setLoading(false);
+      Alert.alert('Erro ao adicionar usuário:', error.message);
     });
   }
 
@@ -227,13 +236,13 @@ function AuthProvider({ children }) {
     await auth.signOut();
     setAuthenticated(false);
     api.defaults.headers.Authorization = undefined;
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("vID")
-    sessionStorage.removeItem("vNome");
-    sessionStorage.removeItem("vSobrenome");
-    sessionStorage.removeItem("vTelefone");
-    sessionStorage.removeItem("vEmail");
-    sessionStorage.removeItem("vTokenMSG");
+    await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("vID");
+    await AsyncStorage.removeItem("vNome");
+    await AsyncStorage.removeItem("vSobrenome");
+    await AsyncStorage.removeItem("vTelefone");
+    await AsyncStorage.removeItem("vEmail");
+    await AsyncStorage.removeItem("vTokenMSG");
     console.clear();
     setUser(null);
   }
