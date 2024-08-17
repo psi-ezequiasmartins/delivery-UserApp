@@ -12,17 +12,25 @@ import { OrderProvider } from './src/contexts/OrderContext';
 
 import Routes from './src/routes';
 
+const theme = {
+  colors: {
+    primary: '#000',
+    secondary: '#FFF',
+    accent: '#FFA092',
+  },
+};
+
 export default function App() {
   return (
-    <NavigationContainer>
-      <AuthProvider>
+    <AuthProvider>
+      <NavigationContainer>
         <CartProvider>
           <OrderProvider>
-            <StatusBar style="auto" backgroundColor='#FFA092'/>
+            <StatusBar style="auto" backgroundColor={theme.colors.accent} />
             <Routes/>
           </OrderProvider>
         </CartProvider>
-      </AuthProvider>
-    </NavigationContainer>
+      </NavigationContainer>
+    </AuthProvider>
   );
 }

@@ -3,49 +3,42 @@
  */
 
 import { useState, useEffect, createContext } from 'react';
+import { Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { getDatabase, ref, set, onValue, child, update } from "firebase/database";
 import { firebase_app } from '../config/apiFirebase';
-import { Alert } from 'react-native';
-
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-
 import api from '../config/apiAxios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AuthContext = createContext();
 
-/**
- * src/contexts/AuthContext.js
- */
-
 function AuthProvider({ children }) {
   const auth = getAuth(firebase_app);
-  const db = getDatabase();
+  const db = getDatabase(firebase_app);
   const [ authenticated, setAuthenticated ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ user, setUser ] = useState(null);
-  const [ token_msg, setTokenMSG ] = useState("");
+  const [ tokenMsg, setTokenMSG ] = useState("");
   const [ notify, setNotify ] = useState(false);
   
   const token = '';
 
-  // useEffect(() => {
-  //   setLoading(true);
-  //   const token = AsyncStorage.getItem("token");
-  //   if (token) {
-  //     api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
-  //     setAuthenticated(true);
-  //   }
-  //   setLoading(false);
-  // }, []);
+  useEffect(() => {
+    async function checkToken() {
+      setLoading(true);
+      const token = AsyncStorage.getItem("token");
+      if (token) {
+        api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
+        setAuthenticated(true);
+      }
+      setLoading(false);
+    }
+    checkToken();
+  }, []);
 
-  function SetNotificationSMS(notification) {
-    setNotify(notification);
-  }
-
-  async function checkValidateTokenMSG(pushToken) {
+  async function checkValidateTokenMsg(pushToken) {
     try {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') {
@@ -77,27 +70,27 @@ function AuthProvider({ children }) {
     }
   }
 
+  function SetNotificationSMS(notification) {
+    setNotify(notification);
+  }
+
   async function signIn(email, password) {
     setLoading(true);
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       const id = result.user.uid;
-
       const useData = ref(db, 'users/' + id);
       onValue(useData, async (snapshot) => {
         const data = snapshot.val();
         console.log(data);
         setTokenMSG(data.TOKEN_MSG);
         setUser(data);
-        await AsyncStorage.setItem("vID", data.USER_ID);
-        await AsyncStorage.setItem("vNome", data.NOME);
-        await AsyncStorage.setItem("vSobrenome", data.SOBRENOME);
-        await AsyncStorage.setItem("vTelefone", data.TELEFONE);
-        await AsyncStorage.setItem("vEmail", data.EMAIL);
-        await AsyncStorage.setItem("vTokenMSG", data.TOKEN_MSG);
+        await AsyncStorage.multiSet(
+          ["vID", data.UserID], ["vNome", data.NOME], ["vSobrenome", data.SOBRENOME], ["vTelefone", data.TELEFONE], ["vEmail", data.EMAIL], ["vTokenMSG", data.TOKEN_MSG]
+        )
       });
 
-      const isTokenValid = await checkValidateTokenMSG(token_msg);
+      const isTokenValid = await checkValidateTokenMsg(token_msg);
       if (!isTokenValid) {
         const result = await registerForPushNotificationsAsync();
         setTokenMSG(result);
@@ -106,10 +99,8 @@ function AuthProvider({ children }) {
         });
       }
 
-      const response = await api.post('/authenticate', { USER_ID: id, CHV: 1 });
-      // console.log({ USER_ID: id, CHV: 1 });
-      const token = response.data?.token;
-      // console.log(`Tamanho do token: ${token.length}`);
+      const response = await api.post('/authenticate', { USER_ID: id, CHV: 1 });  // console.log({ USER_ID: id, CHV: 1 });
+      const token = response.data?.token; // console.log(`Tamanho do token: ${token.length}`);
       if (token) {
         await AsyncStorage.setItem('token', JSON.stringify(token));
         api.defaults.headers.Authorization = `Bearer ${token}`;
@@ -126,133 +117,118 @@ function AuthProvider({ children }) {
     }
   }
 
-  function signUp(
+  async function signUp(
     nome, sobrenome, CEP, endereco, complemento, bairro, cidade, UF, telefone, email, 
     password, confirm_password
   ) {
     setLoading(true);
-    registerForPushNotificationsAsync().then((token_msg) => {
-      setTokenMSG(token_msg);
-    });
+    const tokenMsg = await registerForPushNotificationsAsync();
+    setTokenMSG(tokenMsg);
 
     if (!email || !password) {
       Alert.alert('Favor preencher todos os campos!');
-      setLoading(false); // Para garantir que o loading seja desativado
+      setLoading(false); 
       return;
     }
 
     if (password !== confirm_password) {
       Alert.alert('As senhas não conferem! Digite-as novamente');
-      setLoading(false); // Para garantir que o loading seja desativado
+      setLoading(false); 
       return;
     }
   
-    const json = {
-      "USER_ID": null, 
-      "NOME": nome, 
-      "SOBRENOME": sobrenome,
-      "TELEFONE": telefone, 
-      "EMAIL": email, 
-      "CEP": CEP,
-      "ENDERECO": endereco,
-      "NUMERO": numero,
-      "COMPLEMENTO": complemento,
-      "BAIRRO": bairro,
-      "CIDADE": cidade, 
-      "UF": UF,
-      "URL_IMAGEM": "https://via.placeholder.com/200x200",
-      "TOKEN_MSG": token_msg
+    const userData = {
+      USER_ID: null, 
+      NOME: nome, 
+      SOBRENOME: sobrenome,
+      TELEFONE: telefone, 
+      EMAIL: email, 
+      CEP: CEP,
+      ENDERECO: endereco,
+      NUMERO: numero,
+      COMPLEMENTO: complemento,
+      BAIRRO: bairro,
+      CIDADE: cidade, 
+      UF: UF,
+      URL_IMAGEM: "https://via.placeholder.com/200x200",
+      TOKEN_MSG: tokenMsg
     };
-  
-    api.post('/add/usuario/', json).then(response => {
-      createUserWithEmailAndPassword(auth, email, password).then(async(value) => {
-        // SIGNED IN
-        const id = value.user.uid;
-  
-        set(ref(db, 'users/' + id), {
-          UserID: id,
-          Nome: json.NOME,
-          Sobrenome: json.SOBRENOME,
-          Email: json.EMAIL,
-          Telefone: json.TELEFONE,
-          CEP: json.CEP,
-          Endereco: json.ENDERECO,
-          Numero: json.NUMERO,
-          Complemento: json.COMPLEMENTO,
-          Bairro: json.BAIRRO,
-          Cidade: json.CIDADE,
-          UF: json.UF
-        });
-  
-        try {
-          const response = await api.post('/authenticate', { USER_ID: id, CHV: 1 });
-          const token = response.data?.token;
-          if (token) {
-            await AsyncStorage.setItem("token", JSON.stringify(token));
-            await AsyncStorage.setItem("vID", id);
-            await AsyncStorage.setItem("vNome", json.NOME);
-            await AsyncStorage.setItem("vSobrenome", json.SOBRENOME);
-            await AsyncStorage.setItem("vTelefone", json.TELEFONE);
-            await AsyncStorage.setItem("vEmail", json.EMAIL);
-            await AsyncStorage.setItem("vTokenMSG", json.TOKEN_MSG);
-            api.defaults.headers.Authorization = `Bearer ${token}`;
-            setLoading(false);
-            setUser(response.data);
-            setAuthenticated(true);
-          } else {
-            throw new Error('Token não encontrado na resposta');
-          }
-        } catch (error) {
-          setAuthenticated(false);
-          setLoading(false);
-          Alert.alert('Erro ao autenticar:', error.message);
-        }
-      }).catch(error => {
-        setAuthenticated(false);
-        setLoading(false);
-        if (error.message === 'Password should be at least 6 characters') {
-          Alert.alert('A senha deverá conter pelo menos 6 caracteres'); 
-        } else if (error.message === 'The email address is badly formatted.') {
-          Alert.alert('O formato do E-mail está incorreto') 
-        } else if (error.message === 'The email address is already in use by another account.') {
-          Alert.alert('E-mail já em uso por outra conta');
-        } else {
-          Alert.alert('Erro ao criar conta: ' + error.message);
-        }
+
+    try {
+      api.post('/add/usuario/', userData);
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const id = result.user.uid;
+
+      await set(ref(db, 'users/' + id), {
+        UserID: id,
+        Nome: userData.NOME,
+        Sobrenome: userData.SOBRENOME,
+        Email: userData.EMAIL,
+        Telefone: userData.TELEFONE,
+        CEP: userData.CEP,
+        Endereco: userData.ENDERECO,
+        Numero: userData.NUMERO,
+        Complemento: userData.COMPLEMENTO,
+        Bairro: userData.BAIRRO,
+        Cidade: userData.CIDADE,
+        UF: userData.UF
       });
-    }).catch(error => {
+
+      const response = await api.post('/authenticate', { USER_ID: id, CHV: 1 });
+      const token = response.data?.token;
+      if (token) {
+        await AsyncStorage.setItem("token", JSON.stringify(token));
+        await AsyncStorage.setItem("vID", id);
+        await AsyncStorage.setItem("vNome", userData.NOME);
+        await AsyncStorage.setItem("vSobrenome", userData.SOBRENOME);
+        await AsyncStorage.setItem("vTelefone", userData.TELEFONE);
+        await AsyncStorage.setItem("vEmail", userData.EMAIL);
+        await AsyncStorage.setItem("vTokenMSG", userData.TOKEN_MSG);
+
+        api.defaults.headers.Authorization = `Bearer ${token}`;
+        setLoading(false);
+        setUser(response.data);
+        setAuthenticated(true);
+      } else {
+        throw new Error('Token não encontrado na resposta');
+      }
+    } catch (error) {
+      setAuthenticated(false);
       setLoading(false);
-      Alert.alert('Erro ao adicionar usuário:', error.message);
-    });
+      if (error.message === 'Password should be at least 6 characters') {
+        Alert.alert('A senha deverá conter pelo menos 6 caracteres'); 
+      } else if (error.message === 'The email address is badly formatted.') {
+        Alert.alert('O formato do E-mail está incorreto') 
+      } else if (error.message === 'The email address is already in use by another account.') {
+        Alert.alert('E-mail já em uso por outra conta');
+      } else {
+        Alert.alert('Erro ao criar conta: ' + error.message);
+      }
+    }
   }
 
-  function changePassword(email) {
-    sendPasswordResetEmail(auth, email).then(() => {
+  async function changePassword(email) {
+    try {
+      await sendPasswordResetEmail(auth, email);
       Alert.alert("Email de Recuperação enviado com sucesso! Confira sua caixa de Entrada.");
       setAuthenticated(false);
-    }).catch(error => {
+    } catch (error) {
       Alert.alert('Erro ao enviar email: ' + error.message);
       setAuthenticated(false);
-    })
+    }
   }
 
   async function signOut() {
-    await auth.signOut();
+    await firebaseSignOut(auth);
     setAuthenticated(false);
     api.defaults.headers.Authorization = undefined;
-    await AsyncStorage.removeItem("token");
-    await AsyncStorage.removeItem("vID");
-    await AsyncStorage.removeItem("vNome");
-    await AsyncStorage.removeItem("vSobrenome");
-    await AsyncStorage.removeItem("vTelefone");
-    await AsyncStorage.removeItem("vEmail");
-    await AsyncStorage.removeItem("vTokenMSG");
+    await AsyncStorage.multiRemove(["token", "vID", "vNome", "vSobrenome", "vTelefone", "vEmail", "vTokenMSG"]);
     console.clear();
     setUser(null);
   }
 
   async function registerForPushNotificationsAsync() {
-    let token_msg;
+    let tokenMsg;
     if (Device.isDevice) {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
@@ -264,7 +240,7 @@ function AuthProvider({ children }) {
         alert('Falha ao obter Token push para notificação push!');
         return;
       }
-      token_msg = (await Notifications.getExpoPushTokenAsync()).data;
+      tokenMsg = (await Notifications.getExpoPushTokenAsync()).data;
     } else {
       alert('É necessário um dispositivo físico para notificações push');
     }
@@ -273,14 +249,19 @@ function AuthProvider({ children }) {
         "name": 'default',
         "importance": Notifications.AndroidImportance.MAX,
         "vibrationPattern": [0, 250, 250, 250],
-        "lightColor": '#4DCE4D',
+        "lightColor": '#FF231F7C',
       });
     }
-    return token_msg;
+    return tokenMsg;
   };
 
   return(
-    <AuthContext.Provider value={{ signed: !!authenticated, user, setUser, loading, notify, token_msg, signIn, signUp, changePassword, signOut, SetNotificationSMS }}>
+    <AuthContext.Provider value={{ 
+      signed: !!user, user, authenticated, 
+      loading, notify, tokenMsg, 
+      signIn, signUp, changePassword, signOut, 
+      SetNotificationSMS,
+      checkValidateTokenMsg }}>
       { children }
     </AuthContext.Provider> 
   )
