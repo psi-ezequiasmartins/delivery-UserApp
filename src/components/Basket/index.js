@@ -20,7 +20,7 @@ export default function BasketItem({ item, AddQtd, RemoveQtd }) {
       async function loadProdutoInfo() {
         await api.get(`/produto/${id}`).then((snapshot) => {
           setProduto(snapshot.data[0]);
-          console.log(produto);
+          // console.log(produto);
         });
       }
       loadProdutoInfo();

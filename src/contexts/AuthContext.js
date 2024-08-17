@@ -4,12 +4,12 @@
 
 import { useState, useEffect, createContext } from 'react';
 import { Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { getDatabase, ref, set, onValue, child, update } from "firebase/database";
 import { firebase_app } from '../config/apiFirebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
 import api from '../config/apiAxios';
 
 const AuthContext = createContext();
@@ -27,13 +27,13 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     async function checkToken() {
-      setLoading(true);
+      // setLoading(true);
       const token = AsyncStorage.getItem("token");
       if (token) {
         api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
         setAuthenticated(true);
       }
-      setLoading(false);
+      // setLoading(false);
     }
     checkToken();
   }, []);
@@ -82,11 +82,16 @@ function AuthProvider({ children }) {
       const useData = ref(db, 'users/' + id);
       onValue(useData, async (snapshot) => {
         const data = snapshot.val();
-        console.log(data);
+        console.log('dados recuperado do Firebase Auth: ', data);
         setTokenMSG(data.TOKEN_MSG);
         setUser(data);
         await AsyncStorage.multiSet(
-          ["vID", data.UserID], ["vNome", data.NOME], ["vSobrenome", data.SOBRENOME], ["vTelefone", data.TELEFONE], ["vEmail", data.EMAIL], ["vTokenMSG", data.TOKEN_MSG]
+          ["vID", data.UserID], 
+          ["vNome", data.NOME], 
+          ["vSobrenome", data.SOBRENOME], 
+          ["vTelefone", data.TELEFONE], 
+          ["vEmail", data.EMAIL], 
+          ["vTokenMSG", data.TOKEN_MSG]
         )
       });
 
@@ -171,7 +176,8 @@ function AuthProvider({ children }) {
         Complemento: userData.COMPLEMENTO,
         Bairro: userData.BAIRRO,
         Cidade: userData.CIDADE,
-        UF: userData.UF
+        UF: userData.UF,
+        TokenMSG: tokenMsg 
       });
 
       const response = await api.post('/authenticate', { USER_ID: id, CHV: 1 });
