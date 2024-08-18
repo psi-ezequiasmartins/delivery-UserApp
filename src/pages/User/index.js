@@ -14,7 +14,7 @@ import api from '../../config/apiAxios';
 
 export default function Perfil() {
   const navigation = useNavigation();
-  const { user, setUser, token_msg, signOut } = useContext(AuthContext);
+  const { user, setUser, tokenMsg, signOut } = useContext(AuthContext);
 
   const [ nome, setNome ] = useState(user?.NOME || "");
   const [ sobrenome, setSobrenome ] = useState(user?.SOBRENOME || "");
@@ -49,7 +49,7 @@ export default function Perfil() {
       "BAIRRO": bairro, 
       "CIDADE": cidade, 
       "UF": UF,
-      "TOKEN_MSG": token_msg
+      "TOKEN_MSG": tokenMsg
     }
     try {
       await api.put(`/update/usuario/${user.UserID} `, json).then(response => {

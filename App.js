@@ -22,15 +22,15 @@ const theme = {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <NavigationContainer>
+    <NavigationContainer>
+      <AuthProvider>
         <CartProvider>
           <OrderProvider>
             <StatusBar style="auto" backgroundColor={theme.colors.accent} />
-            <Routes/>
+            <Routes />
           </OrderProvider>
         </CartProvider>
-      </NavigationContainer>
-    </AuthProvider>
+      </AuthProvider>
+    </NavigationContainer>
   );
 }

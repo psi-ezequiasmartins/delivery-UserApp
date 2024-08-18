@@ -18,7 +18,7 @@ export default function Cesta() {
   const navigation = useNavigation();
   const { delivery, basket, subtotal, AddToBasket, RemoveFromBasket, CleanBasket } = useContext(CartContext);
   const { createOrder } = useContext(OrderContext);
-  const { user, token_usr } = useContext(AuthContext);
+  const { user, tokenMsg } = useContext(AuthContext);
   const [ total, setTotal ] = useState(0);
   
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function Cesta() {
       VrSubTotal: parseFloat(subtotal),
       TaxaEntrega: parseFloat(delivery.TaxaEntrega),
       VrTotal: parseFloat(subtotal) + parseFloat(delivery?.TaxaEntrega),
-      TokenSMS: token_usr,
+      TokenMSG: tokenMsg,
       Status: "NOVO",
       itens: formattedBasket,
     };

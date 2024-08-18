@@ -95,12 +95,12 @@ function AuthProvider({ children }) {
         )
       });
 
-      const isTokenValid = await checkValidateTokenMsg(token_msg);
+      const isTokenValid = await checkValidateTokenMsg();
       if (!isTokenValid) {
         const result = await registerForPushNotificationsAsync();
         setTokenMSG(result);
         await update(child(db, `users/${id}`), {
-          "TOKEN_MSG": token_msg
+          "TOKEN_MSG": tokenMsg
         });
       }
 
@@ -127,8 +127,8 @@ function AuthProvider({ children }) {
     password, confirm_password
   ) {
     setLoading(true);
-    const tokenMsg = await registerForPushNotificationsAsync();
-    setTokenMSG(tokenMsg);
+    const tokenForPushNotifications = await registerForPushNotificationsAsync();
+    setTokenMSG(tokenForPushNotifications);
 
     if (!email || !password) {
       Alert.alert('Favor preencher todos os campos!');
@@ -177,7 +177,7 @@ function AuthProvider({ children }) {
         Bairro: userData.BAIRRO,
         Cidade: userData.CIDADE,
         UF: userData.UF,
-        TokenMSG: tokenMsg 
+        TokenMsg: userData.TOKEN_MSG 
       });
 
       const response = await api.post('/authenticate', { USER_ID: id, CHV: 1 });
@@ -263,11 +263,11 @@ function AuthProvider({ children }) {
 
   return(
     <AuthContext.Provider value={{ 
-      signed: !!user, user, authenticated, 
+      signed: !!authenticated, user,
+      signIn, signUp,  signOut, changePassword,
       loading, notify, tokenMsg, 
-      signIn, signUp, changePassword, signOut, 
-      SetNotificationSMS,
-      checkValidateTokenMsg }}>
+      SetNotificationSMS
+    }}>
       { children }
     </AuthContext.Provider> 
   )
