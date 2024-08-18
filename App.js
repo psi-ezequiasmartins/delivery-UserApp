@@ -14,9 +14,7 @@ import Routes from './src/routes';
 
 const theme = {
   colors: {
-    primary: '#000',
-    secondary: '#FFF',
-    accent: '#FFA092',
+    primary: '#000', secondary: '#FFF', accent: '#E0F1FF'
   },
 };
 

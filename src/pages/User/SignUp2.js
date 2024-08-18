@@ -77,7 +77,7 @@ export default function SignUp2(props) {
 
       <View style={styles.header}>
         <Text style={styles.title}>Olá! {nome + ' ' + sobrenome}</Text>
-        <Text style={styles.subtitle}>Por favor, preencha o formulário abaixo com o endereço completo para suas entregas.</Text>
+        <Text style={styles.subtitle}>Por favor, preencha o formulário abaixo com endereço completo para suas entregas.</Text>
       </View>
 
       <View style={styles.row}>
@@ -184,11 +184,9 @@ export default function SignUp2(props) {
       <TouchableOpacity style={styles.btnSubmit} onPress={avancar}>
         <Text style={styles.btnTxt}> AVANÇAR </Text>
       </TouchableOpacity>
-
       <TouchableOpacity style={styles.btnSubmit} onPress={()=>navigation.navigate('SignUp1')}>
         <Text style={styles.btnTxt}> VOLTAR </Text>
       </TouchableOpacity>
-
       <TouchableOpacity style={styles.link} onPress={()=>navigation.navigate('SignIn')}>
         <Text style={styles.linkTxt}>Já tenho uma Conta!</Text>
       </TouchableOpacity>
@@ -273,7 +271,6 @@ const styles = StyleSheet.create({
   },
   link: {
     marginTop: 10,
-    marginBottom: 10,
   },
   linkTxt:{
     textAlign: "center",

@@ -6,7 +6,7 @@ import { useState, useEffect, createContext } from 'react';
 import { Alert } from 'react-native';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { getDatabase, ref, set, onValue, child, update } from "firebase/database";
-import { firebase_app } from '../config/apiFirebase';
+import { auth, firebase_app } from '../config/apiFirebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -15,14 +15,13 @@ import api from '../config/apiAxios';
 const AuthContext = createContext();
 
 function AuthProvider({ children }) {
-  const auth = getAuth(firebase_app);
   const db = getDatabase(firebase_app);
   const [ authenticated, setAuthenticated ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ user, setUser ] = useState(null);
   const [ tokenMsg, setTokenMSG ] = useState("");
   const [ notify, setNotify ] = useState(false);
-  
+
   const token = '';
 
   useEffect(() => {
@@ -85,14 +84,14 @@ function AuthProvider({ children }) {
         console.log('dados recuperado do Firebase Auth: ', data);
         setTokenMSG(data.TOKEN_MSG);
         setUser(data);
-        await AsyncStorage.multiSet(
+        await AsyncStorage.multiSet([
           ["vID", data.UserID], 
           ["vNome", data.NOME], 
           ["vSobrenome", data.SOBRENOME], 
           ["vTelefone", data.TELEFONE], 
           ["vEmail", data.EMAIL], 
           ["vTokenMSG", data.TOKEN_MSG]
-        )
+        ]);
       });
 
       const isTokenValid = await checkValidateTokenMsg();
@@ -234,7 +233,7 @@ function AuthProvider({ children }) {
   }
 
   async function registerForPushNotificationsAsync() {
-    let tokenMsg;
+    let token;
     if (Device.isDevice) {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
@@ -246,19 +245,20 @@ function AuthProvider({ children }) {
         alert('Falha ao obter Token push para notificação push!');
         return;
       }
-      tokenMsg = (await Notifications.getExpoPushTokenAsync()).data;
+      token = (await Notifications.getExpoPushTokenAsync({ projectId: process.env.YOUR_PROJECT_ID})).data;
+      console.log('tokenMsg: ', token);
     } else {
       alert('É necessário um dispositivo físico para notificações push');
     }
-    if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync('default', {
-        "name": 'default',
-        "importance": Notifications.AndroidImportance.MAX,
-        "vibrationPattern": [0, 250, 250, 250],
-        "lightColor": '#FF231F7C',
-      });
-    }
-    return tokenMsg;
+    // if (Platform.OS === 'android') {
+    //   Notifications.setNotificationChannelAsync('default', {
+    //     "name": 'default',
+    //     "importance": Notifications.AndroidImportance.MAX,
+    //     "vibrationPattern": [0, 250, 250, 250],
+    //     "lightColor": '#FF231F7C',
+    //   });
+    // }
+    return token;
   };
 
   return(

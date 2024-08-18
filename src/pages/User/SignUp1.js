@@ -153,7 +153,6 @@ const styles = StyleSheet.create({
   },
   link: {
     marginTop: 10,
-    marginBottom: 10,
   },
   linkTxt:{
     textAlign: "center",

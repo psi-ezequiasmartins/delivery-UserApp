@@ -66,7 +66,7 @@ export default function SignUp3(props) {
 
         <View style={styles.header}>
           <Image style={styles.logo} source={icon} resizeMode="contain" />
-          <Text style={styles.subtitle}>Já estamos concluindo, só mais um pouquinho...</Text>
+          <Text style={styles.subtitle}>Já estamos concluindo...</Text>
           <Text style={styles.subtitle}>Informe seu telefone e email, defina um senha com 6 dígitos numéricos.</Text>
         </View>
 
@@ -211,7 +211,6 @@ const styles = StyleSheet.create({
   },
   link: {
     marginTop: 10,
-    marginBottom: 10,
   },
   linkTxt:{
     textAlign: "center",

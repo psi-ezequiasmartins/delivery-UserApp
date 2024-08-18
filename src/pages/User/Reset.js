@@ -1,5 +1,5 @@
 /**
- * src/pages/User/SignIn.js
+ * src/pages/User/Reset.js
  */
 
 import React, { useState, useContext } from 'react';
@@ -10,12 +10,11 @@ import { AuthContext } from '../../contexts/AuthContext';
 import icon from '../../../assets/icon.png';
 import marca from '../../../assets/logomarca.png';
 
-export default function SignIn() {
+export default function Reset() {
   const navigation = useNavigation();
-  const { signIn, loading } = useContext(AuthContext);
+  const { changePassword, loading } = useContext(AuthContext);
 
   const [ email, setEmail ] = useState('');
-  const [ password, setPassword]  = useState('');
 
   return (
     <SafeAreaView style={styles.background}>
@@ -24,8 +23,8 @@ export default function SignIn() {
         <View style={styles.header}>
           <Image style={styles.logo} source={icon} resizeMode="contain" />
           <Image style={styles.marca} source={marca} resizeMode="contain" />
-          <Text style={styles.title}>Seja bem vindo!</Text>
-          <Text style={styles.subtitle}>UserApp v2.0</Text>
+          <Text style={styles.title}>Recuperar Acesso</Text>
+          <Text style={styles.subtitle}>Enviaremos um link de recuperação para o e-mail cadastrado:</Text>
         </View>
 
         <View style={styles.areaInput}>
@@ -42,22 +41,6 @@ export default function SignIn() {
           />
         </View>
 
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 10}}>Senha:</Text>
-          <TextInput
-            value={password}
-            onChangeText={(input)=>setPassword(input)}
-            placeholder='Senha (6 dígitos numéricos)'
-            autoCapitalize='none'
-            autoCorrect={false}
-            secureTextEntry={true}
-            keyboardType='numeric'
-            textContentType='password'
-            onSubmitEditing={() => Keyboard.dismiss()}
-            style={styles.input}
-          />
-        </View>
-
         <TouchableOpacity style={styles.btnSubmit} onPress={()=>signIn(email, password)}>
           {loading ? (
             <View style={styles.indicator}>
@@ -65,15 +48,16 @@ export default function SignIn() {
               <ActivityIndicator size="large" color='#FFF999' />
             </View> 
           ) : (
-            <Text style={styles.btnTxt}> ACESSAR </Text>
+            <Text style={styles.btnTxt}> ENVIAR LINK </Text>
           )}
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.link} onPress={()=>navigation.navigate('SignUp1')}>
           <Text style={styles.linkTxt}>Ainda não possui Conta? Junte-se a Nós!</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.link} onPress={()=>navigation.navigate('Reset')}>
-          <Text style={styles.linkTxt}>Esqueceu sua senha? Clique aqui.</Text>
+
+        <TouchableOpacity style={styles.link} onPress={()=>navigation.navigate('SignIn')}>
+          <Text style={styles.linkTxt}>Retornar para o Login</Text>
         </TouchableOpacity>
 
       </View>
@@ -150,6 +134,7 @@ const styles = StyleSheet.create({
   },
   link: {
     marginTop: 10,
+    marginBottom: 10,
   },
   linkTxt:{
     textAlign: "center",

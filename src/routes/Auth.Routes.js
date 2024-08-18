@@ -9,6 +9,7 @@ import SignIn from '../pages/User/SignIn';
 import SignUp1 from '../pages/User/SignUp1';
 import SignUp2 from '../pages/User/SignUp2';
 import SignUp3 from '../pages/User/SignUp3';
+import Reset from '../pages/User/reset';
 
 const AuthStack = createNativeStackNavigator();
 
@@ -44,6 +45,11 @@ export default function AuthRoutes() {
       <AuthStack.Screen 
         name="SignUp3" 
         component={SignUp3}
+        options={screenOptions}
+      />
+      <AuthStack.Screen 
+        name="Reset" 
+        component={Reset}
         options={screenOptions}
       />
     </AuthStack.Navigator>
