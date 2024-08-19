@@ -4,7 +4,7 @@
 
 import { useState, useEffect, createContext } from 'react';
 import { Alert } from 'react-native';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut as firebaseSignOut } from "firebase/auth";
 import { getDatabase, ref, set, onValue, child, update } from "firebase/database";
 import { auth, firebase_app } from '../config/apiFirebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,17 +22,13 @@ function AuthProvider({ children }) {
   const [ tokenMsg, setTokenMSG ] = useState("");
   const [ notify, setNotify ] = useState(false);
 
-  const token = '';
-
   useEffect(() => {
     async function checkToken() {
-      // setLoading(true);
-      const token = AsyncStorage.getItem("token");
+      const token = await AsyncStorage.getItem("token");
       if (token) {
         api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
         setAuthenticated(true);
       }
-      // setLoading(false);
     }
     checkToken();
   }, []);
@@ -85,7 +81,7 @@ function AuthProvider({ children }) {
         setTokenMSG(data.TOKEN_MSG);
         setUser(data);
         await AsyncStorage.multiSet([
-          ["vID", data.UserID], 
+          ["vID", data.UserID.asString()], 
           ["vNome", data.NOME], 
           ["vSobrenome", data.SOBRENOME], 
           ["vTelefone", data.TELEFONE], 
