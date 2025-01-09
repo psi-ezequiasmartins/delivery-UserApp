@@ -77,7 +77,7 @@ function AuthProvider({ children }) {
       const useData = ref(db, 'users/' + id);
       onValue(useData, async (snapshot) => {
         const data = snapshot.val();
-        console.log('dados recuperado do Firebase Auth: ', data);
+        console.log('dados recuperados do Firebase Auth: ', data);
         setTokenMSG(data.TOKEN_MSG);
         setUser(data);
         await AsyncStorage.multiSet([
