@@ -9,7 +9,7 @@ import SignIn from '../pages/User/SignIn';
 import SignUp1 from '../pages/User/SignUp1';
 import SignUp2 from '../pages/User/SignUp2';
 import SignUp3 from '../pages/User/SignUp3';
-import Reset from '../pages/User/reset';
+import Reset from '../pages/User/Reset';
 
 const AuthStack = createNativeStackNavigator();
 

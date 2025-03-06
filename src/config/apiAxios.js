@@ -4,7 +4,7 @@
 
 import axios from "axios";
 
-const URL = "https://srv.deliverybairro.com"; // (produção) // 'http://192.168.0.9:3333'; // (desenvolvimento) //
+const URL = 'http://localhost:3359'; // "https://srv.deliverybairro.com"; // 
 
 const api = axios.create({
   baseURL: URL,

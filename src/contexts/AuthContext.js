@@ -8,8 +8,10 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswor
 import { getDatabase, ref, set, onValue, child, update } from "firebase/database";
 import { auth, firebase_app } from '../config/apiFirebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
+// import * as Device from 'expo-device';
+// import * as Notifications from 'expo-notifications';
+// import Constants from 'expo-constants';
+
 import api from '../config/apiAxios';
 
 const AuthContext = createContext();
@@ -19,8 +21,8 @@ function AuthProvider({ children }) {
   const [ authenticated, setAuthenticated ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ user, setUser ] = useState(null);
-  const [ tokenMsg, setTokenMSG ] = useState("");
-  const [ notify, setNotify ] = useState(false);
+  // const [ tokenMsg, setTokenMSG ] = useState("");
+  // const [ notify, setNotify ] = useState(false);
 
   useEffect(() => {
     async function checkToken() {
@@ -33,41 +35,41 @@ function AuthProvider({ children }) {
     checkToken();
   }, []);
 
-  async function checkValidateTokenMsg(pushToken) {
-    try {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Permissão de notificação não concedida.');
-        return false;
-      }
-      const notification = {
-        "to": pushToken,
-        "title": "DeliveryBairro.com",
-        "body": "Verificação de Token: "+pushToken,
-      };
-      const response = await fetch('https://exp.host/--/api/v2/push/send', {
-        "method": 'POST',
-        "headers": {
-          "Accept": 'application/json',
-          'Content-Type': 'application/json',
-        },
-        "body": JSON.stringify(notification),
-      });
-      const result = await response.json();
-      if (result.data && result.data[0].status === 'ok') {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      console.log('Erro ao verificar a validade do token:', error);
-      return false;
-    }
-  }
+  // async function checkValidateTokenMsg(pushToken) {
+  //   try {
+  //     const { status } = await Notifications.requestPermissionsAsync();
+  //     if (status !== 'granted') {
+  //       console.log('Permissão de notificação não concedida.');
+  //       return false;
+  //     }
+  //     const notification = {
+  //       "to": pushToken,
+  //       "title": "DeliveryBairro.com",
+  //       "body": "Verificação de Token: "+pushToken,
+  //     };
+  //     const response = await fetch('https://exp.host/--/api/v2/push/send', {
+  //       "method": 'POST',
+  //       "headers": {
+  //         "Accept": 'application/json',
+  //         'Content-Type': 'application/json',
+  //       },
+  //       "body": JSON.stringify(notification),
+  //     });
+  //     const result = await response.json();
+  //     if (result.data && result.data[0].status === 'ok') {
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   } catch (error) {
+  //     console.log('Erro ao verificar a validade do token:', error);
+  //     return false;
+  //   }
+  // }
 
-  function SetNotificationSMS(notification) {
-    setNotify(notification);
-  }
+  // function SetNotificationSMS(notification) {
+  //   setNotify(notification);
+  // }
 
   async function signIn(email, password) {
     setLoading(true);
@@ -90,14 +92,14 @@ function AuthProvider({ children }) {
         ]);
       });
 
-      const isTokenValid = await checkValidateTokenMsg();
-      if (!isTokenValid) {
-        const result = await registerForPushNotificationsAsync();
-        setTokenMSG(result);
-        await update(child(db, `users/${id}`), {
-          "TOKEN_MSG": tokenMsg
-        });
-      }
+      // const isTokenValid = await checkValidateTokenMsg();
+      // if (!isTokenValid) {
+      //   const result = await registerForPushNotificationsAsync();
+      //   setTokenMSG(result);
+      //   await update(child(db, `users/${id}`), {
+      //     "TOKEN_MSG": tokenMsg
+      //   });
+      // }
 
       const response = await api.post('/authenticate', { USER_ID: id, CHV: 1 });  // console.log({ USER_ID: id, CHV: 1 });
       const token = response.data?.token; // console.log(`Tamanho do token: ${token.length}`);
@@ -122,8 +124,8 @@ function AuthProvider({ children }) {
     password, confirm_password
   ) {
     setLoading(true);
-    const tokenForPushNotifications = await registerForPushNotificationsAsync();
-    setTokenMSG(tokenForPushNotifications);
+    // const tokenForPushNotifications = await registerForPushNotificationsAsync();
+    // setTokenMSG(tokenForPushNotifications);
 
     if (!email || !password) {
       Alert.alert('Favor preencher todos os campos!');
@@ -228,41 +230,45 @@ function AuthProvider({ children }) {
     setUser(null);
   }
 
-  async function registerForPushNotificationsAsync() {
-    let token;
-    if (Device.isDevice) {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== 'granted') {
-        alert('Falha ao obter Token push para notificação push!');
-        return;
-      }
-      token = (await Notifications.getExpoPushTokenAsync({ projectId: process.env.YOUR_PROJECT_ID})).data;
-      console.log('tokenMsg: ', token);
-    } else {
-      alert('É necessário um dispositivo físico para notificações push');
-    }
-    // if (Platform.OS === 'android') {
-    //   Notifications.setNotificationChannelAsync('default', {
-    //     "name": 'default',
-    //     "importance": Notifications.AndroidImportance.MAX,
-    //     "vibrationPattern": [0, 250, 250, 250],
-    //     "lightColor": '#FF231F7C',
-    //   });
-    // }
-    return token;
-  };
+  // async function registerForPushNotificationsAsync() {
+  //   let token;
+  //   if (Device.isDevice) {
+  //     const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  //     let finalStatus = existingStatus;
+  //     if (existingStatus !== 'granted') {
+  //       const { status } = await Notifications.requestPermissionsAsync();
+  //       finalStatus = status;
+  //     }
+  //     if (finalStatus !== 'granted') {
+  //       alert('Falha ao obter Token push para notificação push!');
+  //       return;
+  //     }
+
+  //     try {
+  //       const projectId = 
+  //         Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;          
+  //       if (!projectId) {
+  //         throw new Error('Project ID not found');
+  //       }
+  //       token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+  //       console.log('Token: ', token);
+  //     } catch (error) {
+  //       token = `${error}`
+  //     }
+  //   } else {
+  //     alert('É necessário um dispositivo físico para notificações push');
+  //   }
+  //   return token;
+  // };
 
   return(
     <AuthContext.Provider value={{ 
       signed: !!authenticated, user,
       signIn, signUp,  signOut, changePassword,
-      loading, notify, tokenMsg, 
-      SetNotificationSMS
+      loading, 
+      // notify, 
+      // tokenMsg, 
+      // SetNotificationSMS
     }}>
       { children }
     </AuthContext.Provider> 
@@ -270,3 +276,7 @@ function AuthProvider({ children }) {
 }
 
 export { AuthContext, AuthProvider }
+
+      // token = (await Notifications.getExpoPushTokenAsync({ projectId: process.env.YOUR_PROJECT_ID})).data;
+      // token = (await Notifications.getExpoPushTokenAsync()).data;
+      // console.log('tokenMsg: ', token);
