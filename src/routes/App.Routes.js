@@ -101,7 +101,7 @@ export default function AppRoutes() {
         }}
       >
         <Drawer.Screen
-          name="DeliveryBairro.com"
+          name="psi-Delivery"
           component={ TabNavigator }
           options={({ route }) => ({
             headerTitle: getHeaderTitle(route),

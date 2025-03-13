@@ -14,9 +14,9 @@ Notifications.setNotificationHandler({
   handleNotification: async() => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
-    shouldSetBadge : true
+    shouldSetBadge: true
   })
-});
+})
 
 import icon from '../../../assets/icon.png';
 import logomarca from '../../../assets/logomarca.png';
@@ -25,7 +25,7 @@ import sacola from '../../../assets/pedidos.png';
 export default function Header(props) {
   const navigation = useNavigation();
   const { basket } = useContext(CartContext);
-  const { tokenMsg, SetNotificationSMS } = useContext(AuthContext);
+  const { token_sms, SetNotificationSMS } = useContext(AuthContext);
   const [ notification, setNotification ] = useState(null);
   const notificationListener = useRef();
   const responseListener = useRef();
@@ -56,7 +56,7 @@ export default function Header(props) {
       <View style={styles.header}>
         <TouchableOpacity 
           onPress={()=> {
-            alert('DeliveryBairro UserApp v1.0' + '\n' + '(31) 98410-7540 ' + '\n' + tokenMsg);
+            alert('psi-Delivery UserApp v1.0' + '\n' + '(31) 98410-7540 ' + '\n' + token_sms);
             GoToLink("Pedidos");
           }}
         >

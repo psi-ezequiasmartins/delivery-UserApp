@@ -6,6 +6,7 @@ import React from 'react';
 import { createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import SignIn from '../pages/User/SignIn';
+
 import SignUp1 from '../pages/User/SignUp1';
 import SignUp2 from '../pages/User/SignUp2';
 import SignUp3 from '../pages/User/SignUp3';
@@ -22,7 +23,6 @@ const screenOptions = {
   headerBackTitleVisible: false,
   headerTitle: 'Voltar',
 };
-
 
 export default function AuthRoutes() {
   return(

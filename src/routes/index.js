@@ -11,7 +11,7 @@ import AppRoutes from './App.Routes';
 function Routes() {
   const { signed } = useContext(AuthContext);
 
-  return(
+  return (
     signed ? <AppRoutes/> : <AuthRoutes/> 
   )
 }
