@@ -3,34 +3,29 @@
  */
 
 import { useState, useEffect, createContext } from 'react';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut as firebaseSignOut } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut as firebaseSignOut } from "firebase/auth";
 import { getDatabase, ref, set, onValue, child, update } from "firebase/database";
-import { firebase_app } from '../config/apiFirebase';
+import { auth, firebase_app } from '../config/apiFirebase';
 import { Alert } from 'react-native';
+
+import api from '../config/apiAxios';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import api from '../config/apiAxios';
-
 const AuthContext = createContext();
 
-function AuthProvider({ children }) {
-  const auth = getAuth(firebase_app);
+function AuthProvider({ children }) { 
   const db = getDatabase(firebase_app);
   const [ authenticated, setAuthenticated ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ user, setUser ] = useState(null);
-  const [ token_sms, setTokenSMS ] = useState("");
-  const [ notify, setNotify ] = useState(false);
 
   useEffect(()=>{
     setLoading(true);
     async function tokenAutorization() {
       const token = await AsyncStorage.getItem('token');
       if (token) {
-        api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
+        api.defaults.headers.Authorization = `Bearer ${token}`;
         setAuthenticated(true);
       }
       setLoading(false); 
@@ -38,145 +33,60 @@ function AuthProvider({ children }) {
     tokenAutorization();
   }, []);
 
-  function SetNotificationSMS(notification) {
-    setNotify(notification);
-  }
-
-  async function checkValidateTokenSMS(pushToken) {
-    try {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Permissão de notificação não concedida.');
-        return false;
-      }
-      const notification = {
-        "to": pushToken,
-        "title": "DeliveryBairro.com",
-        "body": "Verificação de Token: "+pushToken,
-      };
-      const response = await fetch('https://exp.host/--/api/v2/push/send', {
-        "method": 'POST',
-        "headers": {
-          "Accept": 'application/json',
-          'Content-Type': 'application/json',
-        },
-        "body": JSON.stringify(notification),
-      });
-
-      // Verifique o código de status da resposta HTTP
-      if (!response.ok) {
-        console.log(`Erro ao enviar requisição: ${response.status} - ${response.statusText}`);
-        return false;
-      }
-
-      const result = await response.json();
-
-      // Adicione um log para verificar o que é retornado pela API
-      console.log('Resultado da resposta:', result);
-
-      // Verifique se a estrutura de 'result' é válida
-      if (result.data && result.data[0] && result.data[0].status === 'ok') {
-        return true;
-      } else {
-        console.log('Token não válido ou erro na resposta da API');
-        return false;
-      }
-    } catch (error) {
-      console.log('Erro ao verificar a validade do token:', error);
-      return false;
-    }
-  }
-
-  async function registerForPushNotificationsAsync() {
-    let token_sms;
-    if (Device.isDevice) {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== 'granted') {
-        alert('Falha ao obter Token push para notificação push!');
-        return;
-      }
-      token_sms = (await Notifications.getExpoPushTokenAsync()).data;
-    } else {
-      alert('É necessário um dispositivo físico para notificações push');
-    }
-    if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync('default', {
-        "name": 'default',
-        "importance": Notifications.AndroidImportance.MAX,
-        "vibrationPattern": [0, 250, 250, 250],
-        "lightColor": '#4DCE4D',
-      });
-    }
-    return token_sms;
-  };
-
   function signIn(email, password) {
     setLoading(true);
     signInWithEmailAndPassword(auth, email, password).then(async(result) => {
       const id = result.user.uid;
-      const useData = ref(db, 'users/' + id);
-      onValue(useData, async(snapshot) => {
+      onValue(ref(db, `users/${id}`), async(snapshot) => {
         const data = snapshot.val();
-        console.log(data);
-        setTokenSMS(data.TokenMsg);
-        setUser(data);
+        setUser(data);       
+
+        // recupera o token e os dados do usuário do dispositivo
+        const currentTime = new Date().toISOString();
         AsyncStorage.multiSet([
-          ["vID", data.UserID.asString()], 
-          ["vNome", data.Nome], ["vSobrenome", data.Sobrenome], 
-          ["vTelefone", data.Telefone], ["vEmail", data.Email], 
-          ["vTokenSMS", data.TokenMsg]
+          ["vID", String(data?.UserID)],
+          ["vNome", data?.Nome],
+          ["vSobrenome", data?.Sobrenome],
+          ["vTelefone", data?.Telefone],
+          ["vEmail", data?.Email],
+          ["vToken", data?.TokenMSG],
+          ["vTokenDT", currentTime]
         ]);
+        const userId = await AsyncStorage.getItem("vID");
+
+        // processa a autenticação do usuário e armazena o token JWT
+        try {
+          const response = await api.post('/authenticate', { USER_ID: userId, CHV: 1 });
+          const token = response.data?.token; 
+          if (token) {
+            AsyncStorage.setItem('token', JSON.stringify(token)); 
+            api.defaults.headers.Authorization = `Bearer ${token}`;
+            setAuthenticated(true);
+            setLoading(false)              
+          } else {
+            throw new Error('Token não encontrado na resposta');
+          }
+        } catch (error) {
+          console.log('Erro ao antenticar: ', error);
+          Alert.alert('Erro ao autenticar. Verifique sua conexão e tente novamente.');
+          setAuthenticated(false);
+          setLoading(false);
+        };
       });
-
-      console.log('dados recuperados e salvos em AsyncStorage e token_sms definido: ', token_sms);
-
-      const isTokenValid = await checkValidateTokenSMS(token_sms);
-      console.log(isTokenValid);
-
-      if (!isTokenValid) {
-          await registerForPushNotificationsAsync().then(async(result)=>{
-          setTokenSMS(result);
-          await update(child(db, `users/${id}`), {
-            "TOKEN_MSG": token_sms
-          });
-        });         
-      }  
-
-      console.log('token_sms validado');
-
-      try {
-        const id = await AsyncStorage.getItem('vID');
-        const response = await api.post('/authenticate', {USER_ID: id, CHV: 1});
-        console.log({USER_ID: id, CHV: 1});
-        const token = response.data?.token; // Verifica se 'data' e 'token' estão definidos
-        console.log(`Tamanho do token: ${token.length}`);
-        if (token) {
-          await AsyncStorage.setItem('token', JSON.stringify(token));
-          api.defaults.headers.Authorization `Bearer ${token}`;
-          setAuthenticated(true);
-          setLoading(false)
-        } else {
-          throw new Error('Token não encontrado na resposta');
-        }
-      } catch (error) {
-        console.log('Erro au antenticar: ', error);
-        setAuthenticated(false);
-        setLoading(false);
-        Alert.alert('Email e/ou Senha inválidos!');
-      };
+    }).catch((error) => {
+      console.log('Erro no login com Firebase: ', error);
+      setAuthenticated(false);
+      setLoading(false)
+      Alert.alert('Email e/ou Senha inválidos!');
     });   
   }
 
-  async function signUp(nome, sobrenome, CEP, endereco, numero, complemento, bairro, cidade, UF, telefone, email, password, confirm_password) {
+  async function signUp(
+    nome, sobrenome, 
+    CEP, endereco, numero, complemento, bairro, cidade, UF, 
+    telefone, email, password, confirm_password) {
     setLoading(true);
-    registerForPushNotificationsAsync().then((token_sms) => {
-      setTokenSMS(token_sms);
-    })
+
     if (!email || !password) {
       Alert.alert('Favor preencher todos os campos!');
       setLoading(false); 
@@ -187,6 +97,7 @@ function AuthProvider({ children }) {
       setLoading(false); 
       return;
     }
+
     const json = {
       USER_ID: null, 
       NOME: nome, SOBRENOME: sobrenome,
@@ -195,6 +106,7 @@ function AuthProvider({ children }) {
       URL_IMAGEM: "https://via.placeholder.com/300x400",
       TOKEN_MSG: token_sms
     };
+
     api.post('/add/usuario/', json).then(result => {
       createUserWithEmailAndPassword(auth, email, password).then(async(value) => {
         // Signed In
@@ -214,7 +126,9 @@ function AuthProvider({ children }) {
           UF: result.data.UF,
           TOKEN_MSG: result.data.TOKEN_MSG
         });
+
         const response = await api.post('/authenticate', { USER_ID: result.data.USER_ID, CHV: 1});
+
         const token = response.data?.token;
         if (token) {
           AsyncStorage.multiSet([
@@ -223,10 +137,12 @@ function AuthProvider({ children }) {
             ["vTelefone", data.TELEFONE], ["vEmail", data.EMAIL], 
             ["vTokenSMS", data.TOKEN_MSG]
           ]);
-          api.defaults.headers.Authorization = `Bearer ${token}`;
-          setLoading(false);
+
+          api.defaults.headers['Authorization'] = `Bearer ${token}`;
+
           setUser(result.data);
           setAuthenticated(true);
+          setLoading(false);
         } else {
           throw new Error('Token não encontrado na resposta');
         }
@@ -259,18 +175,16 @@ function AuthProvider({ children }) {
   async function signOut() {
     await firebaseSignOut(auth); // auth.signOu();
     setAuthenticated(false);
-    api.defaults.headers.Authorization = undefined;
+    api.defaults.headers['Authorization'] = undefined;
     AsyncStorage.multiRemove(["token", "vID", "vNome", "vSobrenome", "vTelefone", "vEmail", "vTokenSMS"]);
     console.clear();
     setUser(null);
   }
 
   return(
-    <AuthContext.Provider value={{ 
-      signed: !!authenticated, user, setUser,
-      loading, notify, token_sms, 
-      signIn, signUp,  changePassword, signOut, 
-      SetNotificationSMS
+    <AuthContext.Provider value={{
+      signed: !!authenticated, user, setUser, 
+      loading, signIn, signUp,  changePassword, signOut
     }}>
       { children }
     </AuthContext.Provider> 
@@ -278,3 +192,76 @@ function AuthProvider({ children }) {
 }
 
 export { AuthContext, AuthProvider }
+
+// notify, token_sms, 
+// SetNotificationSMS
+
+/**
+ * 
+import * as Notifications from 'expo-notifications';
+import api from '../config/apiAxios';
+
+  useEffect(()=>{
+    async function requestNotificationPermissions() {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('You need get permition to receive push notifications!');
+        return;
+      }
+      console.log('Permissão para notificações concedida.');
+    }
+    requestNotificationPermissions();
+  }, []);
+
+  function SetNotificationSMS(notification) {
+    setNotify(notification);
+  }
+
+  // função para registrar novo token para notificações push
+  async function getPushToken() {
+    const tokenExpired = await isTokenExpired();
+
+    if (tokenExpired) {
+      console.log('Token expirado. Gerando um novo token...');
+      const token = await Notifications.getExpoPushTokenAsync();
+      console.log('Novo token gerado:', token.data); 
+      await AsyncStorage.setItem('vToken', token.data);
+      await AsyncStorage.setItem('vTokenDT', new Date().toISOString());
+      return token.data;
+    } else {
+      const storedToken = await AsyncStorage.getItem('vToken');
+      console.log('Token recuperado do AsyncStorage:', storedToken);
+      return storedToken;
+    }
+  }
+
+  async function isTokenExpired() {
+    const vTokenDT = await AsyncStorage.getItem('vTokenDT');
+    if (vTokenDT) {
+      const currentTime = new Date().toISOString();
+      const diff = new Date(currentTime) - new Date(vTokenDT);
+      const daysDifference = diff / (1000 * 60 * 60 * 24); // Convertendo para dias
+      return daysDifference > 30; // Token expira após 30 dias
+    }
+    return true; // Se não encontrar o tempo de geração, considera expirado
+  }
+
+    const [ token_sms, setTokenSMS ] = useState("");
+    const [ notify, setNotify ] = useState(false);
+
+    setTokenSMS(data?.TokenMSG); // salva o token antigo
+
+    // verifica a validade do token
+    console.log('Token SMS recuperado: ', token_sms);
+    const token = await getPushToken();
+    setTokenSMS(token);
+    console.log('token atualizado: ', token);
+    await update(child(db, `users/${id}`), {
+      "TokenSMG": token
+    });
+
+    registerForPushNotificationsAsync().then((token_sms) => {
+      setTokenSMS(token_sms);
+    })
+
+ */

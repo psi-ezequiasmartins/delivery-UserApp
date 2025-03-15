@@ -21,11 +21,11 @@ export default function ExtraListItem({ extra, add, remove }) {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.descricao}>{extra?.Descricao}</Text>
+      <Text style={styles.descricao}>{extra?.DESCRICAO}</Text>
 
       <View style={styles.info}>
         {checkbox ? (
-          <Text>+ R$ {parseFloat(extra?.VrUnitario).toFixed(2)}</Text>
+          <Text>+ R$ {parseFloat(extra?.VR_UNITARIO).toFixed(2)}</Text>
         ) : (
           <Text>Acrescentar item?</Text>
         )}

@@ -13,7 +13,7 @@ import api from "../../config/apiAxios";
 export default function DeliveryItemToSelect({ produto, id, close }) {
   const { AddToBasket } = useContext(CartContext);
   const [ qtd, setQtd ] = useState(1);
-  const [ total, setTotal ] = useState(produto?.VrUnitario);
+  const [ total, setTotal ] = useState(produto?.VR_UNITARIO);
   const [ acrescimos, setAcrescimos] = useState(null);
   const [ itensAcrescentar, setItensAcrescentar ] = useState([]);
   const [ valorAcrescentar, setValorAcrescentar ] = useState(0);
@@ -30,19 +30,19 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
 
   function add() {(
     setQtd(qtd +1),
-    setTotal((qtd +1) * (produto?.VrUnitario + valorAcrescentar))
+    setTotal((qtd +1) * (produto?.VR_UNITARIO + valorAcrescentar))
     )
   }
 
   function remove() {
     if (qtd>1) {
       setQtd(qtd -1);
-      setTotal((qtd -1) * (produto?.VrUnitario + valorAcrescentar))
+      setTotal((qtd -1) * (produto?.VR_UNITARIO + valorAcrescentar))
     }
   }
 
   function setExtrasTotal(extras) {
-    let result = extras.reduce((acc, obj) => {return acc + obj?.VrUnitario}, 0);
+    let result = extras.reduce((acc, obj) => {return acc + obj?.VR_UNITARIO}, 0);
     setValorAcrescentar(result);
   }
 
@@ -78,10 +78,10 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
           <View style={styles.indicator} />
 
           <View style={styles.card}>
-            <Image style={styles.image} source={{ uri: (produto?.UrlImagem === "" ? "https://via.placeholder.com/500x500" : produto.UrlImagem) }} />
-            <Text style={styles.title}>{produto?.Nome}</Text>
-            <Text style={styles.description}>{produto?.Descricao}</Text>
-            <Text style={styles.summary}>R$ {parseFloat(produto?.VrUnitario).toFixed(2)}</Text>
+            <Image style={styles.image} source={{ uri: (produto?.URL_IMAGEM === "" ? "https://via.placeholder.com/500x500" : produto.URL_IMAGEM) }} />
+            <Text style={styles.title}>{produto?.PRODUTO_NOME}</Text>
+            <Text style={styles.description}>{produto?.DESCRICAO}</Text>
+            <Text style={styles.summary}>R$ {parseFloat(produto?.VR_UNITARIO).toFixed(2)}</Text>
           </View>
 
           <FlatList
@@ -94,7 +94,7 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
                 <Text style={styles.resumo}>R$ {parseFloat(valorAcrescentar).toFixed(2)}</Text>
               </View>
             )}
-            keyExtractor={(item) => item.ExtraID}
+            keyExtractor={(item) => item.EXTRA_ID}
             renderItem={({ item }) => <DeliveryListExtra extra={item} add={()=>AddToAcrescimos(item)} remove={()=>RemoveFromAcrescimos(item)} />}
             style={styles.extras}
           />
@@ -115,17 +115,17 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
           <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
             <View style={{ width: 150, flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
               <TouchableOpacity onPress={remove}>
-                <Ionicons name="md-remove-circle-outline" size={50} color="red" />
+                <Ionicons name="remove-circle-outline" size={50} color="red" />
               </TouchableOpacity>
               <Text style={styles.title}>{qtd}</Text>
               <TouchableOpacity onPress={add}>
-                <Ionicons name="ios-add-circle-outline" size={50} color="green" />
+                <Ionicons name="add-circle-outline" size={50} color="green" />
               </TouchableOpacity>
             </View>
 
             <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-              <Text style={styles.summary}>{qtd} x (R$ {parseFloat(produto?.VrUnitario).toFixed(2)} + R$ {parseFloat(valorAcrescentar).toFixed(2)}) = </Text>
-              <Text style={styles.summary}>R$ {(qtd * (parseFloat(produto?.VrUnitario)+parseFloat(valorAcrescentar))).toFixed(2)}</Text>
+              <Text style={styles.summary}>{qtd} x (R$ {parseFloat(produto?.VR_UNITARIO).toFixed(2)} + R$ {parseFloat(valorAcrescentar).toFixed(2)}) = </Text>
+              <Text style={styles.summary}>R$ {(qtd * (parseFloat(produto?.VR_UNITARIO)+parseFloat(valorAcrescentar))).toFixed(2)}</Text>
             </View>
 
             <TouchableOpacity style={styles.btnAdd} onPress={() => AddItem()}>

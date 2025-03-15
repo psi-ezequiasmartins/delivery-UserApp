@@ -4,7 +4,7 @@
 
 import axios from "axios";
 
-const URL = 'http://localhost:3359'; // "https://srv.deliverybairro.com"; // 
+const URL = 'http://192.168.0.4:3359'; // "https://srv.deliverybairro.com"; // 
 
 const api = axios.create({
   baseURL: URL,

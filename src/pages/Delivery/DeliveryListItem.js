@@ -9,13 +9,13 @@ export default function DeliveryListItem({ item, selectItem }) {
   return (
     <TouchableOpacity onPress={ selectItem } style={ styles.container }>
       <View style={{ flex: 1 }}>
-        <Text style={ styles.name }>{ produto?.Nome }</Text>
+        <Text style={ styles.name }>{ produto?.PRODUTO_NOME }</Text>
         <Text style={ styles.description } numberOfLines={ 3 }>
-          { produto?.Descricao }
+          { produto?.DESCRICAO }
         </Text>
-        <Text style={ styles.price }>R$ { (produto?.VrUnitario > 0) ? parseFloat( produto?.VrUnitario ).toFixed(2) : "0,00" }</Text>
+        <Text style={ styles.price }>R$ { (produto?.VR_UNITARIO > 0) ? parseFloat( produto?.VR_UNITARIO ).toFixed(2) : "0,00" }</Text>
       </View>
-      <Image style={ styles.image } source={{uri:(produto?.UrlImagem === "" ? "https://via.placeholder.com/500x500" : produto.UrlImagem)}} />
+      <Image style={ styles.image } source={{uri:(produto?.URL_IMAGEM === "" ? "https://via.placeholder.com/500x500" : produto.URL_IMAGEM)}} />
     </TouchableOpacity>
   );
 };

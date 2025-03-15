@@ -13,16 +13,20 @@ export default function Deliveries({ route }) {
   const navigation = useNavigation();
   const [deliveries, setDeliveries] = useState([]);
 
+  // console.log(route.params.id);
+
   useEffect(() => {
     async function loadDeliveries() {
-      if(route.params.id === 101) {
-        await api.get('/listar/deliveries').then((response)=>{
-          setDeliveries(response.data);
-        })
-      } else {
-        await api.get(`/listar/deliveries/categoria/${route.params.id}`).then((response) => {
-          setDeliveries(response.data);
-        })
+      try {
+        if (route.params.id === 101) {
+          const response = await api.get('/listar/deliveries');
+          setDeliveries(response?.data);
+        } else {
+          const response = await api.get(`/listar/deliveries/categoria/${route.params.id}`);
+          setDeliveries(response?.data);
+        }                 
+      } catch (error) {
+        console.error("Erro ao carregar deliveries: ", error);
       }
     }
     loadDeliveries();
@@ -47,19 +51,19 @@ export default function Deliveries({ route }) {
         <Text style={styles.categoria_title}>{ route.params.categoria }</Text>
         <FlatList
           data={deliveries}
-          keyExtractor={(item)=>String(item.DeliveryID)}
+          keyExtractor={(item)=>String(item.DELIVERY_ID)}
           ListEmptyComponent={() => <Text style={styles.empty}>Ainda não há deliveries nesta categoria.</Text>}
           showsVerticalScrollIndicator={true}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={()=>LinkTo("DeliveryInfo", { id: item?.DeliveryID })}>
-              <Text style={styles.delivery_title}>{ item?.Nome }</Text>
-              <Image style={styles.imagem} source={{uri:(item?.UrlImagem === "" ? "https://via.placeholder.com/540x300" : item?.UrlImagem)}} />
+            <TouchableOpacity onPress={()=>LinkTo("DeliveryInfo", { id: item?.DELIVERY_ID })}>
+              <Text style={styles.delivery_title}>{ item?.DELIVERY_NOME }</Text>
+              <Image style={styles.imagem} source={{uri:(item?.URL_IMAGEM === "" ? "https://via.placeholder.com/540x300" : item?.URL_IMAGEM)}} />
               <View style={styles.row}>
                 <Text style={styles.subtitle}>
-                  Taxa de Entrega R$ { parseFloat(item?.TaxaEntrega).toFixed(2) } &#8226; { item?.MinDeliveryTime }-{ item?.MaxDeliveryTime } minutos
+                  Taxa de Entrega R$ { parseFloat(item?.TAXA_ENTREGA).toFixed(2) } &#8226; { item?.MIN_DELIVERY_TIME }-{ item?.MAX_DELIVERY_TIME } minutos
                 </Text>
                 <View style={styles.rating}>
-                  <Text style={{color: "#FFF"}}>{ parseFloat(item?.Rating).toFixed(1) }</Text>
+                  <Text style={{color: "#FFF"}}>{ parseFloat(item?.RATING).toFixed(1) }</Text>
                 </View>
               </View>
             </TouchableOpacity>

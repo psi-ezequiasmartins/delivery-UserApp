@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "234983243246",
+    "firebase_url": "https://psi-deliverybairro-default-rtdb.firebaseio.com",
+    "project_id": "psi-deliverybairro",
+    "storage_bucket": "psi-deliverybairro.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:234983243246:android:12c7a181d47dcdc492a2ff",
+        "android_client_info": {
+          "package_name": "com.deliverybairro.userapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1Ytj8gWwM_JFpZZQyhcverYdGH6QK55A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

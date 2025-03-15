@@ -8,15 +8,15 @@ import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
 import { CartContext } from '../../contexts/CartContext';
 
-import * as Notifications from 'expo-notifications';
+// import * as Notifications from 'expo-notifications';
 
-Notifications.setNotificationHandler({
-  handleNotification: async() => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true
-  })
-})
+// Notifications.setNotificationHandler({
+//   handleNotification: async() => ({
+//     shouldShowAlert: true,
+//     shouldPlaySound: true,
+//     shouldSetBadge: true
+//   })
+// })
 
 import icon from '../../../assets/icon.png';
 import logomarca from '../../../assets/logomarca.png';
@@ -25,25 +25,25 @@ import sacola from '../../../assets/pedidos.png';
 export default function Header(props) {
   const navigation = useNavigation();
   const { basket } = useContext(CartContext);
-  const { token_sms, SetNotificationSMS } = useContext(AuthContext);
-  const [ notification, setNotification ] = useState(null);
-  const notificationListener = useRef();
-  const responseListener = useRef();
+  // const { token_sms, SetNotificationSMS } = useContext(AuthContext);
+  // const [ notification, setNotification ] = useState(null);
+  // const notificationListener = useRef();
+  // const responseListener = useRef();
 
-  useEffect(() => {
-    notificationListener.current = Notifications.addNotificationReceivedListener((new_notification) => {
-      setNotification(new_notification);
-      SetNotificationSMS(new_notification);
-    });
-    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log(response.notification.request.content.body)
-    });
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
-      Notifications.removeNotificationSubscription(responseListener.current);
-      GoToLink("Pedidos");
-    };
-  }, [notification]);
+  // useEffect(() => {
+  //   notificationListener.current = Notifications.addNotificationReceivedListener((new_notification) => {
+  //     setNotification(new_notification);
+  //     SetNotificationSMS(new_notification);
+  //   });
+  //   responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+  //     console.log(response.notification.request.content.body)
+  //   });
+  //   return () => {
+  //     Notifications.removeNotificationSubscription(notificationListener.current);
+  //     Notifications.removeNotificationSubscription(responseListener.current);
+  //     GoToLink("Pedidos");
+  //   };
+  // }, [notification]);
 
   function GoToLink(link) {
     return (
