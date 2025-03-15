@@ -13,8 +13,6 @@ export default function Deliveries({ route }) {
   const navigation = useNavigation();
   const [deliveries, setDeliveries] = useState([]);
 
-  // console.log(route.params.id);
-
   useEffect(() => {
     async function loadDeliveries() {
       try {

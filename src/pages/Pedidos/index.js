@@ -55,9 +55,9 @@ export default function Pedidos() {
         <FlatList
           data={listadepedidos}
           showsVerticalScrollIndicator={ true }
-          ListEmptyComponent={ ()=><Text style={styles.empty}>Ainda não há pedidos deste Usuário.</Text> }
-          keyExtractor={(item)=>String(item.PedidoID)}
-          renderItem={({ item }) => <OrderListItem order={item}/>}
+          ListEmptyComponent={()=><Text style={styles.empty}>Ainda não há pedidos deste Usuário.</Text>}
+          keyExtractor={(item)=>String(item.PEDIDO_ID)}
+          renderItem={({item}) => <OrderListItem order={item}/>}
           ref={listRef}
         />
       </View>

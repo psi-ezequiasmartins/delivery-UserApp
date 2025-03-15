@@ -10,10 +10,10 @@ import api from '../../config/apiAxios';
 
 export default function BasketItem({ item, AddQtd, RemoveQtd }) {
   const [ produto, setProduto ] = useState([]);
-  const [ qtd, setQtd ] = useState(item?.Qtd);
-  const [ total, setTotal ] = useState(qtd * (item?.VrUnitario + item?.VrAcrescimos));
+  const [ qtd, setQtd ] = useState(item?.QTD);
+  const [ total, setTotal ] = useState(qtd * (item?.VR_UNITARIO + item?.VR_ACRECIMOS));
 
-  const id = item.ProdutoID; 
+  const id = item.PRODUTO_ID; 
 
   useEffect(() => {
     if (id) {
@@ -29,14 +29,14 @@ export default function BasketItem({ item, AddQtd, RemoveQtd }) {
 
   function add() {
     setQtd(qtd +1);
-    setTotal((qtd +1) * (parseFloat(item?.VrUnitario) + parseFloat(item.VrAcrescimos)));
+    setTotal((qtd +1) * (parseFloat(item?.VR_UNITARIO) + parseFloat(item.VR_ACRECIMOS)));
     AddQtd();
   }
 
   function remove() {
     if (qtd>1) {
       setQtd(qtd -1);
-      setTotal((qtd -1) * (parseFloat(item?.VrUnitario) + parseFloat(item.VrAcrescimos)));
+      setTotal((qtd -1) * (parseFloat(item?.VR_UNITARIO) + parseFloat(item.VR_ACRECIMOS)));
       RemoveQtd();
     }
   }
@@ -45,36 +45,36 @@ export default function BasketItem({ item, AddQtd, RemoveQtd }) {
     <View style={styles.container}>
       <View>
         <View>
-          <Image style={styles.imagem} source={{uri: item?.UrlImagem }} />
-          <Text style={styles.nome}>{ item?.Nome }</Text>
+          <Image style={styles.imagem} source={{uri: item?.URL_IMAGEM }} />
+          <Text style={styles.nome}>{ item?.PRODUTO_NOME }</Text>
 
-          {item?.Acrescimos &&
+          {item?.ACRESCIMOS &&
             <FlatList
-              data={ item?.Acrescimos }
+              data={item?.ACRESCIMOS}
               showsVerticalScrollIndicator={ false }
-              keyExtractor={(item)=>String(item.ExtraID)}
+              keyExtractor={(item)=>String(item.EXTRA_ID)}
               renderItem={ ({item}) => (
                 <View>
-                  <Text>+ {item.Descricao} R$ {parseFloat(item.VrUnitario).toFixed(2)}</Text>
+                  <Text>+ {item.DESCRICAO} R$ {parseFloat(item.VR_UNITARIO).toFixed(2)}</Text>
                 </View>
               )}
-              ListEmptyComponent={ () => <Text style={styles.empty}>Sem acréscimos neste item.</Text> }
+              ListEmptyComponent={()=><Text style={styles.empty}>Sem acréscimos neste item.</Text>}
             />
           }
 
-          {item?.Obs &&
-            <Text style={{fontWeight: "bold"}}>Obs.: {item?.Obs}</Text>
+          {item?.OBS &&
+            <Text style={{fontWeight: "bold"}}>Obs.: {item?.OBS}</Text>
           }
 
-          <Text style={styles.summary}>{qtd} x (R$ {parseFloat(item?.VrUnitario).toFixed(2)} + R$ {parseFloat(item?.VrAcrescimos).toFixed(2)}) = R$ {parseFloat(total).toFixed(2)}</Text>
+          <Text style={styles.summary}>{qtd} x (R$ {parseFloat(item?.VR_UNITARIO).toFixed(2)} + R$ {parseFloat(item?.VR_ACRECIMOS).toFixed(2)}) = R$ {parseFloat(total).toFixed(2)}</Text>
         </View>
         <View style={styles.qtd}>
           <TouchableOpacity onPress={remove}>
-            <Ionicons name="md-remove-circle-outline" size={30} color="red"/>
+            <Ionicons name="remove-circle-outline" size={30} color="red"/>
           </TouchableOpacity>
           <Text style={styles.qtdText}>{qtd}</Text>
           <TouchableOpacity onPress={add}>
-            <Ionicons name="ios-add-circle-outline" size={30} color="green" />
+            <Ionicons name="add-circle-outline" size={30} color="green" />
           </TouchableOpacity>
         </View>
       </View>

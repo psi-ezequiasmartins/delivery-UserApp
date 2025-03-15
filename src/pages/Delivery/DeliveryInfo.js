@@ -99,16 +99,16 @@ export default function DeliveryInfo({ route }) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <Modal animationType="slide" transparent={ true } visible={show} >
-          <DeliveryItemToSelect produto={produto} id={route.params.id} close={ ()=>handleCloseModal() } />
+        <Modal animationType="slide" transparent={true} visible={show} >
+          <DeliveryItemToSelect produto={produto} id={route.params.id} close={()=>handleCloseModal()} />
         </Modal>
         <Header />
         <FlatList
           data={listadeprodutos}
-          ListHeaderComponent={ ()=><DeliveryHeader delivery={ delivery } listbyaz={ () => listByAZ() } /> }
-          ListEmptyComponent={ ()=><Text style={styles.empty}>Ainda não há produtos deste Delivery.</Text> }
-          keyExtractor={ (item) => item.PRODUTO_ID }
-          renderItem={ ({ item }) => <DeliveryListItem item={item} selectItem={ ()=>handleSelectItem(item) } /> }
+          ListHeaderComponent={()=><DeliveryHeader delivery={delivery} listbyaz={()=>listByAZ()} /> }
+          ListEmptyComponent={()=><Text style={styles.empty}>Ainda não há produtos deste Delivery.</Text>}
+          keyExtractor={(item)=>item.PRODUTO_ID}
+          renderItem={({item})=><DeliveryListItem item={item} selectItem={()=>handleSelectItem(item)} />}
         />
       </View>
     </SafeAreaView>

@@ -23,7 +23,7 @@ export default function Cesta() {
   
   useEffect(() => {
     function atualizaTotal() {
-      const soma = parseFloat(subtotal) + parseFloat(delivery?.TaxaEntrega);
+      const soma = parseFloat(subtotal) + parseFloat(delivery?.TAXA_ENTREGA);
       setTotal(soma);
     }
     atualizaTotal();
@@ -35,8 +35,8 @@ export default function Cesta() {
       return acrescimos.map((acrescimo) => {
         // Aqui você pode selecionar os campos que deseja manter no objeto acrescimo
         return {
-          Descricao: acrescimo.Descricao,
-          VrUnitario: acrescimo.VrUnitario,
+          DESCRICAO: acrescimo.DESCRICAO,
+          VR_UNITARIO: acrescimo.VR_UNITARIO,
           // Adicione outros campos que desejar manter
         };
       });
@@ -45,18 +45,18 @@ export default function Cesta() {
     // Formate os valores de "Acrescimos" em cada item do carrinho
     const formattedBasket = basket.map((item) => ({
       ...item,
-      Acrescimos: formatAcrescimos(item.Acrescimos),
+      ACRESCIMOS: formatAcrescimos(item.ACRESCIMOS),
     }));
   
     // Formate o objeto JSON final
     const json = {
-      DeliveryID: delivery.DeliveryID,
-      UserID: user.UserID,
-      VrSubTotal: parseFloat(subtotal),
-      TaxaEntrega: parseFloat(delivery.TaxaEntrega),
-      VrTotal: parseFloat(subtotal) + parseFloat(delivery?.TaxaEntrega),
-      TokenMSG: tokenMsg,
-      Status: "NOVO",
+      DELIVERY_ID: delivery.DELIVERY_ID,
+      USER_ID: user.UserID,
+      VR_SUBTOTAL: parseFloat(subtotal),
+      TAXA_ENTREGA: parseFloat(delivery.TAXA_ENTREGA),
+      VR_TOTAL: parseFloat(subtotal) + parseFloat(delivery?.TAXA_ENTREGA),
+      TOKEN_MSG: tokenMsg,
+      STATUS: "NOVO",
       itens: formattedBasket,
     };
   
@@ -92,43 +92,43 @@ export default function Cesta() {
 
         <View style={{flexDirection: 'row'}}>
           <View style={{flexDirection: 'column', width: '100%'}}>
-            <Text style={{ fontSize: 21, fontWeight: 'bold' }}>{ delivery?.Nome }</Text>
-            <Text style={{ fontSize: 13}}>{ delivery?.Horario }</Text>
-            <Text style={{ fontSize: 13}}><Fontisto color="#FF0000" name='map-marker-alt' size={18}/> { parseFloat(delivery?.Latitude).toFixed(6) }, { parseFloat(delivery?.Longitude).toFixed(6) }</Text>
-            <Text style={{ fontSize: 13, marginBottom: 5}}>Valor da Taxa de Entrega: R$ { parseFloat(delivery?.TaxaEntrega).toFixed(2) }</Text>
+            <Text style={{ fontSize: 21, fontWeight: 'bold' }}>{delivery?.DELIVERY_NOME}</Text>
+            <Text style={{ fontSize: 13}}>{delivery?.HORARIO}</Text>
+            <Text style={{ fontSize: 13}}><Fontisto color="#FF0000" name='map-marker-alt' size={18}/> {delivery?.ENDERECO}, {delivery?.NUMERO} - {delivery?.BAIRRO}</Text>
+            <Text style={{ fontSize: 13, marginBottom: 5}}>Valor da Taxa de Entrega: R$ {parseFloat(delivery?.TAXA_ENTREGA).toFixed(2)}</Text>
             <Text style={{ fontWeight: "bold", marginBottom: 5, fontSize: 19 }}>Seus Pedidos</Text>
           </View>
         </View>
 
         <FlatList
-          data={ basket }
-          showsVerticalScrollIndicator={ false }
-          keyExtractor={(item)=>String(item.ProdutoID)}
+          data={basket}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item)=>String(item.PRODUTO_ID)}
           renderItem={ ({item}) => (
             <BasketItem 
               item={item} 
-              AddQtd={()=>AddToBasket(item, 1, item.VrUnitario, [], 0, '')} 
+              AddQtd={()=>AddToBasket(item, 1, item.VR_UNITARIO, [], 0, '')} 
               RemoveQtd={()=>RemoveFromBasket(item)}  
             />
           )}
-          ListEmptyComponent={ () => <Text style={styles.empty}>Cesta de Compras vazia!</Text> }
-          ListFooterComponent={ () => (
+          ListEmptyComponent={()=><Text style={styles.empty}>Cesta de Compras vazia!</Text>}
+          ListFooterComponent={()=>(
             <View>
-              <Text style={styles.subtotal}>+ Sub-Total: R$ { parseFloat(subtotal).toFixed(2) }</Text>
-              <Text style={styles.taxa}>+ Taxa de Entrega: R$ { parseFloat(delivery?.TaxaEntrega ).toFixed(2)}</Text>
-              <Text style={styles.total}>= Total: R$ { parseFloat(total).toFixed(2) }</Text>
+              <Text style={styles.subtotal}>+ Sub-Total: R$ {parseFloat(subtotal).toFixed(2)}</Text>
+              <Text style={styles.taxa}>+ Taxa de Entrega: R$ {parseFloat(delivery?.TAXA_ENTREGA).toFixed(2)}</Text>
+              <Text style={styles.total}>= Total: R$ {parseFloat(total).toFixed(2)}</Text>
             </View>
           )}
         />
 
         {
           (basket?.length > 0) &&
-          <TouchableOpacity style={styles.btnAdd} onPress={ EnviarPedidoELimparCestaDeCompras }>
+          <TouchableOpacity style={styles.btnAdd} onPress={EnviarPedidoELimparCestaDeCompras}>
             <Text style={{color: '#FFF', fontSize: 18}}>CONFIRMAR PEDIDO</Text>
           </TouchableOpacity>
         }
 
-        <TouchableOpacity style={styles.btnCancel} onPress={ CancelarPedido }>
+        <TouchableOpacity style={styles.btnCancel} onPress={CancelarPedido}>
           <Text style={{color: '#FFF', fontSize: 18}}>CANCELAR</Text>
         </TouchableOpacity>
 

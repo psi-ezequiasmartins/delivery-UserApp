@@ -28,7 +28,7 @@ function OrderProvider({ children }) {
 
   async function createOrder(json) {
     await api.post('/add/pedido/', json).then((response) => {
-      Alert.alert('Pedido enviado com sucesso! #' + response.data.PedidoID);
+      Alert.alert('Pedido enviado com sucesso! #' + response.data.PEDIDO_ID);
       setPedido(json);
       CleanBasket();
     }).catch(error => {

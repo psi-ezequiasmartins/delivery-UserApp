@@ -47,18 +47,14 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
   }
 
   function AddToAcrescimos(extra) {
-    console.log("AddToAcrescimos", extra);
     itensAcrescentar.push(extra);
-    console.log(itensAcrescentar);
     setExtrasTotal(itensAcrescentar);
   }
 
   function RemoveFromAcrescimos(extra) {
-    console.log("RemoveFromAcrescimos", extra);
     const result = itensAcrescentar.indexOf(extra);
     if (result !== -1) {
         itensAcrescentar.splice(result, 1);
-        console.log(itensAcrescentar);
         setExtrasTotal(itensAcrescentar);
       } else {
         console.log("Item não encontrado!");
@@ -73,72 +69,81 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
   return (
     <View style={styles.shadow}>
       <View style={styles.modal}>
-        <ScrollView contentContainerStyle={styles.content} focusable={true}>
 
-          <View style={styles.indicator} />
+        <FlatList
+          data={[produto]} // Apenas um item para o produto
+          keyExtractor={(item) => item.PRODUTO_ID.toString()} // Certifique-se de usar uma chave única
+          renderItem={({item}) => (
+            <>
+              <View style={styles.indicator} />
 
-          <View style={styles.card}>
-            <Image style={styles.image} source={{ uri: (produto?.URL_IMAGEM === "" ? "https://via.placeholder.com/500x500" : produto.URL_IMAGEM) }} />
-            <Text style={styles.title}>{produto?.PRODUTO_NOME}</Text>
-            <Text style={styles.description}>{produto?.DESCRICAO}</Text>
-            <Text style={styles.summary}>R$ {parseFloat(produto?.VR_UNITARIO).toFixed(2)}</Text>
-          </View>
-
-          <FlatList
-            data={acrescimos}
-            ListHeaderComponent={<Text style={{ marginBottom: 5, fontWeight: "bold" }}>Deseja acrescentar?</Text>}
-            ListEmptyComponent={() => <Text style={styles.empty}>Não há produtos nesta categoria.</Text>}
-            ListFooterComponent={ () => (
-              <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-                <Text style={styles.resumo}>VALOR A ACRESCENTAR P/ UNIDADE:</Text>
-                <Text style={styles.resumo}>R$ {parseFloat(valorAcrescentar).toFixed(2)}</Text>
+              <View style={styles.card}>
+                <Image style={styles.image} source={{ uri: (item?.URL_IMAGEM === "" ? "https://via.placeholder.com/500x500" : item?.URL_IMAGEM) }} />
+                <Text style={styles.title}>{item?.PRODUTO_NOME}</Text>
+                <Text style={styles.description}>{item?.DESCRICAO}</Text>
+                <Text style={styles.summary}>R$ {parseFloat(item?.VR_UNITARIO).toFixed(2)}</Text>
               </View>
-            )}
-            keyExtractor={(item) => item.EXTRA_ID}
-            renderItem={({ item }) => <DeliveryListExtra extra={item} add={()=>AddToAcrescimos(item)} remove={()=>RemoveFromAcrescimos(item)} />}
-            style={styles.extras}
-          />
 
-          <View style={styles.areaInput}>
-            <Text style={{ marginLeft: 10, marginBottom: 10, fontWeight: "bold" }}>Alguma observação?</Text>
-            <TextInput
-              value={obs}
-              placeholder="Ex.: sem alface e tomate, etc"
-              onChangeText={(text) => setObs(text)}
-              autoCapitalize="sentences"
-              multiline={true}
-              numberOfLines={3}
-              style={styles.input}
-            />
-          </View>
+              <FlatList
+                data={acrescimos}
+                ListHeaderComponent={<Text style={{ marginBottom: 5, fontWeight: "bold" }}>Deseja acrescentar?</Text>}
+                ListEmptyComponent={()=><Text style={styles.empty}>Não há produtos nesta categoria.</Text>}
+                ListFooterComponent={()=>(
+                  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    <Text style={styles.resumo}>VALOR A ACRESCENTAR P/ UNIDADE:</Text>
+                    <Text style={styles.resumo}>R$ {parseFloat(valorAcrescentar).toFixed(2)}</Text>
+                  </View>
+                )}
+                keyExtractor={(item)=>item.EXTRA_ID}
+                renderItem={({item})=> (
+                  <DeliveryListExtra item_extra={item} add={()=>AddToAcrescimos(item)} remove={()=>RemoveFromAcrescimos(item)} />
+                )}
+                style={styles.extras}
+              />
 
-          <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
-            <View style={{ width: 150, flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
-              <TouchableOpacity onPress={remove}>
-                <Ionicons name="remove-circle-outline" size={50} color="red" />
-              </TouchableOpacity>
-              <Text style={styles.title}>{qtd}</Text>
-              <TouchableOpacity onPress={add}>
-                <Ionicons name="add-circle-outline" size={50} color="green" />
-              </TouchableOpacity>
-            </View>
+              <View style={styles.areaInput}>
+                <Text style={{ marginLeft: 10, marginBottom: 10, fontWeight: "bold" }}>Alguma observação?</Text>
+                <TextInput
+                  value={obs}
+                  placeholder="Ex.: sem alface e tomate, etc"
+                  onChangeText={(text)=>setObs(text)}
+                  autoCapitalize="sentences"
+                  multiline={true}
+                  numberOfLines={3}
+                  style={styles.input}
+                />
+              </View>
 
-            <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-              <Text style={styles.summary}>{qtd} x (R$ {parseFloat(produto?.VR_UNITARIO).toFixed(2)} + R$ {parseFloat(valorAcrescentar).toFixed(2)}) = </Text>
-              <Text style={styles.summary}>R$ {(qtd * (parseFloat(produto?.VR_UNITARIO)+parseFloat(valorAcrescentar))).toFixed(2)}</Text>
-            </View>
+              <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
+                <View style={{ width: 150, flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
+                  <TouchableOpacity onPress={remove}>
+                    <Ionicons name="remove-circle-outline" size={50} color="red" />
+                  </TouchableOpacity>
+                  <Text style={styles.title}>{qtd}</Text>
+                  <TouchableOpacity onPress={add}>
+                    <Ionicons name="add-circle-outline" size={50} color="green" />
+                  </TouchableOpacity>
+                </View>
 
-            <TouchableOpacity style={styles.btnAdd} onPress={() => AddItem()}>
-              <Text style={{ color: '#FFF', fontSize: 18 }}>Adiciona Item</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.btnClose} onPress={close}>
-              <Text style={{ color: '#FFF', fontSize: 18 }}>FECHAR</Text>
-            </TouchableOpacity>
-          </View>
+                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                  <Text style={styles.summary}>{qtd} x (R$ {parseFloat(item?.VR_UNITARIO).toFixed(2)} + R$ {parseFloat(valorAcrescentar).toFixed(2)}) = </Text>
+                  <Text style={styles.summary}>R$ {(qtd * (parseFloat(item?.VR_UNITARIO)+parseFloat(valorAcrescentar))).toFixed(2)}</Text>
+                </View>
 
-        </ScrollView>
+                <TouchableOpacity style={styles.btnAdd} onPress={() => AddItem()}>
+                  <Text style={{ color: '#FFF', fontSize: 18 }}>Adiciona Item</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.btnClose} onPress={close}>
+                  <Text style={{ color: '#FFF', fontSize: 18 }}>FECHAR</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+          ListFooterComponent={<View style={{ height: 5 }} />}
+        />
       </View>
     </View>
+
   )
 }
 
@@ -244,4 +249,3 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
 })
-
