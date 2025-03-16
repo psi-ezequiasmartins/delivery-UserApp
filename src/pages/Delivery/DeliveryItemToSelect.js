@@ -13,11 +13,13 @@ import api from "../../config/apiAxios";
 export default function DeliveryItemToSelect({ produto, id, close }) {
   const { AddToBasket } = useContext(CartContext);
   const [ qtd, setQtd ] = useState(1);
-  const [ total, setTotal ] = useState(produto?.VR_UNITARIO);
+  // const [ total, setTotal] = useState(produto?.VR_UNITARIO);
   const [ acrescimos, setAcrescimos] = useState(null);
   const [ itensAcrescentar, setItensAcrescentar ] = useState([]);
   const [ valorAcrescentar, setValorAcrescentar ] = useState(0);
   const [ obs, setObs ] = useState("");
+
+  const total = produto?.VR_UNITARIO;
 
   useEffect(() => {
     async function loadAcrescimos() {
@@ -28,40 +30,38 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
     loadAcrescimos();
   }, []);
 
-  function add() {(
-    setQtd(qtd +1),
-    setTotal((qtd +1) * (produto?.VR_UNITARIO + valorAcrescentar))
-    )
+  function add() {
+    setQtd(qtd +1)   
   }
 
   function remove() {
-    if (qtd>1) {
+    if (qtd >1) {
       setQtd(qtd -1);
-      setTotal((qtd -1) * (produto?.VR_UNITARIO + valorAcrescentar))
     }
   }
 
-  function setExtrasTotal(extras) {
-    let result = extras.reduce((acc, obj) => {return acc + obj?.VR_UNITARIO}, 0);
-    setValorAcrescentar(result);
+  function atualizaTotal(extras) {
+    const vr_extras = extras.reduce((acc, obj) => {return acc + obj.VR_UNITARIO}, 0);
+    setValorAcrescentar(vr_extras);
   }
 
   function AddToAcrescimos(extra) {
     itensAcrescentar.push(extra);
-    setExtrasTotal(itensAcrescentar);
+    atualizaTotal(itensAcrescentar);
   }
 
   function RemoveFromAcrescimos(extra) {
     const result = itensAcrescentar.indexOf(extra);
     if (result !== -1) {
         itensAcrescentar.splice(result, 1);
-        setExtrasTotal(itensAcrescentar);
+        atualizaTotal(itensAcrescentar);
       } else {
         console.log("Item não encontrado!");
     }
   }
 
   function AddItem() {
+    // console.log(produto, qtd, itensAcrescentar, valorAcrescentar);
     AddToBasket(produto, qtd, itensAcrescentar, valorAcrescentar, obs); // incluir acréscimos (itensAcrescentar, valorAcrescentar)
     close();
   }
@@ -72,7 +72,7 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
 
         <FlatList
           data={[produto]} // Apenas um item para o produto
-          keyExtractor={(item) => item.PRODUTO_ID.toString()} // Certifique-se de usar uma chave única
+          keyExtractor={(item) => item?.PRODUTO_ID.toString()} // Certifique-se de usar uma chave única
           renderItem={({item}) => (
             <>
               <View style={styles.indicator} />
@@ -90,7 +90,7 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
                 ListEmptyComponent={()=><Text style={styles.empty}>Não há produtos nesta categoria.</Text>}
                 ListFooterComponent={()=>(
                   <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <Text style={styles.resumo}>VALOR A ACRESCENTAR P/ UNIDADE:</Text>
+                    <Text style={styles.resumo}>VALOR A ACRESCENTAR:</Text>
                     <Text style={styles.resumo}>R$ {parseFloat(valorAcrescentar).toFixed(2)}</Text>
                   </View>
                 )}

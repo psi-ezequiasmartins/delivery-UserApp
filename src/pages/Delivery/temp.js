@@ -17,50 +17,14 @@ export default function DeliveryItemToSelect({ produto, close }) {
 
   const total = atualizaTotal();
 
-  let extras = [
-    {
-      "ExtraID": 2,
-      "DeliveryID": 1002,
-      "Descricao": "Bacon Fatiado 50g",
-      "VrUnitario": 3
-    },
-    {
-      "ExtraID": 1,
-      "DeliveryID": 1002,
-      "Descricao": "Carne Hamburger artezanal 120g",
-      "VrUnitario": 2.5
-    },
-    {
-      "ExtraID": 7,
-      "DeliveryID": 1002,
-      "Descricao": "Molho Barbecue 50g",
-      "VrUnitario": 3
-    },
-    {
-      "ExtraID": 6,
-      "DeliveryID": 1002,
-      "Descricao": "Molho Especial 50g",
-      "VrUnitario": 2
-    },
-    {
-      "ExtraID": 4,
-      "DeliveryID": 1002,
-      "Descricao": "Mussarela",
-      "VrUnitario": 1.5
-    },
-    {
-      "ExtraID": 3,
-      "DeliveryID": 1002,
-      "Descricao": "Ovo (unidade)",
-      "VrUnitario": 1
-    },
-    {
-      "ExtraID": 5,
-      "DeliveryID": 1002,
-      "Descricao": "Salada Americana",
-      "VrUnitario": 1
+  useEffect(() => {
+    async function loadAcrescimos() {
+      await api.get(`/listar/extras/delivery/${id}`).then((response) => {
+        setAcrescimos(response.data);
+      });
     }
-  ];
+    loadAcrescimos();
+  }, []);
 
   function add() {
     setQtd(qtd + 1);
@@ -130,7 +94,7 @@ export default function DeliveryItemToSelect({ produto, close }) {
           </View>
 
           <FlatList
-            data={extras}
+            data={acrescimos}
             ListHeaderComponent={<Text style={{ marginBottom: 5, fontWeight: "bold" }}>Deseja acrescentar?</Text>}
             ListEmptyComponent={() => <Text style={styles.empty}>Não há produtos nesta categoria.</Text>}
             keyExtractor={(item) => item.ExtraID}

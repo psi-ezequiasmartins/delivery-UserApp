@@ -13,7 +13,7 @@ export default function DeliveryListItem({ item, selectItem }) {
         <Text style={ styles.description } numberOfLines={ 3 }>
           { produto?.DESCRICAO }
         </Text>
-        <Text style={ styles.price }>R$ { (produto?.VR_UNITARIO > 0) ? parseFloat( produto?.VR_UNITARIO ).toFixed(2) : "0,00" }</Text>
+        <Text style={ styles.price }>R$ { (produto?.VR_UNITARIO > 0) ? parseFloat(produto?.VR_UNITARIO).toFixed(2) : "0,00" }</Text>
       </View>
       <Image style={ styles.image } source={{uri:(produto?.URL_IMAGEM === "" ? "https://via.placeholder.com/500x500" : produto.URL_IMAGEM)}} />
     </TouchableOpacity>

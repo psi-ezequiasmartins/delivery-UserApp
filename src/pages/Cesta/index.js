@@ -35,8 +35,8 @@ export default function Cesta() {
       return acrescimos.map((acrescimo) => {
         // Aqui você pode selecionar os campos que deseja manter no objeto acrescimo
         return {
-          DESCRICAO: acrescimo.DESCRICAO,
-          VR_UNITARIO: acrescimo.VR_UNITARIO,
+          "DESCRICAO": acrescimo?.DESCRICAO,
+          "VR_UNITARIO": acrescimo?.VR_UNITARIO,
           // Adicione outros campos que desejar manter
         };
       });
@@ -45,19 +45,19 @@ export default function Cesta() {
     // Formate os valores de "Acrescimos" em cada item do carrinho
     const formattedBasket = basket.map((item) => ({
       ...item,
-      ACRESCIMOS: formatAcrescimos(item.ACRESCIMOS),
+      "ACRESCIMOS": formatAcrescimos(item?.VR_ACRESCIMOS),
     }));
   
     // Formate o objeto JSON final
     const json = {
-      DELIVERY_ID: delivery.DELIVERY_ID,
-      USER_ID: user.UserID,
-      VR_SUBTOTAL: parseFloat(subtotal),
-      TAXA_ENTREGA: parseFloat(delivery.TAXA_ENTREGA),
-      VR_TOTAL: parseFloat(subtotal) + parseFloat(delivery?.TAXA_ENTREGA),
-      TOKEN_MSG: tokenMsg,
-      STATUS: "NOVO",
-      itens: formattedBasket,
+      "DELIVERY_ID": delivery?.DELIVERY_ID,
+      "USER_ID": user?.UserID,
+      "VR_SUBTOTAL": subtotal,
+      "TAXA_ENTREGA": delivery?.TAXA_ENTREGA,
+      "VR_TOTAL": subtotal + delivery?.TAXA_ENTREGA,
+      "TOKEN_MSG": tokenMsg,
+      "STATUS": "NOVO",
+      "itens": formattedBasket,
     };
   
     // Converte o objeto JSON em uma string e imprime no log
@@ -103,11 +103,11 @@ export default function Cesta() {
         <FlatList
           data={basket}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item)=>String(item.PRODUTO_ID)}
+          keyExtractor={(item)=>String(item?.PRODUTO_ID)}
           renderItem={ ({item}) => (
             <BasketItem 
               item={item} 
-              AddQtd={()=>AddToBasket(item, 1, item.VR_UNITARIO, [], 0, '')} 
+              AddQtd={()=>AddToBasket(item, 1, item?.VR_UNITARIO, [], 0, '')} 
               RemoveQtd={()=>RemoveFromBasket(item)}  
             />
           )}

@@ -128,11 +128,12 @@ export default function Grupos() {
 const styles = StyleSheet.create({
   background:{
     flex: 1,
-    backgroundColor: '#D2DEFF',
+    backgroundColor: '#FFF',
   },
   container:{
     flex: 1,
     justifyContent: 'flex-start',
+    backgroundColor: '#D9ECFD',
   },
   grupos: {
     flex: 1,

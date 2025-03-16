@@ -27,8 +27,8 @@ function CartProvider({ children }) {
         ACRESCIMOS: itensAcrescentar,
         OBS: obs,
         QTD: qtd,
-        VR_UNITARIO: parseFloat(produto?.VR_UNITARIO),
-        VR_ACRESCIMOS: parseFloat(valorAcrescentar),
+        VR_UNITARIO: produto?.VR_UNITARIO,
+        VR_ACRESCIMOS: valorAcrescentar,
         TOTAL: qtd * (produto?.VR_UNITARIO + valorAcrescentar),
       }
       setBasket(dishes => [...dishes, data]);
@@ -56,7 +56,7 @@ function CartProvider({ children }) {
 
   function setBasketTotal(cart) {
     let result = cart.reduce((acc, obj) => { return acc + obj?.TOTAL}, 0);
-    setSubTotal(result.toFixed(2));
+    setSubTotal(result);
   }
 
   async function CleanBasket() {
