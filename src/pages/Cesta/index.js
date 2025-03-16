@@ -63,7 +63,7 @@ export default function Cesta() {
     // Converte o objeto JSON em uma string e imprime no log
     const jsonString = JSON.stringify(json, null, 2); // O segundo argumento é para formatação
     const pedido = await createOrder(jsonString);
-    console.log(pedido);
+    // console.log(pedido);
     LinkTo("Pedidos");
   }
 

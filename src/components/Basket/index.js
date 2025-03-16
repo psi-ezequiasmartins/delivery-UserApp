@@ -14,7 +14,7 @@ export default function BasketItem({ item, AddQtd, RemoveQtd }) {
   const [ total, setTotal ] = useState(qtd * (item?.VR_UNITARIO + item?.VR_ACRESCIMOS));
 
   const id = item.PRODUTO_ID; 
-  console.log(item, AddQtd, RemoveQtd);
+  // console.log(item, AddQtd, RemoveQtd);
 
   useEffect(() => {
     if (id) {
