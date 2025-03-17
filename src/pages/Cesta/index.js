@@ -16,7 +16,7 @@ import BasketItem from '../../components/Basket';
 
 export default function Cesta() {
   const navigation = useNavigation();
-  const { delivery, basket, subtotal, AddToBasket, RemoveFromBasket, CleanBasket, setSubtotal } = useContext(CartContext);
+  const { delivery, basket, subtotal, setSubtotal, AddToBasket, RemoveFromBasket, CleanBasket } = useContext(CartContext);
   const { createOrder } = useContext(OrderContext);
   const { user, tokenMsg } = useContext(AuthContext);
   const [ total, setTotal ] = useState(0);
