@@ -66,7 +66,7 @@ function CartProvider({ children }) {
 
   return(
     <CartContext.Provider value={{ 
-      basket, delivery, subtotal, 
+      basket, delivery, subtotal, setSubTotal,
       AddToBasket, RemoveFromBasket, CleanBasket, setDelivery 
     }}>
       { children }
