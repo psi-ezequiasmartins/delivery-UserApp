@@ -43,7 +43,9 @@ export default function Cesta() {
   }, [basket, delivery, total, subtotal]);
 
   async function EnviarPedidoELimparCestaDeCompras() {
+    // prepara a lista de itens extras (acréscimos)
     function formatAcrescimos(acrescimos) {
+      // console.log('Acréscimos deste pedido: ', acrescimos);
       return acrescimos.map((acrescimo) => {
         return {
           "DESCRICAO": acrescimo?.DESCRICAO,
@@ -51,10 +53,11 @@ export default function Cesta() {
         };
       });
     }
-
+    // prepara a lista da cesta de compras (basket): itens e acréscimos (se houver)
     const formattedBasket = basket.map((item) => ({
       ...item,
-      "ACRESCIMOS": formatAcrescimos(item?.VR_ACRESCIMOS),
+      "ACRESCIMOS": formatAcrescimos(item?.ACRESCIMOS),
+      "TOTAL": (item?.VR_ACRESCIMOS + item?.VR_UNITARIO) * item?.QTD
     }));
   
     const json = {
@@ -62,15 +65,16 @@ export default function Cesta() {
       "USER_ID": user?.UserID,
       "VR_SUBTOTAL": subtotal,
       "TAXA_ENTREGA": delivery?.TAXA_ENTREGA,
-      "VR_TOTAL": subtotal + delivery?.TAXA_ENTREGA,
+      "VR_TOTAL": total,
       "TOKEN_MSG": tokenMsg,
       "STATUS": "NOVO",
       "itens": formattedBasket,
     };
-  
     const jsonString = JSON.stringify(json, null, 2);
+    console.log('Pedido: ', jsonString);
     const pedido = await createOrder(jsonString);
-    LinkTo("Pedidos");
+    // navigation.navigate('Pedidos');
+    // LinkTo("Pedidos");
   }
 
   async function CancelarPedido() {

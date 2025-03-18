@@ -9,22 +9,22 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '../../config/apiAxios';
 
 export default function BasketItem({ item, AddQtd, RemoveQtd, updateTotal }) { 
-  const [ produto, setProduto ] = useState([]);
+  // const [ produto, setProduto ] = useState([]);
   const [ qtd, setQtd ] = useState(item?.QTD);
   const [ total, setTotal ] = useState(qtd * (item?.VR_UNITARIO + item?.VR_ACRESCIMOS));
 
-  const id = item.PRODUTO_ID; 
+  // const id = item.PRODUTO_ID; 
 
-  useEffect(() => {
-    if (id) {
-      async function loadProdutoInfo() {
-        await api.get(`/produto/${id}`).then((snapshot) => {
-          setProduto(snapshot.data[0]);
-        });
-      }
-      loadProdutoInfo();
-    }
-  }, [id]);
+  // useEffect(() => {
+  //   if (id) {
+  //     async function loadProdutoInfo() {
+  //       await api.get(`/produto/${id}`).then((snapshot) => {
+  //         setProduto(snapshot.data[0]);
+  //       });
+  //     }
+  //     loadProdutoInfo();
+  //   }
+  // }, [id]);
 
   function add() {
     setQtd(qtd + 1);
