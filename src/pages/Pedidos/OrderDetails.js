@@ -18,7 +18,7 @@ export default function OrderDetails({ id }) {
     async function getOrder() {
       await api.get(`/pedido/${order_id}`).then((response) => {
         setPedido(response.data);
-        console.log(pedido);
+        // console.log(pedido);
       })
     }
     getOrder();

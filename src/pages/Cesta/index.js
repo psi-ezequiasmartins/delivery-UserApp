@@ -40,7 +40,6 @@ export default function Cesta() {
 
   useEffect(() => {
     updateSubTotal();
-    console.log(basket);
   }, [basket, delivery, total, subtotal]);
 
   async function EnviarPedidoELimparCestaDeCompras() {

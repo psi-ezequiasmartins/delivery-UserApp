@@ -61,8 +61,7 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
   }
 
   function AddItem() {
-    // console.log(produto, qtd, itensAcrescentar, valorAcrescentar);
-    AddToBasket(produto, qtd, itensAcrescentar, valorAcrescentar, obs); // incluir acréscimos (itensAcrescentar, valorAcrescentar)
+    AddToBasket(produto, qtd, itensAcrescentar, valorAcrescentar, obs); 
     close();
   }
 
