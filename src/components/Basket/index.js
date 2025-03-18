@@ -8,20 +8,18 @@ import { Ionicons } from '@expo/vector-icons';
 
 import api from '../../config/apiAxios';
 
-export default function BasketItem({ item, AddQtd, RemoveQtd }) { 
+export default function BasketItem({ item, AddQtd, RemoveQtd, updateTotal }) { 
   const [ produto, setProduto ] = useState([]);
   const [ qtd, setQtd ] = useState(item?.QTD);
   const [ total, setTotal ] = useState(qtd * (item?.VR_UNITARIO + item?.VR_ACRESCIMOS));
 
   const id = item.PRODUTO_ID; 
-  // console.log(item, AddQtd, RemoveQtd);
 
   useEffect(() => {
     if (id) {
       async function loadProdutoInfo() {
         await api.get(`/produto/${id}`).then((snapshot) => {
           setProduto(snapshot.data[0]);
-          // console.log(produto);
         });
       }
       loadProdutoInfo();
@@ -29,19 +27,21 @@ export default function BasketItem({ item, AddQtd, RemoveQtd }) {
   }, [id]);
 
   function add() {
-    setQtd(qtd +1);
-    setTotal((qtd +1) * (item?.VR_UNITARIO + item?.VR_ACRESCIMOS));
-    AddQtd();
+    setQtd(qtd + 1);
+    setTotal((qtd + 1) * (item?.VR_UNITARIO + item?.VR_ACRESCIMOS));
+    AddQtd(); // Atualiza o contexto do carrinho
+    updateTotal(); // Atualiza o total
   }
-
+  
   function remove() {
-    if (qtd>1) {
-      setQtd(qtd -1);
-      setTotal((qtd -1) * (item?.VR_UNITARIO + item?.VR_ACRESCIMOS));
-      RemoveQtd();
+    if (qtd > 1) {
+      setQtd(qtd - 1);
+      setTotal((qtd - 1) * (item?.VR_UNITARIO + item?.VR_ACRESCIMOS));
+      RemoveQtd(); // Atualiza o contexto do carrinho
+      updateTotal(); // Atualiza o total
     }
   }
-
+ 
   return (
     <View style={styles.container}>
       <View>
