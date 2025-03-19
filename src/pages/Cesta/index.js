@@ -73,7 +73,7 @@ export default function Cesta() {
     console.log('Pedido: ', jsonString);
     const pedido = await createOrder(jsonString);
     // console.log('Pedido enviado: ', pedido);
-    navigation.navigate('Pedidos');
+    navigation.navigate('Orders');
   }
 
   async function CancelarPedido() {

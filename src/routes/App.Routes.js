@@ -14,22 +14,24 @@ import Perfil from '../pages/User';
 import SideBar from '../components/SideBar';
 import OrderDetailsNavigator from '../pages/Pedidos/OrderDetailsNavigator';
 
-const Stack = createStackNavigator();
-const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+const OrdersStack = createStackNavigator();
+const Drawer = createDrawerNavigator();
 
-function TabNavigator() {
-  return (
+function HomeTabNavigator() {
+  return(
     <Tab.Navigator
       screenOptions={{
         tabBarStyle: { height: 65 },
         fontWeight: 'bold',
-        headerShown: false
+        headerShown: false,
+        backgroundColor: '#000',
       }}
     >
       <Tab.Screen
         name='Home'
-        component={Home}
+        component={HomeStackNavigator}
         options={{
           tabBarIcon: ({ color, size, focused }) => {
             return <Entypo name='shop' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
@@ -37,7 +39,7 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name='Meus Pedidos'
+        name='Orders'
         component={OrderStackNavigator}
         options={{
           tabBarIcon: ({ color, size, focused }) => {
@@ -46,7 +48,7 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name='Perfil do Usuário'
+        name='Profile'
         component={Perfil}
         options={{
           tabBarIcon: ({ color, size, focused }) => {
@@ -55,17 +57,71 @@ function TabNavigator() {
         }}
       />
     </Tab.Navigator>
+  )
+}
+
+function HomeStackNavigator() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}
+    >
+      <Stack.Screen
+        name="Home"
+        component={Home}
+      />
+      <Stack.Screen
+        name="Deliveries"
+        component={Deliveries}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="DeliveryInfo"
+        component={DeliveryInfo}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Cesta"
+        component={Cesta}
+        options={{ headerShown: false}}
+      />
+    </Stack.Navigator>   
+  )
+}
+
+function OrderStackNavigator() {
+  return (
+    <OrdersStack.Navigator 
+      screenOptions={{ 
+        headerShown: false 
+      }}
+    >
+      <OrdersStack.Screen
+        name="Orders"
+        component={Pedidos}
+        options={{ headerShown: false }}
+      />
+      <OrdersStack.Screen
+        name="OrderDetails"
+        component={OrderDetailsNavigator}
+        options={{ headerShown: false }}
+      />
+    </OrdersStack.Navigator>
   );
 }
 
-function DrawerNavigator() {
+export default function AppRoutes() {
 
   function getHeaderTitle(route) {
     const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
     switch (routeName) {
       case 'Home': return 'psi-Delivery';
-      case 'Pedidos': return 'Meus Pedidos';
-      case 'Perfil': return 'Dados do Usuário';
+      case 'Deliveries': return 'Lista de Deliveries';
+      case 'DeliveryDetails': return 'Delivery Info'
+      case 'Orders': return 'Meus Pedidos';
+      case 'OrderDetails': return 'Detalhes do Pedido';
+      case 'Profile': return 'Dados do Usuário';
     }
   };
 
@@ -95,8 +151,8 @@ function DrawerNavigator() {
       }}
     >
       <Drawer.Screen
-        name="psi-Delivery"
-        component={TabNavigator}
+        name="Home"
+        component={HomeTabNavigator}
         options={({ route }) => ({
           headerTitle: getHeaderTitle(route),
           headerTintColor: '#FFF',
@@ -110,108 +166,5 @@ function DrawerNavigator() {
         })}
       />
     </Drawer.Navigator>
-  );
-}
-
-const OrdersStack = createStackNavigator();
-
-function OrderStackNavigator() {
-  return (
-    <OrdersStack.Navigator screenOptions={{ headerShown: false }}>
-      <OrdersStack.Screen
-        name="Orders"
-        component={Pedidos}
-        options={{ headerShown: false }}
-      />
-      <OrdersStack.Screen
-        name="OrderDetails"
-        component={OrderDetailsNavigator}
-        options={{ headerShown: false }}
-      />
-    </OrdersStack.Navigator>
-  );
-}
-
-export default function AppRoutes() {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false
-      }}
-    >
-      <Stack.Screen
-        name="Home"
-        component={Home}
-      />
-      <Stack.Screen
-        name="DrawerNavigator"
-        component={DrawerNavigator}
-      />
-      <Stack.Screen
-        name="Deliveries"
-        component={Deliveries}
-        options={{
-          headerShown: true,
-          headerTitle: 'Lista de Deliveries',
-          headerTintColor: '#FFF',
-          headerStyle: {
-            backgroundColor: '#000',
-            borderBottomWidth: 0,
-          },
-        }}
-      />
-      <Stack.Screen
-        name="DeliveryInfo"
-        component={DeliveryInfo}
-        options={{
-          headerShown: true,
-          headerTitle: 'Delivery Info',
-          headerTintColor: '#FFF',
-          headerStyle: {
-            backgroundColor: '#000',
-            borderBottomWidth: 0,
-          },
-        }}
-      />
-      <Stack.Screen
-        name="Cesta"
-        component={Cesta}
-        options={{
-          headerShown: true,
-          headerTitle: 'Cesta de Compras',
-          headerTintColor: '#FFF',
-          headerStyle: {
-            backgroundColor: '#000',
-            borderBottomWidth: 0,
-          },
-        }}
-      />
-      <Stack.Screen
-        name="Pedidos"
-        component={Pedidos}
-        options={{
-          headerShown: true,
-          headerTitle: 'Meus Pedidos',
-          headerTintColor: '#FFF',
-          headerStyle: {
-            backgroundColor: '#000',
-            borderBottomWidth: 0,
-          },
-        }}
-      />
-      <Stack.Screen
-        name="Perfil"
-        component={Perfil}
-        options={{
-          headerShown: true,
-          headerTitle: 'Dados do Usuário',
-          headerTintColor: '#FFF',
-          headerStyle: {
-            backgroundColor: '#000',
-            borderBottomWidth: 0,
-          },
-        }}
-      />
-    </Stack.Navigator>
   );
 }
