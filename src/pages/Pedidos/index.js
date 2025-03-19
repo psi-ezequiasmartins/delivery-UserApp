@@ -19,17 +19,16 @@ export default function Pedidos() {
   const listRef = useRef(null);
 
   let id = user?.UserID;
-  async function loadPedidos() {
-    await api.get(`/listar/pedidos/usuario/${id}`).then((snapshot) => {
-      setListaDePedidos(snapshot.data);
-    });
-  }
 
   useEffect(() => {
+    async function loadPedidos() {
+      await api.get(`/listar/pedidos/usuario/${id}`).then((snapshot) => {
+        setListaDePedidos(snapshot.data);
+      });
+    }
     loadPedidos();
-//}, [id, notify]); // se notify = true, atualiza a lista de pedidos com seus status atualizados.
   }, [id]);
-
+  //}, [id, notify]); // se notify = true, atualiza a lista de pedidos com seus status atualizados.
 
   async function moveToTop() {
     await listRef.current.scrollToOffset({offset: 0, animated: true})
@@ -59,7 +58,7 @@ export default function Pedidos() {
           showsVerticalScrollIndicator={ true }
           ListEmptyComponent={()=><Text style={styles.empty}>Ainda não há pedidos deste Usuário.</Text>}
           keyExtractor={(item)=>String(item?.PEDIDO_ID)}
-          renderItem={({item}) => <OrderListItem order={item}/>}
+          renderItem={({item})=><OrderListItem order={item}/>}
           ref={listRef}
         />
       </View>

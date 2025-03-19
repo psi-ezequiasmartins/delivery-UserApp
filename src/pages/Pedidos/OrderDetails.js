@@ -11,7 +11,8 @@ import { differenceInDays, parse, isToday } from 'date-fns';
 import api from '../../config/apiAxios';
 
 export default function OrderDetails({ route }) {
-  const { id } = route.params;
+  const id = route.params.id;
+  
   console.log("OrderDetails: ", id);
   const [ pedido, setPedido ] = useState(null);
 
