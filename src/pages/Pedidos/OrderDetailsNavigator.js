@@ -11,7 +11,7 @@ import OrderPayment from "./OrderPayment";
 const Tab = createMaterialTopTabNavigator();
 
 export default function OrderDetailsNavigator({ route }) {
-  const id = route?.params?.PedidoID;
+  const id = route?.params?.PEDIDO_ID;
 
   return (
     <Tab.Navigator>

@@ -2,7 +2,12 @@
  * src/components/Header/index.js
  */
 
-import { useState, useContext, useEffect, useRef } from 'react';
+import { 
+  // useState, 
+  useContext, 
+  // useEffect, 
+  // useRef 
+} from 'react';
 import { View, Image, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 // import { AuthContext } from '../../contexts/AuthContext';
@@ -56,8 +61,8 @@ export default function Header(props) {
       <View style={styles.header}>
         <TouchableOpacity 
           onPress={()=> {
-            alert('psi-Delivery UserApp v1.0' + '\n' + '(31) 98410-7540 ' + '\n' + token_sms);
-            GoToLink("Pedidos");
+            alert('psi-Delivery UserApp v1.0' + '\n' + '(31) 98410-7540 '); // + '\n' + token_sms
+            GoToLink("Home");
           }}
         >
           <Image source={icon} style={{ width: 85, height: 85 }} resizeMode="contain" />

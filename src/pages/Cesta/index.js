@@ -45,7 +45,6 @@ export default function Cesta() {
   async function EnviarPedidoELimparCestaDeCompras() {
     // prepara a lista de itens extras (acréscimos)
     function formatAcrescimos(acrescimos) {
-      // console.log('Acréscimos deste pedido: ', acrescimos);
       return acrescimos.map((acrescimo) => {
         return {
           "DESCRICAO": acrescimo?.DESCRICAO,
@@ -73,19 +72,13 @@ export default function Cesta() {
     const jsonString = JSON.stringify(json, null, 2);
     console.log('Pedido: ', jsonString);
     const pedido = await createOrder(jsonString);
-    // navigation.navigate('Pedidos');
-    // LinkTo("Pedidos");
+    // console.log('Pedido enviado: ', pedido);
+    navigation.navigate('Pedidos');
   }
 
   async function CancelarPedido() {
     await CleanBasket();
     navigation.goBack();
-  }
-
-  function LinkTo(page) {
-    return (
-      navigation.navigate(page)
-    )
   }
 
   if (!basket) {

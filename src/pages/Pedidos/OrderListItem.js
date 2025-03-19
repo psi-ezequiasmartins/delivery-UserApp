@@ -9,25 +9,25 @@ import { useNavigation } from "@react-navigation/native";
 export default function OrderListItem({ order }) {
   const navigation = useNavigation();
 
-  const showOrderDetails = () => {
-    navigation.navigate("StkPedido", { PedidoID: order?.PedidoID });
+  function showOrderDetails() {   
+    navigation.navigate("OrderDetails", { id: order?.PEDIDO_ID });
   };
 
   return (
     <View style={styles.card}>
       <TouchableOpacity onPress={showOrderDetails}>
-        <Text style={{fontWeight: 'bold'}}>Pedido Nº {order?.PedidoID}</Text>
-        <Text style={{fontWeight: 'normal'}}>Data/Hora do Pedido: {order?.Data}</Text>
-        <Text style={{fontWeight: 'normal'}}>Qtd. de Itens: {order?.QtdItens} &#8226; Total: R$ { parseFloat(order?.VrTotal).toFixed(2) }</Text>
+        <Text style={{fontWeight: 'bold'}}>Pedido Nº {order?.PEDIDO_ID}</Text>
+        <Text style={{fontWeight: 'normal'}}>Data/Hora do Pedido: {order?.DATA}</Text>
+        <Text style={{fontWeight: 'normal'}}>Qtd. de Itens: {order?.QTD_ITENS} &#8226; Total: R$ { parseFloat(order?.VR_TOTAL).toFixed(2) }</Text>
         <View style={{flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginBottom: 5}}>
-          { order.Status === "NOVO" ? <Text style={[styles.status, {backgroundColor: 'red'}]}> NOVO </Text> : null }
-          { order.Status === "AGUARDANDO" ? <Text style={[styles.status, {backgroundColor: 'yellow', color: 'black'}]}> AGUARDANDO </Text> : null }
-          { order.Status === "PREPARANDO" ? <Text style={[styles.status, {backgroundColor: 'orange', color: 'black'}]}> PREPARANDO </Text> : null }
-          { order.Status === "PRONTO_PARA_RETIRADA" ? <Text style={[styles.status, {backgroundColor: 'green'}]}> PRONTO PARA RETIRADA </Text> : null }
-          { order.Status === "SAIU_PARA_ENTREGA" ? <Text style={[styles.status, {backgroundColor: 'lime', color: 'black'}]}> SAIU PARA ENTREGA </Text> : null }
-          { order.Status === "RECEBIDO" ? <Text style={[styles.status, {backgroundColor: 'purple'}]}> RECEBIDO </Text> : null }
-          { order.Status === "FINALIZADO" ? <Text style={[styles.status, {backgroundColor: 'black'}]}> FINALIZADO </Text> : null }
-          { order.Status === "CANCELADO" ? <Text style={[styles.status, {backgroundColor: 'gray'}]}> CANCELADO </Text> : null }
+          { order?.STATUS === "NOVO" ? <Text style={[styles.status, {backgroundColor: 'red'}]}> NOVO </Text> : null }
+          { order?.STATUS === "AGUARDANDO" ? <Text style={[styles.status, {backgroundColor: 'yellow', color: 'black'}]}> AGUARDANDO </Text> : null }
+          { order?.STATUS === "PREPARANDO" ? <Text style={[styles.status, {backgroundColor: 'orange', color: 'black'}]}> PREPARANDO </Text> : null }
+          { order?.STATUS === "PRONTO_PARA_RETIRADA" ? <Text style={[styles.status, {backgroundColor: 'green'}]}> PRONTO PARA RETIRADA </Text> : null }
+          { order?.STATUS === "SAIU_PARA_ENTREGA" ? <Text style={[styles.status, {backgroundColor: 'lime', color: 'black'}]}> SAIU PARA ENTREGA </Text> : null }
+          { order?.STATUS === "RECEBIDO" ? <Text style={[styles.status, {backgroundColor: 'purple'}]}> RECEBIDO </Text> : null }
+          { order?.STATUS === "FINALIZADO" ? <Text style={[styles.status, {backgroundColor: 'black'}]}> FINALIZADO </Text> : null }
+          { order?.STATUS === "CANCELADO" ? <Text style={[styles.status, {backgroundColor: 'gray'}]}> CANCELADO </Text> : null }
           <Text><FontAwesome color="#000" name='folder-open' size={28}/></Text>
         </View>
       </TouchableOpacity>

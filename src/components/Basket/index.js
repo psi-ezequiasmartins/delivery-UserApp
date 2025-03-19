@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import api from '../../config/apiAxios';
+// import api from '../../config/apiAxios';
 
 export default function BasketItem({ item, AddQtd, RemoveQtd, updateTotal }) { 
   // const [ produto, setProduto ] = useState([]);

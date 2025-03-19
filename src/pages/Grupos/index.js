@@ -1,3 +1,8 @@
+/**
+ * src/pages/Grupos/index.js
+ */
+
+
 import React from 'react';
 import { StyleSheet, View, Image, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -17,8 +22,7 @@ import btn_floricultura from './images/floricultura.jpg';
 import btn_aguamineral from './images/aguamineral.jpg';
 import btn_mercado from './images/mercado.jpg';
 
-export default function Grupos() { 
-
+export default function Home() { 
   const navigation = useNavigation();
 
   function LinkTo(page, p) {

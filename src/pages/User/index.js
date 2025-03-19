@@ -21,13 +21,13 @@ export default function Perfil() {
   const [ url_imagem, setUrlImagem ] = useState(user?.URL_IMAGEM || "https://via.placeholder.com/250");
   const [ telefone, setTelefone ] = useState(user?.TELEFONE || "");
   const [ email, setEmail ] = useState(user?.EMAIL || "");
-  const [ CEP, setCep ] = useState(user?.CEP || "")
-  const [ endereco, setEndereco ] = useState(user?.ENDERECO || "");
-  const [ numero, setNumero ] = useState(user?.NUMERO || "");
-  const [ complemento, setComplemento ] = useState(user?.COMPLEMENTO || "");
-  const [ bairro, setBairro ] = useState(user?. BAIRRO || "");
-  const [ cidade, setCidade ] = useState(user?.CIDADE || "");
-  const [ UF, setUf] = useState(user?.UF || "");
+  // const [ CEP, setCep ] = useState(user?.CEP || "")
+  // const [ endereco, setEndereco ] = useState(user?.ENDERECO || "");
+  // const [ numero, setNumero ] = useState(user?.NUMERO || "");
+  // const [ complemento, setComplemento ] = useState(user?.COMPLEMENTO || "");
+  // const [ bairro, setBairro ] = useState(user?. BAIRRO || "");
+  // const [ cidade, setCidade ] = useState(user?.CIDADE || "");
+  // const [ UF, setUf] = useState(user?.UF || "");
 
   async function onSave() {
     await updateUser();
@@ -42,13 +42,13 @@ export default function Perfil() {
       "URL_IMAGEM": url_imagem, 
       "TELEFONE": telefone, 
       "EMAIL": email,
-      "CEP": CEP,  
-      "ENDERECO": endereco, 
-      "NUMERO": numero,
-      "COMPLEMENTO": complemento, 
-      "BAIRRO": bairro, 
-      "CIDADE": cidade, 
-      "UF": UF,
+      // "CEP": CEP,  
+      // "ENDERECO": endereco, 
+      // "NUMERO": numero,
+      // "COMPLEMENTO": complemento, 
+      // "BAIRRO": bairro, 
+      // "CIDADE": cidade, 
+      // "UF": UF,
       "TOKEN_MSG": tokenMsg
     }
     try {
@@ -119,86 +119,88 @@ export default function Perfil() {
           />
         </View>
 
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>CEP:</Text>
-          <TextInputMask
-            type={'custom'}
-            options={{
-              mask: "99999-999",
-            }}
-            value={CEP}
-            placeholder="99999-999"
-            onChangeText={ (input) => setCep(input) }
-            keyboardType="numeric"
-            style={styles.input}
-          />
-        </View>
+        {/* 
+          <View style={styles.areaInput}>
+            <Text style={{marginBottom: 5}}>CEP:</Text>
+            <TextInputMask
+              type={'custom'}
+              options={{
+                mask: "99999-999",
+              }}
+              value={CEP}
+              placeholder="99999-999"
+              onChangeText={ (input) => setCep(input) }
+              keyboardType="numeric"
+              style={styles.input}
+            />
+          </View>
 
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Endereco:</Text>
-          <TextInput
-            value={endereco}
-            placeholder="Endereço"
-            onChangeText={(input) => setEndereco(input)}
-            autoCapitalize="words"
-            style={styles.input}
-          />
-        </View>
+          <View style={styles.areaInput}>
+            <Text style={{marginBottom: 5}}>Endereco:</Text>
+            <TextInput
+              value={endereco}
+              placeholder="Endereço"
+              onChangeText={(input) => setEndereco(input)}
+              autoCapitalize="words"
+              style={styles.input}
+            />
+          </View>
 
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Número:</Text>
-          <TextInput
-            value={numero}
-            placeholder="Número"
-            onChangeText={(input) => setNumero(input)}
-            keyboardType="numeric"
-            style={styles.input}
-          />
-        </View>
+          <View style={styles.areaInput}>
+            <Text style={{marginBottom: 5}}>Número:</Text>
+            <TextInput
+              value={numero}
+              placeholder="Número"
+              onChangeText={(input) => setNumero(input)}
+              keyboardType="numeric"
+              style={styles.input}
+            />
+          </View>
 
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Complemento:</Text>
-          <TextInput
-            value={complemento}
-            placeholder="Complemento"
-            onChangeText={(input) => setComplemento(input)}
-            style={styles.input}
-          />
-        </View>
+          <View style={styles.areaInput}>
+            <Text style={{marginBottom: 5}}>Complemento:</Text>
+            <TextInput
+              value={complemento}
+              placeholder="Complemento"
+              onChangeText={(input) => setComplemento(input)}
+              style={styles.input}
+            />
+          </View>
 
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Bairro:</Text>
-          <TextInput 
-            value={bairro}
-            placeholder="Bairro"
-            onChangeText={(input) => setBairro(input)}
-            autoCapitalize="words"
-            style={styles.input}
-          />
-        </View>
+          <View style={styles.areaInput}>
+            <Text style={{marginBottom: 5}}>Bairro:</Text>
+            <TextInput 
+              value={bairro}
+              placeholder="Bairro"
+              onChangeText={(input) => setBairro(input)}
+              autoCapitalize="words"
+              style={styles.input}
+            />
+          </View>
 
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Cidade:</Text>
-          <TextInput 
-            value={cidade}
-            placeholder="Cidade"
-            autoCorrect={false}
-            onChangeText={(input) => setCidade(input)}
-            autoCapitalize="words"
-            style={styles.input}
-          />
-        </View>
+          <View style={styles.areaInput}>
+            <Text style={{marginBottom: 5}}>Cidade:</Text>
+            <TextInput 
+              value={cidade}
+              placeholder="Cidade"
+              autoCorrect={false}
+              onChangeText={(input) => setCidade(input)}
+              autoCapitalize="words"
+              style={styles.input}
+            />
+          </View>
 
-        <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>UF:</Text>
-          <TextInput 
-            value={UF}
-            placeholder="UF"
-            onChangeText={(input) => setUf(input)}
-            autoCapitalize="words"
-            style={styles.input}
-          />
-        </View>
+          <View style={styles.areaInput}>
+            <Text style={{marginBottom: 5}}>UF:</Text>
+            <TextInput 
+              value={UF}
+              placeholder="UF"
+              onChangeText={(input) => setUf(input)}
+              autoCapitalize="words"
+              style={styles.input}
+            />
+          </View> 
+        */}
 
       </ScrollView>
       <TouchableOpacity style={styles.btnSubmit} onPress={ onSave }>

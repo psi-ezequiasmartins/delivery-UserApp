@@ -58,7 +58,7 @@ export default function Pedidos() {
           data={listadepedidos}
           showsVerticalScrollIndicator={ true }
           ListEmptyComponent={()=><Text style={styles.empty}>Ainda não há pedidos deste Usuário.</Text>}
-          keyExtractor={(item)=>String(item.PEDIDO_ID)}
+          keyExtractor={(item)=>String(item?.PEDIDO_ID)}
           renderItem={({item}) => <OrderListItem order={item}/>}
           ref={listRef}
         />

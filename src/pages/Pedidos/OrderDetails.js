@@ -1,3 +1,7 @@
+/**
+ * src/pages/Pedidos/OrderDetails.js
+ */
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import { ScrollView } from "react-native-virtualized-view";
@@ -6,11 +10,13 @@ import { differenceInDays, parse, isToday } from 'date-fns';
 
 import api from '../../config/apiAxios';
 
-export default function OrderDetails({ id }) {
+export default function OrderDetails({ route }) {
+  const { id } = route.params;
+  console.log("OrderDetails: ", id);
   const [ pedido, setPedido ] = useState(null);
 
   const order_id = id;
-  const dataPedidoObj = parse(pedido?.Data, 'dd/MM/yyyy HH:mm:ss', new Date());
+  const dataPedidoObj = parse(pedido?.DATA, 'dd/MM/yyyy HH:mm:ss', new Date());
   const dif = differenceInDays(new Date(), dataPedidoObj);
   const qtdDias = Math.floor(dif);
 
@@ -18,7 +24,7 @@ export default function OrderDetails({ id }) {
     async function getOrder() {
       await api.get(`/pedido/${order_id}`).then((response) => {
         setPedido(response.data);
-        // console.log(pedido);
+        console.log(pedido);
       })
     }
     getOrder();
@@ -36,7 +42,7 @@ export default function OrderDetails({ id }) {
       "CANCELADO": { backgroundColor: 'gray' },
     };
     if (status in statusStyle) {
-      return <Text style={[styles.status, statusStyle[status]]}> {pedido?.Status.replace(/_/g, ' ')} </Text>
+      return <Text style={[styles.status, statusStyle[status]]}> {pedido?.STATUS.replace(/_/g, ' ')} </Text>
     } else {
       return <Text> loading... </Text>;
     }
@@ -63,31 +69,30 @@ export default function OrderDetails({ id }) {
   return (
     <ScrollView>
       <Card>
-        <Image style={styles.image} source={{ uri: pedido.DeliveryImg }} />
-        <Text style={styles.title}>{pedido.Delivery}</Text>
-        <Text style={styles.subtitle}>Pedido Nº {pedido.PedidoID}</Text>
-        <Text style={styles.line}>Data: {pedido.Data} &#8226; {qtdDiasFormatado}</Text>
-        <Text style={styles.line}>Status: {renderStatusMessage(pedido.Status)}</Text>
-        <Text style={{ fontWeight: 'bold' }}>{pedido.Nome}</Text>
-        <Text>Endereço: {pedido.Endereco}</Text>
-        <Text>{pedido.DeliveryLat} | {pedido.DeliveryLng}</Text>
+        <Image style={styles.image} source={{ uri: pedido?.DELIVERY_IMG }} />
+        <Text style={styles.title}>{pedido?.DELIVERY_NOME}</Text>
+        <Text style={styles.subtitle}>Pedido Nº {pedido?.PEDIDO_ID}</Text>
+        <Text style={styles.line}>Data: {pedido?.DATA} &#8226; {qtdDiasFormatado}</Text>
+        <Text style={styles.line}>Status: {renderStatusMessage(pedido?.STATUS)}</Text>
+        <Text style={{ fontWeight: 'bold' }}>{pedido?.CLIENTE_NOME}</Text>
+        <Text>Endereço: {pedido?.ENDERECO}</Text>        
       </Card>
 
       <Text style={[styles.title, {marginTop: 10}]}>ITENS DO PEDIDO</Text>
 
       <FlatList
         data={pedido.itens}
-        keyExtractor={(item) => item.ItemID.toString()}
+        keyExtractor={(item) => item?.ITEM_ID.toString()}
         renderItem={({ item }) => (
           <Card>
             <ListItem>
               <Image
-                source={{ uri: item.UrlImagem }}
+                source={{ uri: item?.URL_IMAGEM }}
                 style={{ width: 50, height: 50 }}
               />
               <ListItem.Content>
-                <ListItem.Title>{item.Produto}</ListItem.Title>
-                <ListItem.Subtitle>Quantidade: {item.Qtd} x R$ {parseFloat(item.VrUnitario).toFixed(2)}</ListItem.Subtitle>
+                <ListItem.Title>{item?.PRODUTO_NOME}</ListItem.Title>
+                <ListItem.Subtitle>Quantidade: {item.QTD} x R$ {parseFloat(item.VR_UNITARIO).toFixed(2)}</ListItem.Subtitle>
                 {/* Outros detalhes do item */}
               </ListItem.Content>
             </ListItem>
@@ -98,7 +103,7 @@ export default function OrderDetails({ id }) {
                 <Text style={{ fontWeight: 'bold' }}>Acréscimos:</Text>
                 {item.Acrescimos.map((acrescimo, index) => (
                   <View key={index}>
-                    <Text>+ {acrescimo.Descricao}: {item.Qtd} x R$ {parseFloat(acrescimo.VrUnitario).toFixed(2)} </Text>
+                    <Text>+ {acrescimo.Descricao}: {item?.QTD} x R$ {parseFloat(acrescimo?.VR_UNITARIO).toFixed(2)} </Text>
                   </View>
                 ))}
               </View>
@@ -106,11 +111,11 @@ export default function OrderDetails({ id }) {
 
             {/* Observações */}
             {item.Obs && (
-              <Text style={styles.obs}>Obs.: {item.Obs}</Text>
+              <Text style={styles.obs}>Obs.: {item?.OBS}</Text>
             )}
 
             <Divider />
-            <Text style={{fontWeight: "bold"}}>{item.Qtd} x (R$ {parseFloat(item.VrUnitario).toFixed(2)} + R$ R$ {parseFloat(item.VrAcrescimos).toFixed(2)}) = R$ {parseFloat(item.Total).toFixed(2)}</Text>
+            <Text style={{fontWeight: "bold"}}>{item.QTD} x (R$ {parseFloat(item?.VR_UNITARIO).toFixed(2)} + R$ R$ {parseFloat(item?.VR_ACRESCIMOS).toFixed(2)}) = R$ {parseFloat(item?.TOTAL).toFixed(2)}</Text>
           </Card>
         )}
       />
@@ -118,9 +123,9 @@ export default function OrderDetails({ id }) {
       <Card>
         <Text style={{fontWeight: "bold"}}>RESUMO TOTAL</Text>
         <Divider />
-        <Text style={{fontWeight: "bold"}}>+ SUB-TOTAL: R$ {parseFloat(pedido?.VrSubTotal).toFixed(2)}</Text>
-        <Text style={{fontWeight: "bold"}}>+ TAXA DE ENTREGA: R$ {parseFloat(pedido?.TaxaEntrega).toFixed(2)}</Text>
-        <Text style={{fontWeight: "bold"}}>= TOTAL DO PEDIDO: R$ {parseFloat(pedido?.VrTotal).toFixed(2)}</Text>
+        <Text style={{fontWeight: "bold"}}>+ SUB-TOTAL: R$ {parseFloat(pedido?.VR_SUBTOTAL).toFixed(2)}</Text>
+        <Text style={{fontWeight: "bold"}}>+ TAXA DE ENTREGA: R$ {parseFloat(pedido?.TAXA_ENTREGA).toFixed(2)}</Text>
+        <Text style={{fontWeight: "bold"}}>= TOTAL DO PEDIDO: R$ {parseFloat(pedido?.VR_TOTAL).toFixed(2)}</Text>
       </Card>
     </ScrollView>
   );
