@@ -10,7 +10,10 @@ export default function OrderListItem({ order }) {
   const navigation = useNavigation();
 
   function showOrderDetails() {   
-    navigation.navigate("OrderDetails", { id: order?.PEDIDO_ID });
+    console.log('Order Id: ', order?.PEDIDO_ID);
+    navigation.navigate('OrderDetails', { 
+      id: order?.PEDIDO_ID 
+    });
   };
 
   return (

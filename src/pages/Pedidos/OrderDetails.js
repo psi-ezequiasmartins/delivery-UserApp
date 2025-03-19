@@ -7,29 +7,32 @@ import { View, Text, Image, FlatList, ActivityIndicator, StyleSheet } from 'reac
 import { ScrollView } from "react-native-virtualized-view";
 import { Card, ListItem, Divider } from 'react-native-elements';
 import { differenceInDays, parse, isToday } from 'date-fns';
+import { useNavigation } from "@react-navigation/native";
 
 import api from '../../config/apiAxios';
 
 export default function OrderDetails({ route }) {
-  const id = route.params.id;
-  
-  console.log("OrderDetails: ", id);
-  const [ pedido, setPedido ] = useState(null);
-
-  const order_id = id;
-  const dataPedidoObj = parse(pedido?.DATA, 'dd/MM/yyyy HH:mm:ss', new Date());
-  const dif = differenceInDays(new Date(), dataPedidoObj);
-  const qtdDias = Math.floor(dif);
+  const [pedido, setPedido] = useState(null);
+  const navigation = useNavigation();
+ 
+  const orderId = route?.params?.id;
 
   useEffect(() => {
+    if (!orderId) {
+      console.error('ID do pedido não encontrado.');
+      navigation.goBack();  
+      return;
+    }
     async function getOrder() {
-      await api.get(`/pedido/${order_id}`).then((response) => {
-        setPedido(response.data);
-        console.log(pedido);
-      })
+      try {
+        const response = await api.get(`/pedido/${orderId}`);
+        setPedido(response.data); 
+      } catch (error) {
+        console.error('Erro ao carregar pedido: ', error);
+      }
     }
     getOrder();
-  }, [order_id]);
+  }, [orderId]);
 
   function renderStatusMessage(status) {
     const statusStyle = {
@@ -48,6 +51,10 @@ export default function OrderDetails({ route }) {
       return <Text> loading... </Text>;
     }
   }
+
+  const dataPedidoObj = parse(pedido?.DATA, 'dd/MM/yyyy HH:mm:ss', new Date());
+  const dif = differenceInDays(new Date(), dataPedidoObj);
+  const qtdDias = Math.floor(dif);
 
   let qtdDiasFormatado = '';
     if (isToday(dataPedidoObj)) {

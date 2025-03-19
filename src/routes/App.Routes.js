@@ -19,104 +19,12 @@ const Stack = createStackNavigator();
 const OrdersStack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
-function HomeTabNavigator() {
-  return(
-    <Tab.Navigator
-      screenOptions={{
-        tabBarStyle: { height: 65 },
-        fontWeight: 'bold',
-        headerShown: false,
-        backgroundColor: '#000',
-      }}
-    >
-      <Tab.Screen
-        name='Home'
-        component={HomeStackNavigator}
-        options={{
-          tabBarIcon: ({ color, size, focused }) => {
-            return <Entypo name='shop' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
-          },
-        }}
-      />
-      <Tab.Screen
-        name='Orders'
-        component={OrderStackNavigator}
-        options={{
-          tabBarIcon: ({ color, size, focused }) => {
-            return <Fontisto name='shopping-bag-1' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
-          },
-        }}
-      />
-      <Tab.Screen
-        name='Profile'
-        component={Perfil}
-        options={{
-          tabBarIcon: ({ color, size, focused }) => {
-            return <FontAwesome5 name='user-cog' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
-          },
-        }}
-      />
-    </Tab.Navigator>
-  )
-}
-
-function HomeStackNavigator() {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false
-      }}
-    >
-      <Stack.Screen
-        name="Home"
-        component={Home}
-      />
-      <Stack.Screen
-        name="Deliveries"
-        component={Deliveries}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="DeliveryInfo"
-        component={DeliveryInfo}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Cesta"
-        component={Cesta}
-        options={{ headerShown: false}}
-      />
-    </Stack.Navigator>   
-  )
-}
-
-function OrderStackNavigator() {
-  return (
-    <OrdersStack.Navigator 
-      screenOptions={{ 
-        headerShown: false 
-      }}
-    >
-      <OrdersStack.Screen
-        name="Orders"
-        component={Pedidos}
-        options={{ headerShown: false }}
-      />
-      <OrdersStack.Screen
-        name="OrderDetails"
-        component={OrderDetailsNavigator}
-        options={{ headerShown: false }}
-      />
-    </OrdersStack.Navigator>
-  );
-}
-
 export default function AppRoutes() {
 
   function getHeaderTitle(route) {
     const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
     switch (routeName) {
-      case 'Home': return 'psi-Delivery';
+      case 'Home', 'HomeStack': return 'psi-Delivery';
       case 'Deliveries': return 'Lista de Deliveries';
       case 'DeliveryDetails': return 'Delivery Info'
       case 'Orders': return 'Meus Pedidos';
@@ -124,6 +32,116 @@ export default function AppRoutes() {
       case 'Profile': return 'Dados do Usuário';
     }
   };
+
+  function HomeTabNavigator() {
+    return(
+      <Tab.Navigator
+        screenOptions={{
+          tabBarStyle: { height: 65 },
+          fontWeight: 'bold',
+          headerShown: false,
+          backgroundColor: '#000',
+        }}
+      >
+        <Tab.Screen
+          name='HomeStack'
+          component={HomeStackNavigator}
+          options={({ route }) => ({
+            headerTitle: getHeaderTitle(route),
+            headerTintColor: '#FFF',
+            headerStyle: {
+              backgroundColor: '#000',
+              borderBottomWidth: 0,
+            },
+            tabBarIcon: ({ focused }) => {
+              return <Entypo name='shop' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
+            },
+          })}
+        />
+        <Tab.Screen
+          name='OrdersStack'
+          component={OrderStackNavigator}
+          options={({ route }) => ({
+            headerTitle: getHeaderTitle(route),
+            headerTintColor: '#FFF',
+            headerStyle: {
+              backgroundColor: '#000',
+              borderBottomWidth: 0,
+            },
+            tabBarIcon: ({ focused }) => {
+              return <Fontisto name='shopping-bag-1' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
+            },
+          })}
+        />
+        <Tab.Screen
+          name='Profile'
+          component={Perfil}
+          options={({ route }) => ({
+            headerTitle: getHeaderTitle(route),
+            headerTintColor: '#FFF',
+            headerStyle: {
+              backgroundColor: '#000',
+              borderBottomWidth: 0,
+            },
+            tabBarIcon: ({ focused }) => {
+              return <FontAwesome5 name='user-cog' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
+            },
+          })}
+        />
+      </Tab.Navigator>
+    )
+  }
+
+  function HomeStackNavigator() {
+    return (
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false
+        }}
+      >
+        <Stack.Screen
+          name="Home"
+          component={Home}
+        />
+        <Stack.Screen
+          name="Deliveries"
+          component={Deliveries}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="DeliveryInfo"
+          component={DeliveryInfo}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Cesta"
+          component={Cesta}
+          options={{ headerShown: false}}
+        />
+      </Stack.Navigator>   
+    )
+  }
+
+  function OrderStackNavigator() {
+    return (
+      <OrdersStack.Navigator 
+        screenOptions={{ 
+          headerShown: false 
+        }}
+      >
+        <OrdersStack.Screen
+          name="Orders"
+          component={Pedidos}
+          options={{ headerShown: false }}
+        />
+        <OrdersStack.Screen
+          name="OrderDetails"
+          component={OrderDetailsNavigator}
+          options={{ headerShown: false }}
+        />
+      </OrdersStack.Navigator>
+    );
+  }
 
   return (
     <Drawer.Navigator
