@@ -9,6 +9,7 @@ import Deliveries from '../pages/Delivery';
 import DeliveryInfo from '../pages/Delivery/DeliveryInfo';
 import Cesta from '../pages/Cesta';
 import Pedidos from '../pages/Pedidos';
+import OrderDetails from '../pages/Pedidos/OrderDetails';
 import Perfil from '../pages/User';
 
 import SideBar from '../components/SideBar';
@@ -135,9 +136,21 @@ export default function AppRoutes() {
           options={{ headerShown: false }}
         />
         <OrdersStack.Screen
-          name="OrderDetails"
+          name="OrderDetailsNavigator"
           component={OrderDetailsNavigator}
-          options={{ headerShown: false }}
+          options={{ 
+            title: 'Detalhes do Pedido',  
+            headerTitleAlign: 'center',
+            headerTintColor: '#FFF',
+            headerStyle: {
+              backgroundColor: '#000',
+              borderBottomWidth: 0,
+            },
+            tabBarIcon: {
+              color: '#000'
+            },
+
+          }}
         />
       </OrdersStack.Navigator>
     );

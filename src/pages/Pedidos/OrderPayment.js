@@ -8,7 +8,7 @@ import { TextInputMask } from 'react-native-masked-text';
 
 import api from "../../config/apiAxios";
 
-export default function OrderPayment({ id }) {
+export default function OrderPayment({ orderId }) {
   const [email, setEmail] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [cvv, setCvv] = useState('');
@@ -17,25 +17,24 @@ export default function OrderPayment({ id }) {
   const [loading, setLoading] = useState(false);
 
   const [ pedido, setPedido ] = useState(null);
-  const order_id = id;
-
+  
   useEffect(() => {
     async function getOrder() {
-      await api.get(`/pedido/${order_id}`).then((response) => {
+      await api.get(`/pedido/${orderId}`).then((response) => {
         setPedido(response.data);
         console.log(pedido);
       })
     }
     getOrder();
-  }, [order_id]);
+  }, [orderId]);
 
   async function handlePayment() {
     setLoading(true);
     try {
       const paymentData = {
-        itemId: order_id,
-        itemDescription: pedido?.PedidoID+' '+pedido?.Data+' '+pedido?.Delivery,
-        itemAmount: pedido?.VrTotal,
+        itemId: orderId,
+        itemDescription: pedido?.PEDIDO_ID+' '+pedido?.DATA+' '+pedido?.DELIVERY_NOME,
+        itemAmount: pedido?.VR_TOTAL,
         itemQuantity: '1',
         cardNumber,
         cvv,
@@ -57,9 +56,9 @@ export default function OrderPayment({ id }) {
       <View style={styles.container}>
         <Text style={styles.subtitle}>PAGAMENTO VIA CARTÃO</Text>
         <Text>{" "}</Text>
-        <Text style={{fontSize: 13, fontWeight: "bold" }}>PEDIDO Nº {id} {pedido?.Data}</Text>
+        <Text style={{fontSize: 13, fontWeight: "bold" }}>PEDIDO Nº {orderId} {pedido?.DATA}</Text>
         <Text style={{fontSize: 13}}>
-          R$ {parseFloat(pedido?.VrSubTotal).toFixed(2)} + R$ {parseFloat(pedido?.TaxaEntrega).toFixed(2)} = R$ {parseFloat(pedido?.VrTotal).toFixed(2)}
+          R$ {parseFloat(pedido?.VR_SUBTOTAL).toFixed(2)} + R$ {parseFloat(pedido?.TAXA_ENTREGA).toFixed(2)} = R$ {parseFloat(pedido?.VR_TOTAL).toFixed(2)}
         </Text>
         <View style={styles.areaInput}>
           <TextInput

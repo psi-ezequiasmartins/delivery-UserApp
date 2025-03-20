@@ -9,26 +9,25 @@ import { Fontisto, AntDesign } from "@expo/vector-icons";
 
 import api from "../../config/apiAxios";
 
-export default function OrderLiveUpdates({ id }) {
+export default function OrderLiveUpdates({ orderId }) {
   const [ pedido, setPedido ] = useState(null);
   const [ courier, setCourier ] = useState(null);
 
-  const order_id = id;
-  const courier_id = 200001; //O ID do Courier será fornecido posteriormente junto a atualização do status de entrega
+  const courierId = 200001; //O ID do Courier será fornecido posteriormente junto a atualização do status de entrega
 
   useEffect(() => {
     async function getOrder() {
-      await api.get(`/pedido/${order_id}`).then((response) => {
+      await api.get(`/pedido/${orderId}`).then((response) => {
         setPedido(response.data);
         console.log(pedido);
       })
     }
     getOrder();
-  }, [order_id]);
+  }, [orderId]);
 
   useEffect(() => {
     async function getCourier() {
-      await api.get(`/courier/${courier_id}`).then(response => {
+      await api.get(`/courier/${courierId}`).then(response => {
         setCourier(response.data[0]);
         console.log(courier);
       })
@@ -48,7 +47,7 @@ export default function OrderLiveUpdates({ id }) {
       "CANCELADO": { backgroundColor: 'gray' },
     };
     if (status in statusStyle) {
-      return <Text style={[styles.status, statusStyle[status]]}>{pedido?.Status.replace(/_/g, ' ')}</Text>
+      return <Text style={[styles.status, statusStyle[status]]}>{pedido?.STATUS.replace(/_/g, ' ')}</Text>
     } else {
       return <Text> loading... </Text>;
     }
@@ -65,30 +64,29 @@ export default function OrderLiveUpdates({ id }) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{height: 70}}>
-        {renderStatusMessage(pedido?.Status)}
+        {renderStatusMessage(pedido?.STATUS)}
       </View>
       
       <View style={{flex: 1}}>
         <MapView
           style={styles.map}
-          initialRegion={{
-            latitude: pedido?.DeliveryLat,
-            longitude: pedido?.DeliveryLng,
+          initialRegion={{    
+            latitude: -19.822762623874688, // pedido?.DeliveryLat,
+            longitude: -43.97869630585553, //pedido?.DeliveryLng,
             latitudeDelta: 0.007,
             longitudeDelta: 0.007,
           }}
           showsUserLocation={true} 
           showsTraffic={true}
-          maxZoomLevel={18}
           flipY={true} 
         >
           {courier?.Latitude && (
             <Marker 
               coordinate={{ 
-                latitude: courier?.Latitude, 
-                longitude: courier?.Longitude 
+                latitude: -19.826269026481697, //courier?.Latitude, 
+                longitude: -43.980350412813216, //courier?.Longitude 
               }}
-              title={courier?.Nome}
+              title={courier?.NOME}
               description="Entregador"
             >
               <View style={{ padding: 5, backgroundColor: "red", borderRadius: 5 }}>
@@ -99,10 +97,10 @@ export default function OrderLiveUpdates({ id }) {
 
           <Marker
             coordinate={{
-              latitude: pedido?.DeliveryLat,
-              longitude: pedido?.DeliveryLng
+              latitude: -19.827253702432564, //pedido?.DeliveryLat,
+              longitude: -43.98311978766509, //pedido?.DeliveryLng
             }}
-            title={pedido?.Delivery}
+            title={pedido?.DELIVERY_NOME}
             description="Delivery"
           >
             <View style={{ padding: 5 }}>
@@ -112,10 +110,10 @@ export default function OrderLiveUpdates({ id }) {
 
           <Marker
             coordinate={{
-              latitude: pedido?.Latitude,
-              longitude: pedido?.Longitude
+              latitude: -19.827253702432564, //pedido?.DeliveryLat,
+              longitude: -43.98311978766509, //pedido?.DeliveryLng
             }}
-            title={pedido?.Nome}
+            title={pedido?.CLIENTE_NOME}
             description="Sua Localização"
           >
             <View style={{ padding: 5 }}>

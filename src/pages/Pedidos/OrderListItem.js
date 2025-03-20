@@ -9,16 +9,16 @@ import { useNavigation } from "@react-navigation/native";
 export default function OrderListItem({ order }) {
   const navigation = useNavigation();
 
-  function showOrderDetails() {   
-    console.log('Order Id: ', order?.PEDIDO_ID);
-    navigation.navigate('OrderDetails', { 
-      id: order?.PEDIDO_ID 
+  function handleOrderPress() {   
+    console.log('Order Id antes da navegação: ', order?.PEDIDO_ID);
+    navigation.navigate('OrderDetailsNavigator', {
+      id: order?.PEDIDO_ID
     });
   };
 
   return (
     <View style={styles.card}>
-      <TouchableOpacity onPress={showOrderDetails}>
+      <TouchableOpacity onPress={handleOrderPress}>
         <Text style={{fontWeight: 'bold'}}>Pedido Nº {order?.PEDIDO_ID}</Text>
         <Text style={{fontWeight: 'normal'}}>Data/Hora do Pedido: {order?.DATA}</Text>
         <Text style={{fontWeight: 'normal'}}>Qtd. de Itens: {order?.QTD_ITENS} &#8226; Total: R$ { parseFloat(order?.VR_TOTAL).toFixed(2) }</Text>

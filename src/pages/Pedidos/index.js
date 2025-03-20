@@ -14,7 +14,7 @@ import api from "../../config/apiAxios";
 
 export default function Pedidos() {
   const { user } = useContext(AuthContext); // incluir notify 
-  const [ listadepedidos, setListaDePedidos] = useState([]);
+  const [ pedidos, setPedidos] = useState([]);
 
   const listRef = useRef(null);
 
@@ -22,14 +22,12 @@ export default function Pedidos() {
 
   useEffect(() => {
     async function loadPedidos() {
-      await api.get(`/listar/pedidos/usuario/${id}`).then((snapshot) => {
-        setListaDePedidos(snapshot.data);
-      });
+      const response = await api.get(`/listar/pedidos/usuario/${id}`);
+      setPedidos(response.data);
     }
     loadPedidos();
   }, [id]);
-  //}, [id, notify]); // se notify = true, atualiza a lista de pedidos com seus status atualizados.
-
+  
   async function moveToTop() {
     await listRef.current.scrollToOffset({offset: 0, animated: true})
   }
@@ -54,7 +52,7 @@ export default function Pedidos() {
       </View>
       <View style={styles.container}>
         <FlatList
-          data={listadepedidos}
+          data={pedidos}
           showsVerticalScrollIndicator={ true }
           ListEmptyComponent={()=><Text style={styles.empty}>Ainda não há pedidos deste Usuário.</Text>}
           keyExtractor={(item)=>String(item?.PEDIDO_ID)}
@@ -95,3 +93,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
 })
+
+//}, [id, notify]); // se notify = true, atualiza a lista de pedidos com seus status atualizados.

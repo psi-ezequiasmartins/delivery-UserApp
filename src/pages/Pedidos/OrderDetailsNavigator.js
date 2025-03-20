@@ -11,18 +11,27 @@ import OrderPayment from "./OrderPayment";
 const Tab = createMaterialTopTabNavigator();
 
 export default function OrderDetailsNavigator({ route }) {
-  const id = route?.params?.id;
+  const { id } = route.params || {};
+  console.log('ID recebido no Navigator:', id);
 
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        tabBarLabelStyle: { fontSize: 12, fontWeight: 'bold' },
+        tabBarStyle: { backgroundColor: '#fff' },
+        tabBarIndicatorStyle: { backgroundColor: '#145E7D' },
+        tabBarActiveTintColor: '#145E7D',
+        tabBarInactiveTintColor: '#666'
+      }}
+    >
       <Tab.Screen name="DETALHES">
-        {()=><OrderDetails id={id}/> }
+        {()=><OrderDetails orderId={id}/> }
       </Tab.Screen>
       <Tab.Screen name="LOCALIZAÇÃO">
-        {()=><OrderLiveUpdates id={id}/> }
+        {()=><OrderLiveUpdates orderId={id}/> }
       </Tab.Screen>
       <Tab.Screen name="PAGAMENTO">
-        {()=><OrderPayment id={id}/> }
+        {()=><OrderPayment orderId={id}/> }
       </Tab.Screen>
     </Tab.Navigator>
   );
