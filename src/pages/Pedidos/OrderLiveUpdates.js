@@ -71,8 +71,8 @@ export default function OrderLiveUpdates({ orderId }) {
         <MapView
           style={styles.map}
           initialRegion={{    
-            latitude: -19.822762623874688, // pedido?.DeliveryLat,
-            longitude: -43.97869630585553, //pedido?.DeliveryLng,
+            latitude: -19.82628, // pedido?.DeliveryLat,
+            longitude: -43.98033, //pedido?.DeliveryLng,
             latitudeDelta: 0.007,
             longitudeDelta: 0.007,
           }}
@@ -80,11 +80,11 @@ export default function OrderLiveUpdates({ orderId }) {
           showsTraffic={true}
           flipY={true} 
         >
-          {courier?.Latitude && (
+          {courier?.COURIER_ID && (
             <Marker 
               coordinate={{ 
-                latitude: -19.826269026481697, //courier?.Latitude, 
-                longitude: -43.980350412813216, //courier?.Longitude 
+                latitude: -19.82628, //courier?.Latitude, 
+                longitude: -43.98033, //courier?.Longitude 
               }}
               title={courier?.NOME}
               description="Entregador"
@@ -97,8 +97,8 @@ export default function OrderLiveUpdates({ orderId }) {
 
           <Marker
             coordinate={{
-              latitude: -19.827253702432564, //pedido?.DeliveryLat,
-              longitude: -43.98311978766509, //pedido?.DeliveryLng
+              latitude: -19.82277, //pedido?.DeliveryLat,
+              longitude: -43.97870, //pedido?.DeliveryLng
             }}
             title={pedido?.DELIVERY_NOME}
             description="Delivery"
@@ -110,8 +110,8 @@ export default function OrderLiveUpdates({ orderId }) {
 
           <Marker
             coordinate={{
-              latitude: -19.827253702432564, //pedido?.DeliveryLat,
-              longitude: -43.98311978766509, //pedido?.DeliveryLng
+              latitude: -19.82724, //pedido?.DeliveryLat,
+              longitude: -43.98316, //pedido?.DeliveryLng
             }}
             title={pedido?.CLIENTE_NOME}
             description="Sua Localização"
