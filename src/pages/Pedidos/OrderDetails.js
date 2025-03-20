@@ -158,9 +158,9 @@ export default function OrderDetails({ orderId }) {
         <Text style={[styles.title, {marginTop: 10}]}>ITENS DO PEDIDO</Text>
   
         <FlatList
-          data={pedido.itens}
-          keyExtractor={(item) => item?.ITEM_ID.toString()}
-          renderItem={({ item }) => (
+          data={pedido?.ITENS}
+          keyExtractor={(item)=>String(item?.ITEM_ID)}
+          renderItem={({item}) => (
             <Card>
               <ListItem>
                 <Image
@@ -168,7 +168,7 @@ export default function OrderDetails({ orderId }) {
                   style={{ width: 50, height: 50 }}
                 />
                 <ListItem.Content>
-                  <ListItem.Title>{item?.PRODUTO_NOME}</ListItem.Title>
+                  <ListItem.Title>{item?.PRODUTO}</ListItem.Title>
                   <ListItem.Subtitle>Quantidade: {item.QTD} x R$ {parseFloat(item.VR_UNITARIO).toFixed(2)}</ListItem.Subtitle>
                   {/* Outros detalhes do item */}
                 </ListItem.Content>
