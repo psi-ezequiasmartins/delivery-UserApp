@@ -25,12 +25,8 @@ function CartProvider({ children }) {
     } else {
       let data = {
         ...produto,
-        ACRESCIMOS: itensAcrescentar,
-        OBS: obs,
-        QTD: qtd,
-        VR_UNITARIO: produto?.VR_UNITARIO,
-        VR_ACRESCIMOS: valorAcrescentar,
-        TOTAL: qtd * (produto?.VR_UNITARIO + valorAcrescentar),
+        "ACRESCIMOS": itensAcrescentar, "OBS": obs, "QTD": qtd, "VR_UNITARIO": produto?.VR_UNITARIO, "VR_ACRESCIMOS": valorAcrescentar,
+        "TOTAL": qtd * (produto?.VR_UNITARIO + valorAcrescentar),
       };
       updatedBasket = [...updatedBasket, data]; // Adiciona o novo item
     }

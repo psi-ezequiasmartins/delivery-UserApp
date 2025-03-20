@@ -9,7 +9,6 @@ import Deliveries from '../pages/Delivery';
 import DeliveryInfo from '../pages/Delivery/DeliveryInfo';
 import Cesta from '../pages/Cesta';
 import Pedidos from '../pages/Pedidos';
-import OrderDetails from '../pages/Pedidos/OrderDetails';
 import Perfil from '../pages/User';
 
 import SideBar from '../components/SideBar';
@@ -31,6 +30,8 @@ export default function AppRoutes() {
       case 'Orders': return 'Meus Pedidos';
       case 'OrderDetails': return 'Detalhes do Pedido';
       case 'Profile': return 'Dados do Usuário';
+      case 'HomeStack': return 'psi-Delivery';
+      case 'OrdersStack': return 'Meus Pedidos';
     }
   };
 

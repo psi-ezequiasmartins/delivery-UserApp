@@ -187,7 +187,7 @@ export default function OrderDetails({ orderId }) {
               )}
   
               {/* Observações */}
-              {item.Obs && (
+              {item?.OBS && (
                 <Text style={styles.obs}>Obs.: {item?.OBS}</Text>
               )}
   
@@ -196,6 +196,7 @@ export default function OrderDetails({ orderId }) {
             </Card>
           )}
         />
+
         {/* Exibição do sumário dos totais */}
         <Card>
           <Text style={{fontWeight: "bold"}}>RESUMO TOTAL</Text>

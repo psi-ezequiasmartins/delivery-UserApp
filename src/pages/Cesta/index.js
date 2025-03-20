@@ -21,6 +21,8 @@ export default function Cesta() {
   const { user, tokenMsg } = useContext(AuthContext);
   const [ subtotal, setSubTotal] = useState(0);
   const [ total, setTotal ] = useState(0);
+
+  let token_sms = 'ExponentPushToken[W47L3BHJyJxjUEa5vomnqd]';
   
   function updateSubTotal() {
     let new_value = 0;
@@ -43,37 +45,59 @@ export default function Cesta() {
   }, [basket, delivery, total, subtotal]);
 
   async function EnviarPedidoELimparCestaDeCompras() {
-    // prepara a lista de itens extras (acréscimos)
-    function formatAcrescimos(acrescimos) {
-      return acrescimos.map((acrescimo) => {
-        return {
-          "DESCRICAO": acrescimo?.DESCRICAO,
-          "VR_UNITARIO": acrescimo?.VR_UNITARIO,
-        };
-      });
-    }
-    // prepara a lista da cesta de compras (basket): itens e acréscimos (se houver)
-    const formattedBasket = basket.map((item) => ({
-      ...item,
-      "ACRESCIMOS": formatAcrescimos(item?.ACRESCIMOS),
-      "TOTAL": (item?.VR_ACRESCIMOS + item?.VR_UNITARIO) * item?.QTD
-    }));
+    try {
+      // prepara a lista de itens extras (acréscimos)
+      function formatAcrescimos(acrescimos) {
+        return acrescimos.map((acrescimo) => {
+          return {
+            "DESCRICAO": acrescimo?.DESCRICAO,
+            "VR_UNITARIO": acrescimo?.VR_UNITARIO,
+          };
+        });
+      }
+
+      // prepara a lista da cesta de compras (basket): itens e acréscimos (se houver)
+      const formattedBasket = basket.map((item) => ({
+        ...item,
+        "ACRESCIMOS": formatAcrescimos(item?.ACRESCIMOS),
+        "TOTAL": (item?.VR_ACRESCIMOS + item?.VR_UNITARIO) * item?.QTD
+      }));
   
-    const json = {
-      "DELIVERY_ID": delivery?.DELIVERY_ID,
-      "USER_ID": user?.UserID,
-      "VR_SUBTOTAL": subtotal,
-      "TAXA_ENTREGA": delivery?.TAXA_ENTREGA,
-      "VR_TOTAL": total,
-      "TOKEN_MSG": tokenMsg,
-      "STATUS": "NOVO",
-      "itens": formattedBasket,
-    };
-    const jsonString = JSON.stringify(json, null, 2);
-    console.log('Pedido: ', jsonString);
-    const pedido = await createOrder(jsonString);
-    // console.log('Pedido enviado: ', pedido);
-    navigation.navigate('Orders');
+      const json = {
+        "DELIVERY_ID": delivery?.DELIVERY_ID,
+        "USER_ID": user?.UserID,
+        "VR_SUBTOTAL": subtotal,
+        "TAXA_ENTREGA": delivery?.TAXA_ENTREGA,
+        "VR_TOTAL": total,
+        "TOKEN_MSG": tokenMsg || token_sms,
+        "STATUS": "NOVO",
+        // endereço de entrega (substituir os campos abaixo por um único campo ENDERECO_ENTREGA)
+        // "ENDERECO_ENTREGA": "R. dos Comanches, 870, Apto 302 - Santa Mônica",
+        // "LATITUDE": -19.82711, 
+        // "LONGITUDE": -43.98319,
+        "ENDERECO": "Rua dos Comanches",
+        "NUMERO": "870",
+        "COMPLEMENTO": "Apto 302",
+        "BAIRRO": "Santa Mônica",
+        "CIDADE": "Belo Horizonte",
+        "UF": "MG",
+        "CEP": "31530-250",
+        "itens": formattedBasket,
+      };
+      const pedido = JSON.stringify(json, null, 2);
+      console.log('Dados do Pedido a serem enviados: ', pedido);
+      await createOrder(pedido);
+
+      navigation.navigate('OrdersStack', { screen: 'Pedidos' });
+      
+    } catch (error) {
+      console.error('Erro ao criar pedido:', {
+        message: error.message,
+        data: error.response?.data,
+        status: error.response?.status
+      });
+      throw error;      
+    }
   }
 
   async function CancelarPedido() {

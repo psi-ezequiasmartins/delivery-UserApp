@@ -16,18 +16,12 @@ export default function Perfil() {
   const navigation = useNavigation();
   const { user, setUser, tokenMsg, signOut } = useContext(AuthContext);
 
-  const [ nome, setNome ] = useState(user?.NOME || "");
-  const [ sobrenome, setSobrenome ] = useState(user?.SOBRENOME || "");
-  const [ url_imagem, setUrlImagem ] = useState(user?.URL_IMAGEM || "https://via.placeholder.com/250");
-  const [ telefone, setTelefone ] = useState(user?.TELEFONE || "");
-  const [ email, setEmail ] = useState(user?.EMAIL || "");
-  // const [ CEP, setCep ] = useState(user?.CEP || "")
-  // const [ endereco, setEndereco ] = useState(user?.ENDERECO || "");
-  // const [ numero, setNumero ] = useState(user?.NUMERO || "");
-  // const [ complemento, setComplemento ] = useState(user?.COMPLEMENTO || "");
-  // const [ bairro, setBairro ] = useState(user?. BAIRRO || "");
-  // const [ cidade, setCidade ] = useState(user?.CIDADE || "");
-  // const [ UF, setUf] = useState(user?.UF || "");
+  // const [ UserId, setUserId ] = useState(user?.UserID || "");
+  const [ nome, setNome ] = useState(user?.Nome || "");
+  const [ sobrenome, setSobrenome ] = useState(user?.Sobrenome || "");
+  const [ url_imagem, setUrlImagem ] = useState(user?.url_imagem || "https://via.placeholder.com/250");
+  const [ telefone, setTelefone ] = useState(user?.Telefone || "");
+  const [ email, setEmail ] = useState(user?.Email || "");
 
   async function onSave() {
     await updateUser();
@@ -36,23 +30,16 @@ export default function Perfil() {
 
   async function updateUser() {
     const json = {
-      "USER_ID": user.UserID, 
+      "USER_ID": user?.UserID, 
       "NOME": nome, 
       "SOBRENOME": sobrenome,
       "URL_IMAGEM": url_imagem, 
       "TELEFONE": telefone, 
       "EMAIL": email,
-      // "CEP": CEP,  
-      // "ENDERECO": endereco, 
-      // "NUMERO": numero,
-      // "COMPLEMENTO": complemento, 
-      // "BAIRRO": bairro, 
-      // "CIDADE": cidade, 
-      // "UF": UF,
       "TOKEN_MSG": tokenMsg
     }
     try {
-      await api.put(`/update/usuario/${user.UserID} `, json).then(response => {
+      await api.put(`/update/usuario/${user?.UserID} `, json).then(response => {
         setUser(response.data[0]);
         Alert.alert('Dados atualizados com sucesso!');
       });
@@ -66,6 +53,20 @@ export default function Perfil() {
       <Header/>
       <Text style={styles.subtitle}>PERFIL DO USUÁRIO</Text>
       <ScrollView contentContainerStyle={styles.content} focusable={true} >
+
+      <View style={styles.areaInput}>
+
+          <Text style={{marginBottom: 5}}>ID (Ficha Nº):</Text>
+          <TextInput 
+            value={user?.UserID}
+            placeholder={String(user?.UserID)}
+            autoCorrect={false}
+            // onChangeText={(input) => setUserId(input)}
+            autoCapitalize="words"
+            style={styles.input}
+            editable={false}
+          />
+        </View>
 
         <View style={styles.areaInput}>
           <Text style={{marginBottom: 5}}>Nome:</Text>

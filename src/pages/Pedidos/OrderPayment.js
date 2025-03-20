@@ -57,8 +57,11 @@ export default function OrderPayment({ orderId }) {
         <Text style={styles.subtitle}>PAGAMENTO VIA CARTÃO</Text>
         <Text>{" "}</Text>
         <Text style={{fontSize: 13, fontWeight: "bold" }}>PEDIDO Nº {orderId} {pedido?.DATA}</Text>
-        <Text style={{fontSize: 13}}>
-          R$ {parseFloat(pedido?.VR_SUBTOTAL).toFixed(2)} + R$ {parseFloat(pedido?.TAXA_ENTREGA).toFixed(2)} = R$ {parseFloat(pedido?.VR_TOTAL).toFixed(2)}
+        <Text style={{ fontSize: 13 }}>
+          R$ {parseFloat(pedido?.VR_SUBTOTAL).toFixed(2)} + R$ {parseFloat(pedido?.TAXA_ENTREGA).toFixed(2)} =
+          <Text style={{ fontWeight: 'bold' }}>
+            R$ {parseFloat(pedido?.VR_TOTAL).toFixed(2)}
+          </Text>
         </Text>
         <View style={styles.areaInput}>
           <TextInput
