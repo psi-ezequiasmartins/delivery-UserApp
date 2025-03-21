@@ -3,7 +3,7 @@
 */
 
 import { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { ScrollView } from "react-native-virtualized-view";
 import { Fontisto } from '@expo/vector-icons';
 
@@ -21,7 +21,9 @@ export default function Cesta() {
   const { user, tokenMsg } = useContext(AuthContext);
   const [ subtotal, setSubTotal] = useState(0);
   const [ total, setTotal ] = useState(0);
+  const [ loading, setLoading ] = useState(false);
 
+  // Token de notificação para testes
   let token_sms = 'ExponentPushToken[W47L3BHJyJxjUEa5vomnqd]';
   
   function updateSubTotal() {
@@ -44,8 +46,10 @@ export default function Cesta() {
     updateSubTotal();
   }, [basket, delivery, total, subtotal]);
 
-  async function EnviarPedidoELimparCestaDeCompras() {
+  async function handleFinalizarPedido() {
     try {
+      // setLoading(true);
+
       // prepara a lista de itens extras (acréscimos)
       function formatAcrescimos(acrescimos) {
         return acrescimos.map((acrescimo) => {
@@ -56,51 +60,39 @@ export default function Cesta() {
         });
       }
 
-      // prepara a lista da cesta de compras (basket): itens e acréscimos (se houver)
+      // prepara a lista da cesta de compras (basket): itens e acréscimos (se houver) 
       const formattedBasket = basket.map((item) => ({
         ...item,
         "ACRESCIMOS": formatAcrescimos(item?.ACRESCIMOS),
         "TOTAL": (item?.VR_ACRESCIMOS + item?.VR_UNITARIO) * item?.QTD
       }));
-  
-      const json = {
+
+      const order = { 
         "DELIVERY_ID": delivery?.DELIVERY_ID,
-        "USER_ID": user?.UserID,
+        "USER_ID": user?.UserID, 
         "VR_SUBTOTAL": subtotal,
         "TAXA_ENTREGA": delivery?.TAXA_ENTREGA,
         "VR_TOTAL": total,
         "TOKEN_MSG": tokenMsg || token_sms,
         "STATUS": "NOVO",
-        // endereço de entrega (substituir os campos abaixo por um único campo ENDERECO_ENTREGA)
-        // "ENDERECO_ENTREGA": "R. dos Comanches, 870, Apto 302 - Santa Mônica",
-        // "LATITUDE": -19.82711, 
-        // "LONGITUDE": -43.98319,
-        "ENDERECO": "Rua dos Comanches",
-        "NUMERO": "870",
-        "COMPLEMENTO": "Apto 302",
-        "BAIRRO": "Santa Mônica",
-        "CIDADE": "Belo Horizonte",
-        "UF": "MG",
-        "CEP": "31530-250",
-        "itens": formattedBasket,
+        "itens": formattedBasket
       };
-      const pedido = JSON.stringify(json, null, 2);
-      console.log('Dados do Pedido a serem enviados: ', pedido);
-      await createOrder(pedido);
 
+      console.log('Dados do Pedido a serem enviados: ', order);
+      await createOrder(order);
+      // O diálogo será mostrado automaticamente
+      // A navegação para a próxima tela deve acontecer após a confirmação
       navigation.navigate('OrdersStack', { screen: 'Pedidos' });
-      
-    } catch (error) {
-      console.error('Erro ao criar pedido:', {
-        message: error.message,
-        data: error.response?.data,
-        status: error.response?.status
-      });
-      throw error;      
-    }
-  }
 
-  async function CancelarPedido() {
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível criar o pedido');
+    } finally {
+      // setLoading(false);
+    }
+  };
+  
+
+  async function handleCancelarPedido() {
     await CleanBasket();
     navigation.goBack();
   }
@@ -151,12 +143,12 @@ export default function Cesta() {
 
         {
           (basket?.length > 0) &&
-          <TouchableOpacity style={styles.btnAdd} onPress={EnviarPedidoELimparCestaDeCompras}>
-            <Text style={{color: '#FFF', fontSize: 18}}>CONFIRMAR PEDIDO</Text>
+          <TouchableOpacity style={styles.btnAdd} onPress={handleFinalizarPedido}>
+            <Text style={{color: '#FFF', fontSize: 18}}>FINALIZAR PEDIDO</Text>
           </TouchableOpacity>
         }
 
-        <TouchableOpacity style={styles.btnCancel} onPress={CancelarPedido}>
+        <TouchableOpacity style={styles.btnCancel} onPress={handleCancelarPedido}>
           <Text style={{color: '#FFF', fontSize: 18}}>CANCELAR</Text>
         </TouchableOpacity>
 

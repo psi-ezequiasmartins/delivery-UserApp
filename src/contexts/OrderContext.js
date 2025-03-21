@@ -5,7 +5,9 @@
 import { useState, useEffect, useContext, createContext } from 'react';
 import { AuthContext } from './AuthContext';
 import { CartContext } from './CartContext';
-import { Alert } from 'react-native';
+import { AddressConfirmationDialog } from '../components/gps/AddressConfirmationDialog';
+import { getCurrentLocationStandalone } from '../components/gps/useGeolocation';
+import { Alert } from 'react-native'; 
 
 import api from '../config/apiAxios';
 
@@ -16,6 +18,8 @@ function OrderProvider({ children }) {
   const { delivery, CleanBasket } = useContext(CartContext);
   const [ pedido, setPedido ] = useState([]);
   const [ pedidos, setPedidos] = useState([]);
+  const [ showAddressDialog, setShowAddressDialog ] = useState(false);
+  const [ tempOrderData, setTempOrderData ] = useState(null);
 
   useEffect(() => {
     async function loadOrdersByUserID() {
@@ -26,15 +30,62 @@ function OrderProvider({ children }) {
     loadOrdersByUserID();
   }, [user, pedido]);
 
-  async function createOrder(json) {
-    await api.post('/add/pedido/', json).then((response) => {
+  async function createOrder(order) { 
+    try {
+      const locationData = await getCurrentLocationStandalone();
+      if (!locationData?.location || !locationData?.address) {
+        Alert.alert('Não foi possível obter sua localização');
+        return;
+      } 
+
+      // Armazena dados temporários do pedido
+      setTempOrderData({
+        order,       
+        location: locationData.location,
+        address: locationData.address
+      });      
+
+      // Mostra diálogo de confirmação
+      setShowAddressDialog(true);
+    } catch (error) {
+      Alert.alert('Erro', 'Falha ao criar pedido: ' + error.message);
+      console.error('Erro ao criar pedido: ', error);
+    }
+  };
+
+  async function handleAddressConfirm(confirmedAddress) {
+    try {
+      setShowAddressDialog(false);
+
+      if (!confirmedAddress) {
+        throw new Error('Endereço de entrega não confirmado');
+      } 
+
+      const newOrder = {
+        "DELIVERY_ID": tempOrderData.order.DELIVERY_ID,
+        "USER_ID": tempOrderData.order.USER_ID,
+        "VR_SUBTOTAL": tempOrderData.order.VR_SUBTOTAL,
+        "TAXA_ENTREGA": tempOrderData.order.TAXA_ENTREGA,
+        "VR_TOTAL": tempOrderData.order.VR_TOTAL,
+        "TOKEN_MSG": tempOrderData.order.TOKEN_MSG,
+        "STATUS": tempOrderData.order.STATUS,
+        // Dados de localização confirmados
+        "ENDERECO_ENTREGA": confirmedAddress.enderecoCompleto,
+        "LATITUDE": confirmedAddress.coordinates.latitude,
+        "LONGITUDE": confirmedAddress.coordinates.longitude,
+        "itens": tempOrderData.order.cartItems
+      };
+
+      const response = await api.post('/add/pedido/', newOrder);
       Alert.alert('Pedido enviado com sucesso! #' + response.data.PEDIDO_ID);
       setPedido(json);
       CleanBasket();
-    }).catch(error => {
-      console.log('ERROR: ' + error);
-    })
-    return pedido;
+
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao finalizar pedido: ', error);
+      throw error;
+    }
   };
 
   async function getOrder(id) {
@@ -49,29 +100,14 @@ function OrderProvider({ children }) {
   return (
     <OrderContext.Provider value={{ delivery, pedidos, createOrder, getOrder }}>
       {children}
+      <AddressConfirmationDialog
+        visible={showAddressDialog}
+        address={tempOrderData?.address}
+        onConfirm={handleAddressConfirm}
+        onCancel={()=>setShowAddressDialog(false)}
+      />
     </OrderContext.Provider>
   );
 };
 
 export { OrderContext, OrderProvider };
-
-  // import * as Location from 'expo-location';
-
-  // async function getPositionByGps() {
-  //   try {
-  //     let { status } = await Location.requestForegroundPermissionsAsync();
-  //     if (status !== 'granted') {
-  //       setErrorMsg('Permissão para acessar a localização foi negada');
-  //       return;
-  //     }
-  //     const { coords } = await Location.getCurrentPositionAsync({});
-  //     setLatitude(coords.latitude);
-  //     setLongitude(coords.longitude);
-  //   } catch (error) {
-  //     console.log("Não foi possível obter a localização atual do Usuário.");
-  //     return;
-  //   }
-  //   return { latitude, longitude };
-  // }
-
-  // getPositionByGps();

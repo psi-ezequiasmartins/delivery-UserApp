@@ -3,6 +3,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { LogBox } from 'react-native';
 import { View, Text, Image, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import { ScrollView } from "react-native-virtualized-view";
 import { Card, ListItem, Divider } from 'react-native-elements';
@@ -16,12 +17,17 @@ export default function OrderDetails({ orderId }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
+
+  // Ignore specific warning
+  LogBox.ignoreLogs([
+    'Warning: TextElement: Support for defaultProps will be removed from function components',
+  ]);
  
   useEffect(() => {
     let isMounted = true; // Controle de montagem do componente
     async function getOrder() {
       try {
-        setLoading(true);
+        setLoading(true);r
         setError(null);   
         // console.log('ID recebido no OrderDetails:', orderId);
         if (!orderId) {
