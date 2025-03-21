@@ -33,49 +33,57 @@ export default function SideBar(props) {
 
       <DrawerItem
         label="CATEGORIAS"
-        onPress={() => GoToLink("Home")}
-        activeTintColor='#FFF'
-        activeBackgroundColor='#FF0000'
-        inactiveTintColor='#FFF'
-        inactiveBackgroundColor='#000'
+        onPress={() => GoToLink("HomeStack")}
+        activeTintColor='#000'
+        activeBackgroundColor='#FFCC00'
+        inactiveTintColor='#000'
+        inactiveBackgroundColor='#FFCC'
+        borderRadius={10}
+        marginTop={5}
         icon={({ focused, size }) => (
-          <Entypo name='shop' size={size} color={(focused !== true) ? '#FFF' : '#000'} />
+          <Entypo name='shop' size={size} color={(focused !== true) ? '#000' : '#FFCC'} />
         )}
       />
 
       <DrawerItem
         label="MEUS PEDIDOS"
-        onPress={() => GoToLink("Pedidos")}
-        activeTintColor='#FFF'
-        activeBackgroundColor='#FF0000'
-        inactiveTintColor='#FFF'
-        inactiveBackgroundColor='#000'
+        onPress={() => GoToLink("OrdersStack")}
+        activeTintColor='#000'
+        activeBackgroundColor='#FFCC00'
+        inactiveTintColor='#000'
+        inactiveBackgroundColor='#FFCC'
+        borderRadius={10}
+        marginTop={5}
         icon={({ focused, size }) => (
-          <Fontisto name='shopping-bag-1' size={size} color={(focused !== true) ? '#FFF' : '#000'} />
+          <Fontisto name='shopping-bag-1' size={size} color={(focused !== true) ? '#000' : '#FFCC'} />
         )}
       />
 
       <DrawerItem
         label="MEUS DADOS"
-        onPress={() => GoToLink("Perfil")}
-        activeTintColor='#FFF'
-        activeBackgroundColor='#FF0000'
-        inactiveTintColor='#FFF'
-        inactiveBackgroundColor='#000'
+        onPress={() => GoToLink("Profile")}
+        activeTintColor='#000'
+        activeBackgroundColor='#FFCC00'
+        inactiveTintColor='#000'
+        inactiveBackgroundColor='#FFCC'
+        borderRadius={10}
+        marginTop={5}
         icon={({ focused, size }) => (
-          <FontAwesome5 name='user-cog' size={size} color={(focused !== true) ? '#FFF' : '#000'} />
+          <FontAwesome5 name='user-cog' size={size} color={(focused !== true) ? '#000' : '#FFCC'} />
         )}
       />
 
       <DrawerItem
         label="SAIR (FECHAR)"
         onPress={signOut}
-        activeTintColor='#FFF'
-        activeBackgroundColor='#FF0000'
-        inactiveTintColor='#FFF'
-        inactiveBackgroundColor='#000'
+        activeTintColor='#000'
+        activeBackgroundColor='#FFCC00'
+        inactiveTintColor='#000'
+        inactiveBackgroundColor='#FFCC'
+        borderRadius={10}
+        marginTop={5}
         icon={({ focused, size }) => (
-          <FontAwesome5 name="door-open" size={size} color={(focused !== true) ? '#FFF' : '#000'} />
+          <FontAwesome5 name="door-open" size={size} color={(focused !== true) ? '#000' : '#FFCC'} />
         )}
       />
 

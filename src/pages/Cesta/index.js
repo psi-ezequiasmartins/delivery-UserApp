@@ -3,7 +3,8 @@
 */
 
 import { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { Alert, View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { getCurrentLocationStandalone } from '../../components/gps/useGeolocation';
 import { ScrollView } from "react-native-virtualized-view";
 import { Fontisto } from '@expo/vector-icons';
 
@@ -48,7 +49,12 @@ export default function Cesta() {
 
   async function handleFinalizarPedido() {
     try {
-      // setLoading(true);
+      // Obter localização do usuário
+      const locationData = await getCurrentLocationStandalone();  
+      if (!locationData?.location || !locationData?.address) {
+        Alert.alert('Não foi possível obter sua localização');
+        return;
+      }
 
       // prepara a lista de itens extras (acréscimos)
       function formatAcrescimos(acrescimos) {
@@ -75,19 +81,45 @@ export default function Cesta() {
         "VR_TOTAL": total,
         "TOKEN_MSG": tokenMsg || token_sms,
         "STATUS": "NOVO",
+        "ENDERECO_ENTREGA": locationData.address.formatted,
+        "LATITUDE": locationData.location.latitude,
+        "LONGITUDE": locationData.location.longitude, 
         "itens": formattedBasket
       };
 
-      console.log('Dados do Pedido a serem enviados: ', order);
-      await createOrder(order);
-      // O diálogo será mostrado automaticamente
-      // A navegação para a próxima tela deve acontecer após a confirmação
-      navigation.navigate('OrdersStack', { screen: 'Pedidos' });
+      // Confirma o endereço com o usuário
+      // setTempOrderData({ 
+      //    order, 
+      //    location: locationData.location, 
+      //    address: locationData.address 
+      // });
+      // setShowAddressDialog(true);  
+      
+      Alert.alert(
+        "Confirmar Endereço da Entrega",
+        `Endereço: ${locationData.address.formatted}`,
+        [
+          {
+            text: "Cancelar",
+            style: "cancel"
+          },
+          {
+            text: "Confirmar",
+            onPress: async() => {
+              try {
+                await createOrder(order);
+                navigation.navigate('OrdersStack', { screen: 'Pedidos' });
+              } catch (error) {
+                Alert.alert('Erro', 'Não foi possível criar o pedido');
+              }
+            }
+          }
+        ]
+      );
 
     } catch (error) {
+      console.error('Erro ao finalizar pedido:', error);
       Alert.alert('Erro', 'Não foi possível criar o pedido');
-    } finally {
-      // setLoading(false);
     }
   };
   
