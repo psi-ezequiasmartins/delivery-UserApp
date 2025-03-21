@@ -1,4 +1,8 @@
-import { useState, useEffect } from 'react';
+/**
+ * src/components/gps/useGeolocation.js
+ */
+
+// import { useState, useEffect } from 'react';
 import * as Location from 'expo-location';
 
 // Exportar a função getCurrentLocation separadamente
