@@ -16,6 +16,7 @@ export default function OrderDetails({ orderId }) {
   const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
   const navigation = useNavigation();
 
   // Ignore specific warning
@@ -27,14 +28,17 @@ export default function OrderDetails({ orderId }) {
     let isMounted = true; // Controle de montagem do componente
     async function getOrder() {
       try {
-        setLoading(true);r
+        setLoading(true);
         setError(null);   
+        
         // console.log('ID recebido no OrderDetails:', orderId);
         if (!orderId) {
           throw new Error('ID do pedido não informado!');
         }
+
         // console.log('Buscando pedido ID: ', orderId);
         const response = await api.get(`/pedido/${orderId}`);
+        
         // validação da resposta
         if (!response?.data) {
           throw new Error('Resposta inválida do servidor, dados não encontrados!'); 
@@ -157,8 +161,8 @@ export default function OrderDetails({ orderId }) {
           <Text style={styles.subtitle}>Pedido Nº {pedido?.PEDIDO_ID}</Text>
           <Text style={styles.line}>Data: {pedido?.DATA} &#8226; {formatDataPedido(pedido?.DATA)}</Text>
           <Text style={styles.line}>Status: {renderStatusMessage(pedido?.STATUS)}</Text>
-          <Text style={{ fontWeight: 'bold' }}>{pedido?.CLIENTE_NOME}</Text>
-          <Text>Endereço: {pedido?.ENDERECO}</Text>        
+          <Text style={{ fontWeight: 'bold' }}>{pedido?.CLIENTE_NOME} {pedido?.CLIENTE_TELEFONE}</Text>
+          <Text>{pedido?.ENDERECO_ENTREGA}</Text>        
         </Card>
   
         <Text style={[styles.title, {marginTop: 10}]}>ITENS DO PEDIDO</Text>

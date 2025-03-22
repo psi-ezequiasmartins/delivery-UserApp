@@ -94,10 +94,10 @@ export default function Cesta() {
       //    address: locationData.address 
       // });
       // setShowAddressDialog(true);  
-      
+
       Alert.alert(
         "Confirmar Endereço da Entrega",
-        `Endereço: ${locationData.address.formatted}`,
+        `${locationData.address.formatted}`,
         [
           {
             text: "Cancelar",

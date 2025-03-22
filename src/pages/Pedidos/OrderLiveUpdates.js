@@ -6,20 +6,29 @@ import MapView, { Marker } from "react-native-maps";
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView } from "react-native";
 import { Fontisto, AntDesign } from "@expo/vector-icons";
+// import { getCoordinatesFromAddress } from "../../components/gps/useGeolocation";
 
 import api from "../../config/apiAxios";
 
 export default function OrderLiveUpdates({ orderId }) {
   const [ pedido, setPedido ] = useState(null);
   const [ courier, setCourier ] = useState(null);
-
-  const courierId = 200001; //O ID do Courier será fornecido posteriormente junto a atualização do status de entrega
-
+  // const [ delivery_coords, setDeliveryCoords ] = useState(null);
+  // const [ courier_coords, setCourierCoords ] = useState(null);
+  
+  const courierId = 200001; //Os dados do Courier serão fornecidos posteriormente junto com a atualização do status (coleta/retirada e entrega)
+  // setCourierCoords({"latitude": -19.82628, "longitude": -43.98033});
+  
   useEffect(() => {
     async function getOrder() {
-      await api.get(`/pedido/${orderId}`).then((response) => {
-        setPedido(response.data);
-        console.log(pedido);
+      await api.get(`/pedido/${orderId}`).then(async(response) => {
+        setPedido(response?.data);
+        console.log('Pedido recuperado: ', pedido);
+        // const coords = await getCoordinatesFromAddress(response?.data?.CLIENTE_ENDERECO);
+        // if (coords) { 
+        //   console.log('Coordenadas obtidas (Delivery): ', coords);
+        //   setDeliveryCoords(coords);
+        // }       
       })
     }
     getOrder();
@@ -71,10 +80,10 @@ export default function OrderLiveUpdates({ orderId }) {
         <MapView
           style={styles.map}
           initialRegion={{    
-            latitude: -19.82628, // pedido?.DeliveryLat,
-            longitude: -43.98033, //pedido?.DeliveryLng,
+            latitude: -19.82277, // coordenadas iniciais
+            longitude: -43.98033, // coordenadas iniciais
             latitudeDelta: 0.007,
-            longitudeDelta: 0.007,
+            longitudeDelta: 0.007
           }}
           showsUserLocation={true} 
           showsTraffic={true}
@@ -83,8 +92,8 @@ export default function OrderLiveUpdates({ orderId }) {
           {courier?.COURIER_ID && (
             <Marker 
               coordinate={{ 
-                latitude: -19.82628, //courier?.Latitude, 
-                longitude: -43.98033, //courier?.Longitude 
+                latitude: -19.82628,
+                longitude: -43.98033,
               }}
               title={courier?.NOME}
               description="Entregador"
@@ -97,27 +106,27 @@ export default function OrderLiveUpdates({ orderId }) {
 
           <Marker
             coordinate={{
-              latitude: -19.82277, //pedido?.DeliveryLat,
-              longitude: -43.97870, //pedido?.DeliveryLng
+              latitude: delivery_coords?.latitude, //-19.82277,
+              longitude: delivery_coords?.longitude, //-43.97870, 
             }}
             title={pedido?.DELIVERY_NOME}
             description="Delivery"
           >
             <View style={{ padding: 5 }}>
-              <AntDesign name="pushpin" size={40} color="red" />
+              <AntDesign name="pushpin" size={45} color="blue" />
             </View>
           </Marker>
 
           <Marker
             coordinate={{
-              latitude: -19.82724, //pedido?.DeliveryLat,
-              longitude: -43.98316, //pedido?.DeliveryLng
+              latitude: pedido?.LATITUDE,
+              longitude: pedido?.LONGITUDE
             }}
             title={pedido?.CLIENTE_NOME}
             description="Sua Localização"
           >
             <View style={{ padding: 5 }}>
-              <Fontisto name="map-marker-alt" size={40} color="red" />
+              <Fontisto name="map-marker-alt" size={45} color="red" />
             </View>
           </Marker>
 
