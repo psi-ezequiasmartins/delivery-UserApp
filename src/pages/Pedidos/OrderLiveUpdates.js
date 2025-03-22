@@ -6,32 +6,43 @@ import MapView, { Marker } from "react-native-maps";
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView } from "react-native";
 import { Fontisto, AntDesign } from "@expo/vector-icons";
-// import { getCoordinatesFromAddress } from "../../components/gps/useGeolocation";
+import { getCoordinatesFromAddress } from "../../components/gps/useGeolocation";
 
 import api from "../../config/apiAxios";
 
 export default function OrderLiveUpdates({ orderId }) {
   const [ pedido, setPedido ] = useState(null);
   const [ courier, setCourier ] = useState(null);
-  // const [ delivery_coords, setDeliveryCoords ] = useState(null);
+  const [ delivery_coords, setDeliveryCoords ] = useState(null);
   // const [ courier_coords, setCourierCoords ] = useState(null);
   
   const courierId = 200001; //Os dados do Courier serão fornecidos posteriormente junto com a atualização do status (coleta/retirada e entrega)
   // setCourierCoords({"latitude": -19.82628, "longitude": -43.98033});
   
   useEffect(() => {
-    async function getOrder() {
-      await api.get(`/pedido/${orderId}`).then(async(response) => {
-        setPedido(response?.data);
-        console.log('Pedido recuperado: ', pedido);
-        // const coords = await getCoordinatesFromAddress(response?.data?.CLIENTE_ENDERECO);
-        // if (coords) { 
-        //   console.log('Coordenadas obtidas (Delivery): ', coords);
-        //   setDeliveryCoords(coords);
-        // }       
-      })
+    let isMounted = true;
+      async function getOrder() {
+      try {
+        const response = await api.get(`/pedido/${orderId}`);
+        if (!isMounted) return;
+        console.log('Dados do Pedido:', response.data);     
+        setPedido(response.data);
+        
+        if (response.data?.DELIVERY_ENDERECO) {
+          const coords = await getCoordinatesFromAddress(response.data.DELIVERY_ENDERECO);
+          if (isMounted && coords?.latitude && coords?.longitude) {
+            console.log('Coordenadas obtidas (Delivery): ', coords);
+            setDeliveryCoords(coords);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+      }
     }
-    getOrder();
+      getOrder(); 
+    return () => {
+      isMounted = false;
+    };
   }, [orderId]);
 
   useEffect(() => {
@@ -104,31 +115,35 @@ export default function OrderLiveUpdates({ orderId }) {
             </Marker>
           )}
 
-          <Marker
-            coordinate={{
-              latitude: delivery_coords?.latitude, //-19.82277,
-              longitude: delivery_coords?.longitude, //-43.97870, 
-            }}
-            title={pedido?.DELIVERY_NOME}
-            description="Delivery"
-          >
-            <View style={{ padding: 5 }}>
-              <AntDesign name="pushpin" size={45} color="blue" />
-            </View>
-          </Marker>
+          {delivery_coords?.latitude && delivery_coords?.longitude && (
+            <Marker
+              coordinate={{
+                latitude: delivery_coords.latitude,
+                longitude: delivery_coords.longitude,
+              }}
+              title={pedido?.DELIVERY_NOME}
+              description="Delivery"
+            >
+              <View style={{ padding: 5 }}>
+                <AntDesign name="pushpin" size={45} color="blue" />
+              </View>
+            </Marker>
+          )}
 
-          <Marker
-            coordinate={{
-              latitude: pedido?.LATITUDE,
-              longitude: pedido?.LONGITUDE
-            }}
-            title={pedido?.CLIENTE_NOME}
-            description="Sua Localização"
-          >
-            <View style={{ padding: 5 }}>
-              <Fontisto name="map-marker-alt" size={45} color="red" />
-            </View>
-          </Marker>
+          {pedido?.LATITUDE && pedido?.LONGITUDE && (
+            <Marker
+              coordinate={{
+                latitude: pedido.LATITUDE,
+                longitude: pedido.LONGITUDE
+              }}
+              title={pedido?.CLIENTE_NOME}
+              description="Sua Localização"
+            >
+              <View style={{ padding: 5 }}>
+                <Fontisto name="map-marker-alt" size={45} color="red" />
+              </View>
+            </Marker>
+          )}
 
         </MapView>
       </View>

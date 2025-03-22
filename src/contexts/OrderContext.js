@@ -26,18 +26,50 @@ function OrderProvider({ children }) {
     loadOrdersByUserID();
   }, [user, pedido]);
 
-  async function createOrder(order) {
-    await api.post('/add/pedido/', order).then((response) => {
-      Alert.alert('Pedido enviado com sucesso! #' + response.data.PedidoID);
-      setPedido(order);
-      CleanBasket();
-    }).catch(error => {
-      Alert.alert('Erro', 'Falha ao criar pedido: ' + error.message);
-      console.error('Erro ao criar pedido: ', error);
-    })
-    return pedido;
-  };
+  async function createOrder(orderData) {
+    try {
 
+      // Verifica conexão primeiro
+      const isServerAvailable = await api.ping();
+      if (!isServerAvailable) {
+        throw new Error('Servidor não está respondendo. Verifique sua conexão.');
+      }
+
+      console.log('Iniciando createOrder...', orderData);
+      
+      // Adiciona timeout para a requisição
+      const response = await api.post('/add/pedido/', orderData, {
+        timeout: 10000, // 10 segundos
+        validateStatus: function (status) {
+          return status >= 200 && status < 300;
+        }
+      });
+  
+      console.log('Status da resposta:', response.status);
+      console.log('Headers da resposta:', response.headers);
+      console.log('Dados da resposta:', response.data);
+  
+      if (!response.data) {
+        throw new Error('Resposta vazia do servidor');
+      }
+  
+      // Atualiza a lista de pedidos após criar um novo
+      await api.get(`/listar/pedidos/usuario/${orderData.USER_ID}`).then((snapshot) => {
+        setPedidos(snapshot.data);
+      });
+  
+      return response.data;
+    } catch (error) {
+      console.error('Erro detalhado em createOrder:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        config: error.config
+      });
+      throw error;
+    }
+  }
+  
   async function getOrder(id) {
     await api.get(`/pedido/${id}`).then((response) => {
       setPedido(response.data[0]);

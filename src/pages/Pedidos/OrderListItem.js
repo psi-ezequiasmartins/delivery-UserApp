@@ -3,7 +3,7 @@
  */
 
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
 export default function OrderListItem({ order }) {
@@ -31,7 +31,7 @@ export default function OrderListItem({ order }) {
           { order?.STATUS === "RECEBIDO" ? <Text style={[styles.status, {backgroundColor: 'purple'}]}> RECEBIDO </Text> : null }
           { order?.STATUS === "FINALIZADO" ? <Text style={[styles.status, {backgroundColor: 'black'}]}> FINALIZADO </Text> : null }
           { order?.STATUS === "CANCELADO" ? <Text style={[styles.status, {backgroundColor: 'gray'}]}> CANCELADO </Text> : null }
-          <Text><FontAwesome color="#000" name='folder-open' size={28}/></Text>
+          <Text><Entypo color="#000" name='shopping-bag' size={28}/></Text>
         </View>
       </TouchableOpacity>
     </View>

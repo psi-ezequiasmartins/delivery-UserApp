@@ -49,10 +49,12 @@ export default function Cesta() {
 
   async function handleFinalizarPedido() {
     try {
+      setLoading(true); // Adicionar feedback visual
+
       // Obter localização do usuário
-      const locationData = await getCurrentLocationStandalone();  
+      const locationData = await getCurrentLocationStandalone();
       if (!locationData?.location || !locationData?.address) {
-        Alert.alert('Não foi possível obter sua localização');
+        Alert.alert('Erro', 'Não foi possível obter sua localização');
         return;
       }
 
@@ -65,7 +67,6 @@ export default function Cesta() {
           };
         });
       }
-
       // prepara a lista da cesta de compras (basket): itens e acréscimos (se houver) 
       const formattedBasket = basket.map((item) => ({
         ...item,
@@ -73,9 +74,9 @@ export default function Cesta() {
         "TOTAL": (item?.VR_ACRESCIMOS + item?.VR_UNITARIO) * item?.QTD
       }));
 
-      const order = { 
+      const order = {
         "DELIVERY_ID": delivery?.DELIVERY_ID,
-        "USER_ID": user?.UserID, 
+        "USER_ID": user?.UserID,
         "VR_SUBTOTAL": subtotal,
         "TAXA_ENTREGA": delivery?.TAXA_ENTREGA,
         "VR_TOTAL": total,
@@ -83,7 +84,7 @@ export default function Cesta() {
         "STATUS": "NOVO",
         "ENDERECO_ENTREGA": locationData.address.formatted,
         "LATITUDE": locationData.location.latitude,
-        "LONGITUDE": locationData.location.longitude, 
+        "LONGITUDE": locationData.location.longitude,
         "itens": formattedBasket
       };
 
@@ -95,47 +96,70 @@ export default function Cesta() {
       // });
       // setShowAddressDialog(true);  
 
-      Alert.alert(
-        "Confirmar Endereço da Entrega",
-        `${locationData.address.formatted}`,
-        [
-          {
-            text: "Cancelar",
-            style: "cancel"
-          },
-          {
-            text: "Confirmar",
-            onPress: async() => {
-              try {
-                await createOrder(order);
-                navigation.navigate('OrdersStack', { screen: 'Pedidos' });
-              } catch (error) {
-                Alert.alert('Erro', 'Não foi possível criar o pedido');
-              }
+      // Usar Promise para garantir que o Alert.alert aguarde a resposta
+      const confirmed = await new Promise((resolve) => {
+        Alert.alert(
+          "Confirmar Endereço da Entrega",
+          `${locationData.address.formatted}`,
+          [
+            {
+              text: "Cancelar",
+              style: "cancel",
+              onPress: () => resolve(false)
+            },
+            {
+              text: "Confirmar",
+              onPress: () => resolve(true)
             }
-          }
-        ]
-      );
+          ],
+          { cancelable: false }
+        );
+      });
+      
+      if (confirmed) {
+        console.log('Endereço confirmado, enviando pedido...');
+        const response = await createOrder(order);
+        console.log('Resposta do createOrder:', response);
+  
+        if (response) {
+          console.log('Pedido criado com sucesso, limpando cesta...');
+          await CleanBasket();
+          
+          console.log('Navegando para tela de pedidos...');
+          navigation.reset({
+            index: 0,
+            routes: [{ 
+              name: 'OrdersStack', 
+              params: { 
+                screen: 'Pedidos',
+                initial: false
+              } 
+            }]
+          });
+        } else {
+          throw new Error('Resposta vazia do createOrder');
+        }
+      }
 
     } catch (error) {
       console.error('Erro ao finalizar pedido:', error);
       Alert.alert('Erro', 'Não foi possível criar o pedido');
+    } finally {
+      setLoading(false);
     }
-  };
-  
+  }  
 
   async function handleCancelarPedido() {
     await CleanBasket();
     navigation.goBack();
   }
 
-  if (!basket) {
-    return (
-      <View style={styles.indicator}>
-        <ActivityIndicator size="large" color='#FFF' />
-      </View>
-    )
-  }
+  {loading && (
+    <View style={styles.indicator}>
+      <ActivityIndicator size="large" color="#FFF" />
+      <Text style={styles.loadingText}>Processando pedido...</Text>
+    </View>
+  )}
 
   return (
     <View style={styles.container}>
@@ -280,14 +304,19 @@ const styles = StyleSheet.create({
     width: 75, 
     height: 75,
   },
-  indicator:{
-    flex:1, 
-    position: 'absolute', 
-    backgroundColor: '#000', 
-    opacity: 0.7, 
-    width: '100%', 
-    height: '100%', 
-    alignItems: 'center', 
-    justifyContent: 'center'
+  indicator: {
+    flex: 1,
+    position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 999
   },
+  loadingText: {
+    color: '#FFF',
+    marginTop: 10,
+    fontSize: 16
+  }
 });

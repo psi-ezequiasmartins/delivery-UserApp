@@ -4,51 +4,71 @@
 
 import axios from "axios";
 
-const URL = "https://srv.deliverybairro.com"; // 'http://192.168.0.210:3359'; // 
-
 const api = axios.create({
-  baseURL: URL,
+  // baseURL: 'http://192.168.0.4:3359', // servidor local
+  baseURL: 'https://srv.deliverybairro.com', // servidor de produção
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': '*/*'
+    'Accept': 'application/json'
+  },
+  validateStatus: function (status) {
+    return status >= 200 && status < 300;
   }
 });
 
-// Adicione estes interceptors após a criação da instância api
+// Modificando o ping para usar uma rota existente
+api.ping = async () => {
+  try {
+    // Usando uma rota pública que sabemos que existe
+    const response = await api.get('/pedido/1059');
+    return response.status === 200;
+  } catch (error) {
+    console.error('Erro de conectividade:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    });
+    return false;
+  }
+};
+
+// Melhorando os interceptors
 api.interceptors.request.use(
   config => {
-      console.log('API Request:', {
-          method: config.method,
-          url: config.url,
-          data: config.data,
-          headers: config.headers
-      });
-      return config;
+    console.log('Enviando requisição:', {
+      method: config.method,
+      url: config.url,
+      data: config.data && JSON.stringify(config.data).substring(0, 500) // Limita o tamanho do log
+    });
+    return config;
   },
   error => {
-      console.error('API Request Error:', error);
-      return Promise.reject(error);
+    console.error('Erro na requisição:', error.message);
+    return Promise.reject(error);
   }
 );
 
 api.interceptors.response.use(
   response => {
-      console.log('API Response:', {
-          url: response.config.url,
-          status: response.status,
-          data: response.data
+    try {
+      // Limpar/validar dados antes de logar
+      const cleanData = typeof response.data === 'string' 
+        ? JSON.parse(response.data)
+        : response.data;
+
+      console.log('Resposta recebida:', {
+        url: response.config.url,
+        status: response.status,
+        data: JSON.stringify(cleanData).substring(0, 500)
       });
       return response;
+    } catch (error) {
+      console.warn('Erro ao processar resposta:', error);
+      return response;
+    }
   },
-  error => {
-      console.error('API Error:', {
-          url: error.config?.url,
-          status: error.response?.status,
-          message: error.message,
-          data: error.response?.data
-      });
-      return Promise.reject(error);
-  }
+  // ...existing error handler...
 );
 
 export default api;
