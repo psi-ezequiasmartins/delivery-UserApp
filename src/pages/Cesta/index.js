@@ -13,6 +13,8 @@ import { CartContext } from '../../contexts/CartContext';
 import { OrderContext } from '../../contexts/OrderContext';
 import { AuthContext } from '../../contexts/AuthContext';
 
+import AddressConfirmationModal from '../../components/gps/AddressConfirmationDialog';
+
 import BasketItem from '../../components/Basket';
 
 export default function Cesta() {
@@ -23,10 +25,13 @@ export default function Cesta() {
   const [ subtotal, setSubTotal] = useState(0);
   const [ total, setTotal ] = useState(0);
   const [ loading, setLoading ] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [tempAddress, setTempAddress] = useState('');
+  const [tempOrderData, setTempOrderData] = useState(null);  
 
   // Token de notificação para testes
   let token_sms = 'ExponentPushToken[W47L3BHJyJxjUEa5vomnqd]';
-  
+
   function updateSubTotal() {
     let new_value = 0;
     basket.forEach((item) => {
@@ -67,6 +72,7 @@ export default function Cesta() {
           };
         });
       }
+
       // prepara a lista da cesta de compras (basket): itens e acréscimos (se houver) 
       const formattedBasket = basket.map((item) => ({
         ...item,
@@ -88,58 +94,10 @@ export default function Cesta() {
         "itens": formattedBasket
       };
 
-      // Confirma o endereço com o usuário
-      // setTempOrderData({ 
-      //    order, 
-      //    location: locationData.location, 
-      //    address: locationData.address 
-      // });
-      // setShowAddressDialog(true);  
-
-      // Usar Promise para garantir que o Alert.alert aguarde a resposta
-      const confirmed = await new Promise((resolve) => {
-        Alert.alert(
-          "Confirmar Endereço da Entrega",
-          `${locationData.address.formatted}`,
-          [
-            {
-              text: "Cancelar",
-              style: "cancel",
-              onPress: () => resolve(false)
-            },
-            {
-              text: "Confirmar",
-              onPress: () => resolve(true)
-            }
-          ],
-          { cancelable: false }
-        );
-      });
-      
-      if (confirmed) {
-        console.log('Endereço confirmado, enviando pedido...');
-        const response = await createOrder(order);
-        console.log('Resposta do createOrder:', response);
-  
-        if (response) {
-          console.log('Pedido criado com sucesso, limpando cesta...');
-          await CleanBasket();
-          
-          console.log('Navegando para tela de pedidos...');
-          navigation.reset({
-            index: 0,
-            routes: [{ 
-              name: 'OrdersStack', 
-              params: { 
-                screen: 'Pedidos',
-                initial: false
-              } 
-            }]
-          });
-        } else {
-          throw new Error('Resposta vazia do createOrder');
-        }
-      }
+      // Salva os dados temporariamente e mostra o modal
+      setTempOrderData(order);
+      setTempAddress(locationData.address.formatted);
+      setShowModal(true);
 
     } catch (error) {
       console.error('Erro ao finalizar pedido:', error);
@@ -148,6 +106,42 @@ export default function Cesta() {
       setLoading(false);
     }
   }  
+
+  async function handleConfirmAddress(confirmedAddress) {
+    try {
+      setLoading(true);
+      setShowModal(false);
+
+      const finalOrder = {
+        ...tempOrderData,
+        ENDERECO_ENTREGA: confirmedAddress
+      };
+
+      console.log('Endereço confirmado, enviando pedido...');
+      const response = await createOrder(finalOrder);
+
+      if (response) {
+        console.log('Pedido criado com sucesso, limpando cesta...');
+        await CleanBasket();
+
+        navigation.reset({
+          index: 0,
+          routes: [{ 
+            name: 'OrdersStack', 
+            params: { 
+              screen: 'Pedidos',
+              initial: false
+            } 
+          }]
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao processar pedido:', error);
+      Alert.alert('Erro', 'Não foi possível criar o pedido');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function handleCancelarPedido() {
     await CleanBasket();
@@ -165,48 +159,56 @@ export default function Cesta() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} focusable={true} >
 
-        <View style={{flexDirection: 'row'}}>
-          <View style={{flexDirection: 'column', width: '100%'}}>
-            <Text style={{ fontSize: 21, fontWeight: 'bold' }}>{delivery?.DELIVERY_NOME}</Text>
-            <Text style={{ fontSize: 13}}>{delivery?.HORARIO}</Text>
-            <Text style={{ fontSize: 13}}><Fontisto color="#FF0000" name='map-marker-alt' size={18}/> {delivery?.ENDERECO}, {delivery?.NUMERO} - {delivery?.BAIRRO}</Text>
-            <Text style={{ fontSize: 13, marginBottom: 5}}>Valor da Taxa de Entrega: R$ {parseFloat(delivery?.TAXA_ENTREGA).toFixed(2)}</Text>
-            <Text style={{ fontWeight: "bold", marginBottom: 5, fontSize: 19 }}>Seus Pedidos</Text>
-          </View>
-        </View>
-
-        <FlatList
-          data={basket}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item)=>String(item?.PRODUTO_ID)}
-          renderItem={ ({item}) => (
-            <BasketItem 
-              item={item} 
-              AddQtd={()=>AddToBasket(item, 1, item?.VR_UNITARIO, [], 0, '')} 
-              RemoveQtd={()=>RemoveFromBasket(item)}  
-              updateTotal={()=>updateSubTotal()}
-            />
-          )}
-          ListEmptyComponent={()=><Text style={styles.empty}>Cesta de Compras vazia!</Text>}
-          ListFooterComponent={()=>(
-            <View>
-              <Text style={styles.subtotal}>+ Sub-Total: R$ {parseFloat(subtotal).toFixed(2)}</Text>
-              <Text style={styles.taxa}>+ Taxa de Entrega: R$ {parseFloat(delivery?.TAXA_ENTREGA).toFixed(2)}</Text>
-              <Text style={styles.total}>= Total: R$ {parseFloat(total).toFixed(2)}</Text>
+        { basket.length === 0 && <Text style={styles.empty}>Cesta de Compras vazia!</Text> }
+        { basket.length > 0 && <>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flexDirection: 'column', width: '100%'}}>
+                <Text style={{ fontSize: 21, fontWeight: 'bold' }}>{delivery?.DELIVERY_NOME}</Text>
+                <Text style={{ fontSize: 13}}>{delivery?.HORARIO}</Text>
+                <Text style={{ fontSize: 13}}><Fontisto color="#FF0000" name='map-marker-alt' size={18}/> {delivery?.ENDERECO}, {delivery?.NUMERO} - {delivery?.BAIRRO}</Text>
+                <Text style={{ fontSize: 13, marginBottom: 5}}>Valor da Taxa de Entrega: R$ {parseFloat(delivery?.TAXA_ENTREGA).toFixed(2)}</Text>
+                <Text style={{ fontWeight: "bold", marginBottom: 5, fontSize: 19 }}>Seus Pedidos</Text>
+              </View>
             </View>
-          )}
-        />
 
-        {
-          (basket?.length > 0) &&
-          <TouchableOpacity style={styles.btnAdd} onPress={handleFinalizarPedido}>
-            <Text style={{color: '#FFF', fontSize: 18}}>FINALIZAR PEDIDO</Text>
-          </TouchableOpacity>
+            <FlatList
+              data={basket}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(item)=>String(item?.PRODUTO_ID)}
+              renderItem={ ({item}) => (
+                <BasketItem 
+                  item={item} 
+                  AddQtd={()=>AddToBasket(item, 1, item?.VR_UNITARIO, [], 0, '')} 
+                  RemoveQtd={()=>RemoveFromBasket(item)}  
+                  updateTotal={()=>updateSubTotal()}
+                />
+              )}
+              ListEmptyComponent={()=><Text style={styles.empty}>Cesta de Compras vazia!</Text>}
+              ListFooterComponent={()=>(
+                <View>
+                  <Text style={styles.subtotal}>+ Sub-Total: R$ {parseFloat(subtotal).toFixed(2)}</Text>
+                  <Text style={styles.taxa}>+ Taxa de Entrega: R$ {parseFloat(delivery?.TAXA_ENTREGA).toFixed(2)}</Text>
+                  <Text style={styles.total}>= Total: R$ {parseFloat(total).toFixed(2)}</Text>
+                </View>
+              )}
+            />
+
+            <TouchableOpacity style={styles.btnAdd} onPress={handleFinalizarPedido}>
+              <Text style={{color: '#FFF', fontSize: 18}}>FINALIZAR PEDIDO</Text>
+            </TouchableOpacity>
+          </>
         }
 
         <TouchableOpacity style={styles.btnCancel} onPress={handleCancelarPedido}>
           <Text style={{color: '#FFF', fontSize: 18}}>CANCELAR</Text>
         </TouchableOpacity>
+
+        <AddressConfirmationModal
+          visible={showModal}
+          address={tempAddress}
+          onConfirm={handleConfirmAddress}
+          onCancel={() => setShowModal(false)}
+        />
 
       </ScrollView>
     </View>
@@ -244,7 +246,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontStyle: 'italic',
     textAlign: 'center',
-    marginTop: 10
+    color: "red",
+    marginTop: 30,
+    marginBottom: 30,
   },
   subtotal:{
     fontSize: 18,

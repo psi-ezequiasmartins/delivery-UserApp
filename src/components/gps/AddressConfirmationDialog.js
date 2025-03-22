@@ -1,20 +1,28 @@
-import React from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
-export function AddressConfirmationDialog({ visible, address, onConfirm, onCancel }) {
-  if (!visible || !address) return null;
+export default function AddressConfirmationModal({ visible, address, onConfirm, onCancel }) {
+  const [editedAddress, setEditedAddress] = useState(address || '');
 
   return (
     <Modal
-      transparent
       visible={visible}
-      animationType="fade"
+      transparent
+      animationType="slide"
     >
-      <View style={styles.container}>
-        <View style={styles.dialog}>
-          <Text style={styles.title}>Confirmar Endereço de Entrega</Text>
-          <Text style={styles.address}>{address.formatted}</Text>
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Text style={styles.title}>Confirmar Endereço da Entrega</Text>
           
+          <TextInput
+            style={styles.input}
+            value={editedAddress}
+            onChangeText={setEditedAddress}
+            multiline
+            numberOfLines={2}
+            placeholder="Digite o endereço completo"
+          />
+
           <View style={styles.buttonContainer}>
             <TouchableOpacity 
               style={[styles.button, styles.cancelButton]} 
@@ -25,13 +33,7 @@ export function AddressConfirmationDialog({ visible, address, onConfirm, onCance
             
             <TouchableOpacity 
               style={[styles.button, styles.confirmButton]} 
-              onPress={() => onConfirm({
-                enderecoCompleto: address.formatted,
-                coordinates: {
-                  latitude: address.details.latitude,
-                  longitude: address.details.longitude
-                }
-              })}
+              onPress={() => onConfirm(editedAddress)}
             >
               <Text style={styles.buttonText}>Confirmar</Text>
             </TouchableOpacity>
@@ -40,30 +42,34 @@ export function AddressConfirmationDialog({ visible, address, onConfirm, onCance
       </View>
     </Modal>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
+  modalContainer: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
-    alignItems: 'center',
+    padding: 20,
   },
-  dialog: {
+  modalContent: {
     backgroundColor: 'white',
     borderRadius: 8,
     padding: 20,
-    width: '90%',
-    maxWidth: 400,
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  address: {
-    fontSize: 16,
     marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    padding: 10,
+    marginBottom: 20,
+    minHeight: 60,
+    textAlignVertical: 'top'
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -71,8 +77,8 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    padding: 10,
-    borderRadius: 5,
+    padding: 15,
+    borderRadius: 4,
     marginHorizontal: 5,
   },
   cancelButton: {
@@ -84,6 +90,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     textAlign: 'center',
-    fontSize: 16,
-  },
+    fontWeight: 'bold',
+  }
 });
