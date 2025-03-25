@@ -3,13 +3,11 @@
  */
 
 import React, { useState } from 'react';
-import { SafeAreaView, View, Image, Text, TextInput, TouchableOpacity, Keyboard, Platform, StyleSheet } from 'react-native';
-import { ScrollView } from "react-native-virtualized-view";
-import { TextInputMask } from 'react-native-masked-text';
+import { SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, Platform, StyleSheet } from 'react-native';
+import { MaskedTextInput } from 'react-native-mask-text';
 import { useNavigation } from '@react-navigation/native';
 
 import SelectUF from '../../components/SelectUF';
-import icon from '../../../assets/icon.png';
 
 export default function SignUp2(props) {
   const navigation = useNavigation();
@@ -84,15 +82,11 @@ export default function SignUp2(props) {
         <View style={[styles.areaInput, { width: "40%" }]}>
           <View style={styles.areaInput}>
             <Text style={{ marginBottom: 5 }}>CEP</Text>
-            <TextInputMask
-              type={'custom'}
-              options={{
-                mask: "99999-999",
-              }}
+            <MaskedTextInput
               value={CEP}
+              mask="99999-999"
               placeholder="31000-000"
-              onChangeText={(input) => setCep(input)}
-              onSubmitEditing={() => Keyboard.dismiss()}
+              onChangeText={(masked, unmasked) => setCep(masked)}
               keyboardType="numeric"
               style={styles.input}
             />

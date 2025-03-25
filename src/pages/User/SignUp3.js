@@ -4,7 +4,7 @@
 
 import React, {useState, useContext} from 'react';
 import { SafeAreaView, View, Image, Text, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, Platform, StyleSheet } from 'react-native';
-import { TextInputMask } from 'react-native-masked-text';
+import { MaskedTextInput } from 'react-native-mask-text';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
 
@@ -72,14 +72,11 @@ export default function SignUp3(props) {
 
         <View style={styles.areaInput}>
           <Text style={{marginBottom: 5}}>Telefone:</Text>
-          <TextInputMask
-            type={'custom'}
-            options={{
-              mask: "(99) 99999-9999",
-            }}
+          <MaskedTextInput
             value={telefone}
-            placeholder="Ex.: (31) 99999-9999"
-            onChangeText={ (input) => setTelefone(input) }
+            mask={"(99) 99999-9999"}
+            placeholder="(31) 99999-9999"
+            onChangeText={(masked, unmasked)=>{setTelefone(masked)}}
             keyboardType="numeric"
             style={styles.input}
           />

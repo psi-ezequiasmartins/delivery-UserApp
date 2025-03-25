@@ -5,7 +5,7 @@
 import { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, SafeAreaView, StyleSheet } from 'react-native';
 import { ScrollView } from "react-native-virtualized-view";
-import { TextInputMask } from 'react-native-masked-text';
+import { MaskedTextInput } from 'react-native-mask-text';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
 
@@ -56,7 +56,7 @@ export default function Perfil() {
 
       <View style={styles.areaInput}>
 
-          <Text style={{marginBottom: 5}}>ID (Ficha Nº):</Text>
+          <Text>ID (Ficha Nº):</Text>
           <TextInput 
             value={user?.UserID}
             placeholder={String(user?.UserID)}
@@ -68,7 +68,7 @@ export default function Perfil() {
         </View>
 
         <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Nome:</Text>
+          <Text>Nome:</Text>
           <TextInput 
             value={nome}
             placeholder="Nome"
@@ -80,7 +80,7 @@ export default function Perfil() {
         </View>
 
         <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Sobrenome:</Text>
+          <Text>Sobrenome:</Text>
           <TextInput
             value={sobrenome}
             placeholder="Sobrenome"
@@ -91,19 +91,19 @@ export default function Perfil() {
         </View>
 
         <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Telefone:</Text>
-          <TextInputMask
+          <Text>Telefone:</Text>
+          <MaskedTextInput
             value={telefone}
             mask={"(99) 99999-9999"}
             placeholder="(31) 99999-9999"
-            onChangeText={setTelefone}
+            onChangeText={(masked, unmasked)=>{setTelefone(masked)}}
             keyboardType="numeric"
             style={styles.input}
           />
         </View>
 
         <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Email:</Text>
+          <Text>Email:</Text>
           <TextInput
             value={email}
             onChangeText={(input)=>setEmail(input)}
@@ -153,6 +153,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "flex-start",
     margin: 5,
+    padding: 5
   },
   input:{
     flex: 1, 

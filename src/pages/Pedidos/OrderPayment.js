@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Keyboard, TouchableOpacity, ActivityIndicator, SafeAreaView, StyleSheet } from "react-native";
-import { TextInputMask } from 'react-native-masked-text'; //  "react-native-masked-text": "^1.13.0",
+import { MaskedTextInput } from "react-native-mask-text";
 
 import api from "../../config/apiAxios";
 
@@ -66,11 +66,11 @@ export default function OrderPayment({ orderId }) {
         </Text>
 
         <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Email</Text>
+          <Text>Email</Text>
           <TextInput
             placeholder="Email"
             value={email}
-            onChangeText={setEmail} // onChangeText={(input)=>setEmail(input)}
+            onChangeText={setEmail} 
             autoCapitalize='none'
             keyboardType='email-address'
             textContentType='emailAddress'
@@ -80,36 +80,36 @@ export default function OrderPayment({ orderId }) {
         </View>
 
         <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Número do Cartão</Text>
-          <TextInputMask
+          <Text>Número do Cartão</Text>
+          <MaskedTextInput
             value={cardNumber}
-            mask={"[0000] [0000] [0000] [0000]"}
+            mask={"9999 9999 9999 9999"}
             placeholder="9999 9999 9999 9999"
-            onChangeText={setCardNumber}
+            onChangeText={(masked, unmasked) => {setCardNumber(masked)}}
             keyboardType="numeric"
             style={styles.input}
           />
         </View>
 
         <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Validade do Cartão</Text>
-          <TextInputMask
+          <Text>Validade do Cartão</Text>
+          <MaskedTextInput
             value={expiryDate}
-            mask={"[99]/[9999]"}
-            placeholder="99/9999"           
-            onChangeText={setExpiryDate}
+            mask="99/9999"
+            placeholder="MM/AAAA"
+            onChangeText={(masked, unmasked) => {setExpiryDate(masked)}}
             keyboardType="numeric"
             style={styles.input}
           />
         </View>
 
         <View style={styles.areaInput}>
-          <Text style={{marginBottom: 5}}>Código CVV</Text>
-          <TextInputMask
+          <Text>Código CVV</Text>
+          <MaskedTextInput
             value={cvv}
-            mask={"[999]"}
+            mask={"999"}
             placeholder="999"
-            onChangeText={setCvv}
+            onChangeText={(masked, unmasked)=>{setCvv(masked)}}
             keyboardType="numeric"
             style={styles.input}
           />
@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "flex-start",
     margin: 5,
+    padding: 5
   },
   input:{
     width: "95%",
