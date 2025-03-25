@@ -61,7 +61,6 @@ export default function Perfil() {
             value={user?.UserID}
             placeholder={String(user?.UserID)}
             autoCorrect={false}
-            // onChangeText={(input) => setUserId(input)}
             autoCapitalize="words"
             style={styles.input}
             editable={false}
@@ -94,13 +93,10 @@ export default function Perfil() {
         <View style={styles.areaInput}>
           <Text style={{marginBottom: 5}}>Telefone:</Text>
           <TextInputMask
-            type={'custom'}
-            options={{
-              mask: "(99) 99999-9999",
-            }}
             value={telefone}
+            mask={"(99) 99999-9999"}
             placeholder="(31) 99999-9999"
-            onChangeText={ (input) => setTelefone(input) }
+            onChangeText={setTelefone}
             keyboardType="numeric"
             style={styles.input}
           />
@@ -119,90 +115,6 @@ export default function Perfil() {
             style={styles.input}
           />
         </View>
-
-        {/* 
-          <View style={styles.areaInput}>
-            <Text style={{marginBottom: 5}}>CEP:</Text>
-            <TextInputMask
-              type={'custom'}
-              options={{
-                mask: "99999-999",
-              }}
-              value={CEP}
-              placeholder="99999-999"
-              onChangeText={ (input) => setCep(input) }
-              keyboardType="numeric"
-              style={styles.input}
-            />
-          </View>
-
-          <View style={styles.areaInput}>
-            <Text style={{marginBottom: 5}}>Endereco:</Text>
-            <TextInput
-              value={endereco}
-              placeholder="Endereço"
-              onChangeText={(input) => setEndereco(input)}
-              autoCapitalize="words"
-              style={styles.input}
-            />
-          </View>
-
-          <View style={styles.areaInput}>
-            <Text style={{marginBottom: 5}}>Número:</Text>
-            <TextInput
-              value={numero}
-              placeholder="Número"
-              onChangeText={(input) => setNumero(input)}
-              keyboardType="numeric"
-              style={styles.input}
-            />
-          </View>
-
-          <View style={styles.areaInput}>
-            <Text style={{marginBottom: 5}}>Complemento:</Text>
-            <TextInput
-              value={complemento}
-              placeholder="Complemento"
-              onChangeText={(input) => setComplemento(input)}
-              style={styles.input}
-            />
-          </View>
-
-          <View style={styles.areaInput}>
-            <Text style={{marginBottom: 5}}>Bairro:</Text>
-            <TextInput 
-              value={bairro}
-              placeholder="Bairro"
-              onChangeText={(input) => setBairro(input)}
-              autoCapitalize="words"
-              style={styles.input}
-            />
-          </View>
-
-          <View style={styles.areaInput}>
-            <Text style={{marginBottom: 5}}>Cidade:</Text>
-            <TextInput 
-              value={cidade}
-              placeholder="Cidade"
-              autoCorrect={false}
-              onChangeText={(input) => setCidade(input)}
-              autoCapitalize="words"
-              style={styles.input}
-            />
-          </View>
-
-          <View style={styles.areaInput}>
-            <Text style={{marginBottom: 5}}>UF:</Text>
-            <TextInput 
-              value={UF}
-              placeholder="UF"
-              onChangeText={(input) => setUf(input)}
-              autoCapitalize="words"
-              style={styles.input}
-            />
-          </View> 
-        */}
-
       </ScrollView>
       <TouchableOpacity style={styles.btnSubmit} onPress={ onSave }>
         <Text style={styles.btnTxt}>ATUALIZAR DADOS</Text>

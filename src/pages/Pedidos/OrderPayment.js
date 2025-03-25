@@ -3,8 +3,8 @@
 */
 
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Keyboard, Button, TouchableOpacity, ActivityIndicator, SafeAreaView, StyleSheet } from "react-native";
-import { TextInputMask } from 'react-native-masked-text';
+import { View, Text, TextInput, Keyboard, TouchableOpacity, ActivityIndicator, SafeAreaView, StyleSheet } from "react-native";
+import { TextInputMask } from 'react-native-masked-text'; //  "react-native-masked-text": "^1.13.0",
 
 import api from "../../config/apiAxios";
 
@@ -57,13 +57,16 @@ export default function OrderPayment({ orderId }) {
         <Text style={styles.subtitle}>PAGAMENTO VIA CARTÃO</Text>
         <Text>{" "}</Text>
         <Text style={{fontSize: 13, fontWeight: "bold" }}>PEDIDO Nº {orderId} {pedido?.DATA}</Text>
+
         <Text style={{ fontSize: 13 }}>
           R$ {parseFloat(pedido?.VR_SUBTOTAL).toFixed(2)} + R$ {parseFloat(pedido?.TAXA_ENTREGA).toFixed(2)} =
           <Text style={{ fontWeight: 'bold' }}>
             R$ {parseFloat(pedido?.VR_TOTAL).toFixed(2)}
           </Text>
         </Text>
+
         <View style={styles.areaInput}>
+          <Text style={{marginBottom: 5}}>Email</Text>
           <TextInput
             placeholder="Email"
             value={email}
@@ -77,42 +80,36 @@ export default function OrderPayment({ orderId }) {
         </View>
 
         <View style={styles.areaInput}>
+          <Text style={{marginBottom: 5}}>Número do Cartão</Text>
           <TextInputMask
-            type={'custom'}
-            placeholder="Número do Cartão"
             value={cardNumber}
-            onChangeText={setCardNumber} // onChangeText={(input)=>setCardNumber(input) }
-            options={{
-              mask: "9999 9999 9999 9999",
-            }}
+            mask={"[0000] [0000] [0000] [0000]"}
+            placeholder="9999 9999 9999 9999"
+            onChangeText={setCardNumber}
             keyboardType="numeric"
             style={styles.input}
           />
         </View>
 
         <View style={styles.areaInput}>
+          <Text style={{marginBottom: 5}}>Validade do Cartão</Text>
           <TextInputMask
-            type={'custom'}
-            placeholder="CVV"
-            value={cvv}
-            onChangeText={setCvv} // onChangeText={(input)=>setCvv(input) }
-            options={{
-              mask: "999",
-            }}
-            keyboardType="numeric"
-            style={styles.input}
-          />
-        </View>
-
-        <View style={styles.areaInput}>
-          <TextInputMask
-            type={'custom'}
-            placeholder="Data de Expiração"
             value={expiryDate}
-            onChangeText={setExpiryDate} // onChangeText={(input)=>setExpiryDate(input) }
-            options={{
-              mask: "99/9999",
-            }}
+            mask={"[99]/[9999]"}
+            placeholder="99/9999"           
+            onChangeText={setExpiryDate}
+            keyboardType="numeric"
+            style={styles.input}
+          />
+        </View>
+
+        <View style={styles.areaInput}>
+          <Text style={{marginBottom: 5}}>Código CVV</Text>
+          <TextInputMask
+            value={cvv}
+            mask={"[999]"}
+            placeholder="999"
+            onChangeText={setCvv}
             keyboardType="numeric"
             style={styles.input}
           />
