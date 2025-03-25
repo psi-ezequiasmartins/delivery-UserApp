@@ -12,19 +12,13 @@ import { OrderProvider } from './src/contexts/OrderContext';
 
 import Routes from './src/routes';
 
-const theme = {
-  colors: {
-    primary: '#000', secondary: '#FFF', accent: '#E0F1FF'
-  },
-};
-
 export default function App() {
   return (
     <NavigationContainer>
       <AuthProvider>
         <CartProvider>
           <OrderProvider>
-            <StatusBar style="auto" backgroundColor="#FCC000" />
+            <StatusBar backgroundColor='#FCC000' barStyle='dark-content'  />
             <Routes />
           </OrderProvider>
         </CartProvider>
