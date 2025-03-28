@@ -2,7 +2,10 @@
 * src/pages/Pedidos/OrderDetailsNavigator.js
 */
 
+import React, { useState, useEffect } from 'react';
+import { View, Text } from 'react-native'
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import api from '../../config/apiAxios';
 
 import OrderDetails from "./OrderDetails";
 import OrderLiveUpdates from "./OrderLiveUpdates";
@@ -11,8 +14,30 @@ import OrderPayment from "./OrderPayment";
 const Tab = createMaterialTopTabNavigator();
 
 export default function OrderDetailsNavigator({ route }) {
-  const { id } = route.params || {};
-  console.log('ID recebido no Navigator:', id);
+  const { orderId } = route.params || {};
+  const [pedido, setPedido] = useState(null);
+
+  console.log('ID do Pedido em OrderDetailsNavigator: ', orderId);
+
+  useEffect(() => {
+    async function fetchPedido() {
+      await api.get(`/pedido/${orderId}`).then((response)=>{
+        setPedido(response?.data);
+        console.log('Dados recuperados do pedido: ', response?.data);
+      }).catch((error) =>{
+        console.log('Error: ', error)
+      });
+    }
+    fetchPedido();
+  }, [orderId]);
+
+  if (!pedido) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Erro ao carregar dados do pedido</Text>
+      </View>
+    );
+  } 
 
   return (
     <Tab.Navigator
@@ -25,13 +50,13 @@ export default function OrderDetailsNavigator({ route }) {
       }}
     >
       <Tab.Screen name="DETALHES">
-        {()=><OrderDetails orderId={id}/> }
+        {()=><OrderDetails pedido={pedido}/> }
       </Tab.Screen>
       <Tab.Screen name="LOCALIZAÇÃO">
-        {()=><OrderLiveUpdates orderId={id}/> }
+        {()=><OrderLiveUpdates pedido={pedido}/> }
       </Tab.Screen>
       <Tab.Screen name="PAGAMENTO">
-        {()=><OrderPayment orderId={id}/> }
+        {()=><OrderPayment pedido={pedido}/> }
       </Tab.Screen>
     </Tab.Navigator>
   );

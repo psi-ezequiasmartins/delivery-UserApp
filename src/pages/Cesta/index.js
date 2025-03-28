@@ -22,9 +22,9 @@ export default function Cesta() {
   const { delivery, basket, AddToBasket, RemoveFromBasket, CleanBasket } = useContext(CartContext);
   const { createOrder } = useContext(OrderContext);
   const { user, tokenMsg } = useContext(AuthContext);
-  const [ subtotal, setSubTotal] = useState(0);
-  const [ total, setTotal ] = useState(0);
-  const [ loading, setLoading ] = useState(false);
+  const [subtotal, setSubTotal] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [tempAddress, setTempAddress] = useState('');
   const [tempOrderData, setTempOrderData] = useState(null);  

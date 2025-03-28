@@ -2,36 +2,29 @@
 * src/pages/Pedidos/OrderLiveUpdates.js
 */
 
+import React, { useState, useEffect } from "react";
 import MapView, { Marker } from "react-native-maps";
-import React, { useState, useEffect, useContext } from "react";
 import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView } from "react-native";
 import { Fontisto, AntDesign } from "@expo/vector-icons";
 import { getCoordinatesFromAddress } from "../../components/gps/useGeolocation";
 
 import api from "../../config/apiAxios";
 
-export default function OrderLiveUpdates({ orderId }) {
-  const [ pedido, setPedido ] = useState(null);
+export default function OrderLiveUpdates({ pedido }) {
   const [ courier, setCourier ] = useState(null);
   const [ delivery_coords, setDeliveryCoords ] = useState(null);
   // const [ courier_coords, setCourierCoords ] = useState(null);
-  
-  const courierId = 200001; //Os dados do Courier serão fornecidos posteriormente junto com a atualização do status (coleta/retirada e entrega)
   // setCourierCoords({"latitude": -19.82628, "longitude": -43.98033});
+  // Os dados do Courier serão fornecidos posteriormente junto com a atualização do status (coleta/retirada e entrega)
+  const courierId = 200001; 
   
   useEffect(() => {
-    let isMounted = true;
-      async function getOrder() {
+    async function getOrder() {
       try {
-        const response = await api.get(`/pedido/${orderId}`);
-        if (!isMounted) return;
-        console.log('Dados do Pedido:', response.data);     
-        setPedido(response.data);
-        
-        if (response.data?.DELIVERY_ENDERECO) {
-          const coords = await getCoordinatesFromAddress(response.data.DELIVERY_ENDERECO);
-          if (isMounted && coords?.latitude && coords?.longitude) {
-            console.log('Coordenadas obtidas (Delivery): ', coords);
+        if (pedido?.DELIVERY_ENDERECO) {
+          const coords = await getCoordinatesFromAddress(pedido.DELIVERY_ENDERECO);
+          if (coords?.latitude && coords?.longitude) {
+            console.log('Coordenadas do Delivery: ', coords);
             setDeliveryCoords(coords);
           }
         }
@@ -39,11 +32,8 @@ export default function OrderLiveUpdates({ orderId }) {
         console.error('Erro ao buscar dados:', error);
       }
     }
-      getOrder(); 
-    return () => {
-      isMounted = false;
-    };
-  }, [orderId]);
+    getOrder(); 
+  }, [pedido]);
 
   useEffect(() => {
     async function getCourier() {
@@ -171,8 +161,6 @@ const styles = StyleSheet.create({
   },
   map:{
     flex: 1,
-    // width: "100%",
-    // height: "100%"
   }
 });
 

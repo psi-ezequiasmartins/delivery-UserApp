@@ -24,7 +24,7 @@ export default function AppRoutes() {
   function getHeaderTitle(route) {
     const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
     switch (routeName) {
-      case 'Home', 'HomeStack': return 'psi-Delivery';
+      case 'Home' || 'HomeStack': return 'psi-Delivery';
       case 'Deliveries': return 'Lista de Deliveries';
       case 'DeliveryDetails': return 'Delivery Info'
       case 'Orders': return 'Meus Pedidos';

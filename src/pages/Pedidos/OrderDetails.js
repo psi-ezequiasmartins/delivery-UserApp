@@ -2,95 +2,22 @@
  * src/pages/Pedidos/OrderDetails.js
  */
 
-import React, { useEffect, useState } from 'react';
 import { LogBox } from 'react-native';
-import { View, Text, Image, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { ScrollView } from "react-native-virtualized-view";
 import { Card, ListItem, Divider } from 'react-native-elements';
 import { differenceInDays, parse, isToday } from 'date-fns';
 import { useNavigation } from "@react-navigation/native";
 
-import api from '../../config/apiAxios';
-
-export default function OrderDetails({ orderId }) {
-  const [pedido, setPedido] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
+export default function OrderDetails({ pedido }) { 
   const navigation = useNavigation();
+
+  console.log('Dados do pedido: ', pedido);
 
   // Ignore specific warning
   LogBox.ignoreLogs([
     'Warning: TextElement: Support for defaultProps will be removed from function components',
   ]);
- 
-  useEffect(() => {
-    let isMounted = true; // Controle de montagem do componente
-    async function getOrder() {
-      try {
-        setLoading(true);
-        setError(null);   
-        
-        // console.log('ID recebido no OrderDetails:', orderId);
-        if (!orderId) {
-          throw new Error('ID do pedido não informado!');
-        }
-
-        // console.log('Buscando pedido ID: ', orderId);
-        const response = await api.get(`/pedido/${orderId}`);
-        
-        // validação da resposta
-        if (!response?.data) {
-          throw new Error('Resposta inválida do servidor, dados não encontrados!'); 
-        }
-        if (isMounted) {
-          // console.log('Dados recebidos: ', response.data);
-          setPedido(response.data);
-        }
-      } catch (error) {
-        console.error('Erro detalhado:', {
-          message: error.message,
-          response: error.response?.data,
-          status: error.response?.status
-        });
-        if (isMounted) {
-          setError(error.message);
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }    
-    }
-    getOrder();
-    // Cleanup function
-    return () => {
-      isMounted = false;
-    };
-  }, [orderId]);
-
-  if (loading) {
-    return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#145E7D" />
-        <Text>Carregando pedido...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity 
-          style={styles.button}
-          onPress={()=>navigation.goBack()}
-        >
-          <Text style={styles.buttonText}> Voltar </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
 
   // Validação adicional antes de renderizar
   if (!pedido || !pedido?.PEDIDO_ID) {
@@ -215,6 +142,7 @@ export default function OrderDetails({ orderId }) {
           <Text style={{fontWeight: "bold"}}>+ TAXA DE ENTREGA: R$ {parseFloat(pedido?.TAXA_ENTREGA).toFixed(2)}</Text>
           <Text style={{fontWeight: "bold"}}>= TOTAL DO PEDIDO: R$ {parseFloat(pedido?.VR_TOTAL).toFixed(2)}</Text>
         </Card>
+        <Text style={{textAlign: 'center'}}>. . .</Text>
       </ScrollView>
     );      
   } catch (error) {
@@ -288,16 +216,6 @@ const styles = StyleSheet.create({
   imagem:{
     width: 75, 
     height: 75,
-  },
-  indicator:{
-    flex:1, 
-    position: 'absolute', 
-    backgroundColor: '#000', 
-    opacity: 0.7, 
-    width: '100%', 
-    height: '100%', 
-    alignItems: 'center', 
-    justifyContent: 'center'
   },
   centerContainer: {
     flex: 1,

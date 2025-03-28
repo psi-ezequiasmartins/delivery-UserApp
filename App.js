@@ -1,5 +1,8 @@
 /**
  * App.js
+ * 
+ * eas build --platform android --profile preview
+ * 
  */
 
 import 'react-native-gesture-handler';
