@@ -23,7 +23,7 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
 
   useEffect(() => {
     async function loadAcrescimos() {
-      await api.get(`/listar/extras/delivery/${id}`).then((response) => {
+      await api.get(`/api/listar/extras/delivery/${id}`).then((response) => {
         setAcrescimos(response.data);
       });
     }
@@ -140,9 +140,9 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
           )}
           ListFooterComponent={<View style={{ height: 5 }} />}
         />
+        
       </View>
     </View>
-
   )
 }
 

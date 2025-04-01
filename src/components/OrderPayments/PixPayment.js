@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  Image, 
-  TouchableOpacity, 
+import { View, Text, Image, TouchableOpacity, 
   Clipboard,
-  Alert,
-  ActivityIndicator,
-  StyleSheet 
+  Alert, ActivityIndicator, StyleSheet 
 } from 'react-native';
 import api from '../../config/apiAxios';
 
@@ -24,7 +18,7 @@ export default function OrderPixPayment({ orderId }) {
     setLoading(true);
     try {
       // Busca dados do pedido
-      const orderResponse = await api.get(`/pedido/${orderId}`);
+      const orderResponse = await api.get(`/api/pedido/${orderId}`);
       setPedido(orderResponse.data);
 
       // Gera PIX

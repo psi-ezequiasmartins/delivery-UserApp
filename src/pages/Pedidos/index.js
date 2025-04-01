@@ -22,7 +22,7 @@ export default function Pedidos() {
 
   useEffect(() => {
     async function loadPedidos() {
-      const response = await api.get(`/listar/pedidos/usuario/${id}`);
+      const response = await api.get(`/api/listar/pedidos/usuario/${id}`);
       setPedidos(response.data);
     }
     loadPedidos();

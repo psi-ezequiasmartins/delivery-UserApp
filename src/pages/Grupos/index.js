@@ -2,7 +2,6 @@
  * src/pages/Grupos/index.js
  */
 
-
 import React from 'react';
 import { StyleSheet, View, Image, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';

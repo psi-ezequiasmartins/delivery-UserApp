@@ -17,10 +17,10 @@ export default function Deliveries({ route }) {
     async function loadDeliveries() {
       try {
         if (route.params.id === 101) {
-          const response = await api.get('/listar/deliveries');
+          const response = await api.get('/api/listar/deliveries');
           setDeliveries(response?.data);
         } else {
-          const response = await api.get(`/listar/deliveries/categoria/${route.params.id}`);
+          const response = await api.get(`/api/listar/deliveries/categoria/${route.params.id}`);
           setDeliveries(response?.data);
         }                 
       } catch (error) {

@@ -19,7 +19,7 @@ export default function DeliveryItemToSelect({ produto, close }) {
 
   useEffect(() => {
     async function loadAcrescimos() {
-      await api.get(`/listar/extras/delivery/${id}`).then((response) => {
+      await api.get(`/api/listar/extras/delivery/${id}`).then((response) => {
         setAcrescimos(response.data);
       });
     }

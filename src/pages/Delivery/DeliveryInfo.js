@@ -27,7 +27,7 @@ export default function DeliveryInfo({ route }) {
   useEffect(() => {
     setBasketDelivery(null);
     async function loadDeliveryInfo() {
-      await api.get(`/delivery/${id}`).then((response) => {
+      await api.get(`/api/delivery/${id}`).then((response) => {
         let info = {
           "DELIVERY_ID": response.data.DELIVERY_ID,
           "DELIVERY_NOME": response.data.DELIVERY_NOME,
@@ -48,7 +48,7 @@ export default function DeliveryInfo({ route }) {
     }
 
     async function loadProdutos() {
-      await api.get(`/listar/produtos/delivery/${route.params.id}`).then((response) => {
+      await api.get(`/api/listar/produtos/delivery/${route.params.id}`).then((response) => {
         setListaDeProdutos(response.data);
       }).catch(error => {
         console.log('ERROR: ' + error);

@@ -37,7 +37,7 @@ export default function OrderLiveUpdates({ pedido }) {
 
   useEffect(() => {
     async function getCourier() {
-      await api.get(`/courier/${courierId}`).then(response => {
+      await api.get(`/api/courier/${courierId}`).then(response => {
         setCourier(response.data[0]);
         console.log(courier);
       })

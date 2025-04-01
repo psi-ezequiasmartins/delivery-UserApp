@@ -20,7 +20,7 @@ export default function OrderCreditCardPayment({ orderId }) {
   
   useEffect(() => {
     async function getOrder() {
-      await api.get(`/pedido/${orderId}`).then((response) => {
+      await api.get(`/api/pedido/${orderId}`).then((response) => {
         setPedido(response.data);
         console.log(pedido);
       })

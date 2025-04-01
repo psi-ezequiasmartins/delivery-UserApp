@@ -4,7 +4,7 @@
 
 import { useState, useEffect, createContext } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut as firebaseSignOut } from "firebase/auth";
-import { getDatabase, ref, set, onValue, child, update } from "firebase/database";
+import { getDatabase, ref, set, onValue } from "firebase/database";
 import { auth, firebase_app } from '../config/apiFirebase';
 import { Alert } from 'react-native';
 
@@ -54,9 +54,8 @@ function AuthProvider({ children }) {
         ]);
         const userId = await AsyncStorage.getItem("vID");
 
-        // processa a autenticação do usuário e armazena o token JWT
         try {
-          const response = await api.post('/authenticate', { USER_ID: userId, CHV: 1 });
+          const response = await api.post('/api/authenticate', { USER_ID: userId, CHV: 1 });
           const token = response.data?.token; 
           if (token) {
             AsyncStorage.setItem('token', JSON.stringify(token)); 
@@ -107,7 +106,7 @@ function AuthProvider({ children }) {
       TOKEN_MSG: token_sms
     };
 
-    api.post('/add/usuario/', json).then(result => {
+    api.post('/api/add/usuario/', json).then(result => {
       createUserWithEmailAndPassword(auth, email, password).then(async(value) => {
         // Signed In
         const id = value.user.uid;
@@ -127,7 +126,7 @@ function AuthProvider({ children }) {
           TOKEN_MSG: result.data.TOKEN_MSG
         });
 
-        const response = await api.post('/authenticate', { USER_ID: result.data.USER_ID, CHV: 1});
+        const response = await api.post('/api/authenticate', { USER_ID: result.data.USER_ID, CHV: 1});
 
         const token = response.data?.token;
         if (token) {
@@ -173,7 +172,7 @@ function AuthProvider({ children }) {
   }
 
   async function signOut() {
-    await firebaseSignOut(auth); // auth.signOu();
+    await firebaseSignOut(auth);
     setAuthenticated(false);
     api.defaults.headers['Authorization'] = undefined;
     AsyncStorage.multiRemove(["token", "vID", "vNome", "vSobrenome", "vTelefone", "vEmail", "vTokenSMS"]);

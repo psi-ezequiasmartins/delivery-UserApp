@@ -18,7 +18,7 @@ export default function BasketItem({ item, AddQtd, RemoveQtd, updateTotal }) {
   // useEffect(() => {
   //   if (id) {
   //     async function loadProdutoInfo() {
-  //       await api.get(`/produto/${id}`).then((snapshot) => {
+  //       await api.get(`/api/produto/${id}`).then((snapshot) => {
   //         setProduto(snapshot.data[0]);
   //       });
   //     }

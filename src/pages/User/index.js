@@ -39,7 +39,7 @@ export default function Perfil() {
       "TOKEN_MSG": tokenMsg
     }
     try {
-      await api.put(`/update/usuario/${user?.UserID} `, json).then(response => {
+      await api.put(`/api/update/usuario/${user?.UserID} `, json).then(response => {
         setUser(response.data[0]);
         Alert.alert('Dados atualizados com sucesso!');
       });

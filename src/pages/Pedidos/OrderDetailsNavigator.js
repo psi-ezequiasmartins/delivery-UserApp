@@ -21,7 +21,7 @@ export default function OrderDetailsNavigator({ route }) {
 
   useEffect(() => {
     async function fetchPedido() {
-      await api.get(`/pedido/${orderId}`).then((response)=>{
+      await api.get(`/api/pedido/${orderId}`).then((response)=>{
         setPedido(response?.data);
         console.log('Dados recuperados do pedido: ', response?.data);
       }).catch((error) =>{
