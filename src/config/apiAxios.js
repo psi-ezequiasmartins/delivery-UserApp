@@ -21,7 +21,7 @@ const api = axios.create({
 api.ping = async () => {
   try {
     // Usando uma rota pública que sabemos que existe
-    const response = await api.get('/pedido/1059');
+    const response = await api.get('/api/pedido/1059');
     return response.status === 200;
   } catch (error) {
     console.error('Erro de conectividade:', {
