@@ -31,16 +31,16 @@ function OrderProvider({ children }) {
       if (!isServerAvailable) {
         throw new Error('Servidor não está respondendo. Verifique sua conexão.');
       }
-      // console.log('Iniciando createOrder...', orderData);     
+      console.log('Iniciando createOrder...', orderData);     
       const response = await api.post('/api/add/pedido/', orderData, {
         timeout: 10000, // 10 segundos
         validateStatus: function (status) {
           return status >= 200 && status < 300;
         }
       });
-      // console.log('Status da resposta:', response.status);
-      // console.log('Headers da resposta:', response.headers);
-      // console.log('Dados da resposta:', response.data);
+      console.log('Status da resposta:', response.status);
+      console.log('Headers da resposta:', response.headers);
+      console.log('Dados da resposta:', response.data);
       if (!response.data) {
         throw new Error('Resposta vazia do servidor');
       }

@@ -3,7 +3,6 @@
  */
 
 import { initializeApp } from 'firebase/app';
-// import { getMessaging } from "firebase/messaging";
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import { API_KEY, AUTH_DOMAIN, DATABASE_URL, PROJECT_ID, STORAGE_BUCKET, MESSAGING_SENDER_ID, APP_ID } from '@env';
 
@@ -21,14 +20,10 @@ const firebaseConfig = {
 
 // Inicialize o Firebase App
 const firebase_app = initializeApp(firebaseConfig);
-// const messaging = getMessaging(firebase_app);
+
 // Inicialize o Firebase Auth com persistência no AsyncStorage
 const auth = initializeAuth(firebase_app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
 
-export { 
-  firebase_app,
-  // messaging, 
-  auth 
-};
+export { firebase_app, auth };
