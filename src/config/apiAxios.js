@@ -5,8 +5,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: 'http://192.168.0.7:3357', // servidor local
-  // baseURL: 'https://srv.deliverybairro.com', // servidor de produção
+  // baseURL: 'http://192.168.0.7:3357', // servidor local
+  baseURL: 'https://srv.deliverybairro.com', // servidor de produção
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
