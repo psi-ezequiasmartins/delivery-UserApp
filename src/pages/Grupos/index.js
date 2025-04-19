@@ -87,7 +87,7 @@ export default function Home() {
             </View>
             <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
               <TouchableOpacity onPress={()=>LinkTo('Deliveries', { id: 108, categoria: "MEDICAMENTOS" })}>
-                <Image style={[styles.item, {opacity: 0.5}]} source={btn_medicamentos}/>
+                <Image style={[styles.item, {opacity: 0.3}]} source={btn_medicamentos}/>
               </TouchableOpacity>
               <Text>Medicamentos</Text>
             </View>
@@ -102,7 +102,7 @@ export default function Home() {
           <View style={styles.linha}>
             <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
               <TouchableOpacity onPress={()=>LinkTo('Deliveries', { id: 110, categoria: "FLORICULTURA" })}>
-                <Image style={[styles.item, {opacity: 0.5}]} source={btn_floricultura}/>
+                <Image style={[styles.item, {opacity: 0.3}]} source={btn_floricultura}/>
               </TouchableOpacity>
               <Text>Floricultura</Text>
             </View>
@@ -114,7 +114,7 @@ export default function Home() {
             </View>
             <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
               <TouchableOpacity onPress={()=>LinkTo('Deliveries', { id: 112, categoria: "MERCADO" })}>
-                <Image style={[styles.item, {opacity: 0.5}]} source={btn_mercado}/>
+                <Image style={[styles.item, {opacity: 0.3}]} source={btn_mercado}/>
               </TouchableOpacity>
               <Text>Mercado</Text>
             </View>
@@ -132,11 +132,12 @@ const styles = StyleSheet.create({
   background:{
     flex: 1,
     backgroundColor: '#FFF',
+    color: '#FFF',
   },
   container:{
     flex: 1,
     justifyContent: 'flex-start',
-    backgroundColor: '#D9ECFD',
+    backgroundColor: '#D9ECFD', //'#FFFFCC', // 
   },
   grupos: {
     flex: 1,

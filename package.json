@@ -24,6 +24,7 @@
     "axios": "^1.8.1",
     "date-fns": "^4.1.0",
     "expo": "~52.0.42",
+    "expo-clipboard": "~7.0.1",
     "expo-device": "~7.0.3",
     "expo-location": "~18.0.10",
     "expo-notifications": "~0.29.14",

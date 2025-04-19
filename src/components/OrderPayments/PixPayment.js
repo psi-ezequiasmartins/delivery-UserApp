@@ -1,18 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, 
-  Clipboard,
-  Alert, ActivityIndicator, StyleSheet 
+import { 
+  View, Text, Image, TouchableOpacity, Alert, 
+  ActivityIndicator, StyleSheet 
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import api from '../../config/apiAxios';
 
 export default function OrderPixPayment({ orderId }) {
   const [loading, setLoading] = useState(false);
   const [pixData, setPixData] = useState(null);
   const [pedido, setPedido] = useState(null);
-  
+  const [expirationTime, setExpirationTime] = useState(null);
+ 
   useEffect(() => {
     getPedidoAndGeneratePix();
   }, [orderId]);
+
+  useEffect(() => {
+    if (expirationTime > 0) {
+      const timer = setInterval(() => {
+        setExpirationTime(prev => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [expirationTime]);
+
+  useEffect(() => {
+    if (pixData) {
+      const checkStatus = setInterval(async () => {
+        const response = await api.get(`/pix/status/${orderId}`);
+        if (response.data.status === 'PAID') {
+          clearInterval(checkStatus);
+          Alert.alert('Sucesso', 'Pagamento confirmado!');
+        }
+      }, 5000);
+      return () => clearInterval(checkStatus);
+    }
+  }, [pixData]);  
 
   async function getPedidoAndGeneratePix() {
     setLoading(true);
@@ -28,7 +52,13 @@ export default function OrderPixPayment({ orderId }) {
         description: `Pedido #${orderId}`
       });
       
-      setPixData(pixResponse.data);
+      if (pixResponse.data.success) {
+        setPixData(pixResponse.data);
+        setExpirationTime(pixResponse.data.expiresIn);
+      } else {
+        throw new Error('Falha ao gerar PIX');
+      }
+
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível gerar o PIX');
       console.error(error);
@@ -37,9 +67,13 @@ export default function OrderPixPayment({ orderId }) {
     }
   }
 
-  const copyToClipboard = () => {
-    Clipboard.setString(pixData.copyPaste);
-    Alert.alert('Sucesso', 'Código PIX copiado para área de transferência!');
+  async function copyToClipboard() {
+    try {
+      await Clipboard.setStringAsync(pixData.copyPaste);
+      Alert.alert('Sucesso', 'Código PIX copiado para área de transferência!');
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível copiar o código');
+    }
   };
 
   if (loading) {
@@ -60,11 +94,16 @@ export default function OrderPixPayment({ orderId }) {
       </Text>
 
       {pixData?.qrcode && (
-        <Image 
-          source={{ uri: pixData.qrcode }}
-          style={styles.qrCode}
-          resizeMode="contain"
-        />
+        <View style={styles.qrCodeContainer}>
+          <Image 
+            source={{ uri: pixData.qrcode }}
+            style={styles.qrCode}
+            resizeMode="contain"
+          />
+          <Text style={styles.expirationInfo}>
+            Expira em: {Math.floor(expirationTime / 60)} minutos
+          </Text>
+        </View>
       )}
 
       <TouchableOpacity 
@@ -88,9 +127,9 @@ export default function OrderPixPayment({ orderId }) {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
     alignItems: 'center',
     padding: 20,
+    backgroundColor: '#FFF',
   },
   title: {
     fontSize: 20,
@@ -101,10 +140,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
   },
+  qrCodeContainer: {
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
   qrCode: {
     width: 200,
     height: 200,
     marginVertical: 20,
+  },
+  expirationInfo: {
+    color: '#666',
+    marginTop: 10,
   },
   copyButton: {
     backgroundColor: '#000',
@@ -112,7 +161,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: '100%',
     alignItems: 'center',
-    marginVertical: 10,
+    marginVertical: 20,
   },
   copyButtonText: {
     color: '#FFF',
@@ -123,5 +172,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     color: '#666',
+    lineHeight: 24,
   }
 });

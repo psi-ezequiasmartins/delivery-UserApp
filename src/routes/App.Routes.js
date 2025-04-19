@@ -39,16 +39,21 @@ export default function AppRoutes() {
     return(
       <Tab.Navigator
         screenOptions={{
-          tabBarStyle: { height: 65 },
+          tabBarStyle: { height: 70 },
+          tabBarActiveTintColor: '#FC0000',
+          tabBarInactiveTintColor: '#999',
+          tabBarLabelStyle: {
+            fontSize: 12,
+          },
           fontWeight: 'bold',
           headerShown: false,
-          backgroundColor: '#000',
         }}
       >
         <Tab.Screen
-          name='HomeStack'
+          name='Home'
           component={HomeStackNavigator}
           options={({ route }) => ({
+            headerShown: false,
             headerTitle: getHeaderTitle(route),
             headerTintColor: '#FFF',
             headerStyle: {
@@ -61,9 +66,10 @@ export default function AppRoutes() {
           })}
         />
         <Tab.Screen
-          name='OrdersStack'
+          name='Meus Pedidos'
           component={OrderStackNavigator}
           options={({ route }) => ({
+            headerShown: false,
             headerTitle: getHeaderTitle(route),
             headerTintColor: '#FFF',
             headerStyle: {
@@ -76,9 +82,10 @@ export default function AppRoutes() {
           })}
         />
         <Tab.Screen
-          name='Profile'
+          name='Perfil'
           component={Perfil}
           options={({ route }) => ({
+            headerShown: false,
             headerTitle: getHeaderTitle(route),
             headerTintColor: '#FFF',
             headerStyle: {
@@ -104,21 +111,22 @@ export default function AppRoutes() {
         <Stack.Screen
           name="Home"
           component={Home}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="Deliveries"
           component={Deliveries}
-          options={{headerShown: false}}
+          options={{headerShown: true}}
         />
         <Stack.Screen
           name="DeliveryInfo"
           component={DeliveryInfo}
-          options={{headerShown: false}}
+          options={{headerShown: true}}
         />
         <Stack.Screen
           name="Cesta"
           component={Cesta}
-          options={{ headerShown: false}}
+          options={{ headerShown: true}}
         />
       </Stack.Navigator>   
     )
@@ -161,7 +169,7 @@ export default function AppRoutes() {
     <Drawer.Navigator
       drawerContent={(props) => <SideBar {...props} />}
       screenOptions={{
-        headerShown: true,
+        headerShown: false,
         drawerStyle: {
           backgroundColor: '#FFF',
           width: '70%',
@@ -174,7 +182,7 @@ export default function AppRoutes() {
           fontWeight: 'bold'
         },
         drawerItemStyle: {
-          activeTintColor: '#FFF',
+          activeTintColor: '#FCC000',
           activeBackgroundColor: '#FF0000',
           inactiveTintColor: '#5D5D5D',
           inactiveBackgroundColor: '#000',
@@ -186,6 +194,7 @@ export default function AppRoutes() {
         name="Home"
         component={HomeTabNavigator}
         options={({ route }) => ({
+          headerShown: true,
           headerTitle: getHeaderTitle(route),
           headerTintColor: '#FFF',
           headerStyle: {
