@@ -3,10 +3,10 @@
  */
 
 import axios from "axios";
+import { BASE_URL } from '@env';
 
 const api = axios.create({
-  // baseURL: 'http://192.168.0.4:3357', // servidor local
-  baseURL: 'https://srv.deliverybairro.com', // servidor de produção
+  baseURL: BASE_URL, // servidor de produção
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
