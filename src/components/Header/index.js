@@ -7,7 +7,7 @@ import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
 import { CartContext } from '../../contexts/CartContext';
-import { registerForPushNotificationsAsync } from './src/components/Notifications';
+import { registerForPushNotificationsAsync } from '../Notifications';
 import * as Notifications from 'expo-notifications';
 import api from './src/config/apiAxios';
 
@@ -49,7 +49,7 @@ export default function Header(props) {
         navigation.navigate('OrderDetailsNavigator', { orderId });
       }
     );
-    
+
     // cleanup function to remove the listener
     return () => {
       Notifications.removeNotificationSubscription(notificationListener.current);
