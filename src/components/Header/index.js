@@ -2,26 +2,14 @@
  * src/components/Header/index.js
  */
 
-import { 
-  // useState, 
-  useContext, 
-  // useEffect, 
-  // useRef 
-} from 'react';
-import { View, Image, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { useContext, useEffect, useRef } from 'react';
+import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-// import { AuthContext } from '../../contexts/AuthContext';
+import { AuthContext } from '../../contexts/AuthContext';
 import { CartContext } from '../../contexts/CartContext';
-
-// import * as Notifications from 'expo-notifications';
-
-// Notifications.setNotificationHandler({
-//   handleNotification: async() => ({
-//     shouldShowAlert: true,
-//     shouldPlaySound: true,
-//     shouldSetBadge: true
-//   })
-// })
+import { registerForPushNotificationsAsync } from './src/components/Notifications';
+import * as Notifications from 'expo-notifications';
+import api from './src/config/apiAxios';
 
 import icon from '../../../assets/icon.png';
 import logomarca from '../../../assets/logomarca.png';
@@ -29,26 +17,10 @@ import sacola from '../../../assets/pedidos.png';
 
 export default function Header(props) {
   const navigation = useNavigation();
+  const { user } = useContext(AuthContext);
   const { basket } = useContext(CartContext);
-  // const { token_sms, SetNotificationSMS } = useContext(AuthContext);
-  // const [ notification, setNotification ] = useState(null);
-  // const notificationListener = useRef();
-  // const responseListener = useRef();
-
-  // useEffect(() => {
-  //   notificationListener.current = Notifications.addNotificationReceivedListener((new_notification) => {
-  //     setNotification(new_notification);
-  //     SetNotificationSMS(new_notification);
-  //   });
-  //   responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-  //     console.log(response.notification.request.content.body)
-  //   });
-  //   return () => {
-  //     Notifications.removeNotificationSubscription(notificationListener.current);
-  //     Notifications.removeNotificationSubscription(responseListener.current);
-  //     GoToLink("Pedidos");
-  //   };
-  // }, [notification]);
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
   function GoToLink(link) {
     return (
@@ -56,12 +28,41 @@ export default function Header(props) {
     )
   }
 
+  useEffect(() => {
+    registerForPushNotificationsAsync().then(async token => {
+      if (token) {
+        console.log('Token de notificação:', token);
+        try {
+          await api.put('/api/usuario/push-token', { 
+            token,
+            userId: user?.UserID
+          });
+        } catch (error) {
+          console.error('Erro ao salvar token:', error);
+        }
+      }
+    });
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(
+      response => {
+        const { orderId } = response.request.content.data;
+        navigation.navigate('OrderDetailsNavigator', { orderId });
+      }
+    );
+    
+    // cleanup function to remove the listener
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    }
+  }, []);
+
   return (
     <View>
       <View style={styles.header}>
         <TouchableOpacity 
           onPress={()=> {
-            alert('psi-Delivery UserApp v1.0' + '\n' + '(31) 98410-7540 '); // + '\n' + token_sms
+            alert('psi-Delivery UserApp v1.0' + '\n' + '(31) 98410-7540 '); 
             GoToLink("Home");
           }}
         >
