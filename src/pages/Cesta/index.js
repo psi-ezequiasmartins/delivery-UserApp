@@ -3,8 +3,9 @@
 */
 
 import { useState, useEffect, useContext } from 'react';
+import { NotificationContext } from '../../contexts/NotificationContext';
 import { Alert, View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
-import { getCurrentLocationStandalone } from '../../components/gps/useGeolocation';
+import { getCurrentLocationStandalone } from '../../components/Gps/useGeolocation';
 import { ScrollView } from "react-native-virtualized-view";
 import { Fontisto } from '@expo/vector-icons';
 
@@ -13,7 +14,7 @@ import { CartContext } from '../../contexts/CartContext';
 import { OrderContext } from '../../contexts/OrderContext';
 import { AuthContext } from '../../contexts/AuthContext';
 
-import AddressConfirmationModal from '../../components/gps/AddressConfirmationDialog';
+import AddressConfirmationModal from '../../components/Gps/AddressConfirmationDialog';
 
 import BasketItem from '../../components/Basket';
 
@@ -21,16 +22,27 @@ export default function Cesta() {
   const navigation = useNavigation();
   const { delivery, basket, AddToBasket, RemoveFromBasket, CleanBasket } = useContext(CartContext);
   const { createOrder } = useContext(OrderContext);
-  const { user, tokenMsg } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+  const { getPushToken } = useContext(NotificationContext);
+
   const [subtotal, setSubTotal] = useState(0);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [tempAddress, setTempAddress] = useState('');
   const [tempOrderData, setTempOrderData] = useState(null);  
+  const [tempAddress, setTempAddress] = useState('');
 
-  // Token de notificação para testes
-  let token_sms = 'ExponentPushToken[W47L3BHJyJxjUEa5vomnqd]';
+  // Helper function to format basket items
+  function formattedBasketItems(basketItems) {
+    return basketItems.map((item) => ({
+      ...item,
+      "ACRESCIMOS": item?.ACRESCIMOS?.map(acrescimo => ({
+        "DESCRICAO": acrescimo?.DESCRICAO,
+        "VR_UNITARIO": acrescimo?.VR_UNITARIO,
+      })),
+      "TOTAL": (item?.VR_ACRESCIMOS + item?.VR_UNITARIO) * item?.QTD
+    }));
+  }
 
   function updateSubTotal() {
     let new_value = 0;
@@ -41,7 +53,7 @@ export default function Cesta() {
           items_total += parseFloat(extra.VR_UNITARIO);
         });
       }
-      new_value += items_total * item.QTD; // Multiplica pela quantidade do item
+      new_value += items_total * item.QTD; 
     });
     setSubTotal(new_value);
     const soma = new_value + parseFloat(delivery?.TAXA_ENTREGA);
@@ -54,31 +66,20 @@ export default function Cesta() {
 
   async function handleFinalizarPedido() {
     try {
-      setLoading(true); // Adicionar feedback visual
+      setLoading(true); 
 
-      // Obter localização do usuário
       const locationData = await getCurrentLocationStandalone();
       if (!locationData?.location || !locationData?.address) {
         Alert.alert('Erro', 'Não foi possível obter sua localização');
         return;
       }
 
-      // prepara a lista de itens extras (acréscimos)
-      function formatAcrescimos(acrescimos) {
-        return acrescimos.map((acrescimo) => {
-          return {
-            "DESCRICAO": acrescimo?.DESCRICAO,
-            "VR_UNITARIO": acrescimo?.VR_UNITARIO,
-          };
-        });
+      // Get push token using the new context
+      const pushToken = await getPushToken();
+      if (!pushToken) {
+        Alert.alert('Aviso', 'Não foi possível configurar as notificações');
+        return;
       }
-
-      // prepara a lista da cesta de compras (basket): itens e acréscimos (se houver) 
-      const formattedBasket = basket.map((item) => ({
-        ...item,
-        "ACRESCIMOS": formatAcrescimos(item?.ACRESCIMOS),
-        "TOTAL": (item?.VR_ACRESCIMOS + item?.VR_UNITARIO) * item?.QTD
-      }));
 
       const order = {
         "DELIVERY_ID": delivery?.DELIVERY_ID,
@@ -86,19 +87,18 @@ export default function Cesta() {
         "VR_SUBTOTAL": subtotal,
         "TAXA_ENTREGA": delivery?.TAXA_ENTREGA,
         "VR_TOTAL": total,
-        "TOKEN_MSG": tokenMsg || token_sms,
+        "PUSH_TOKEN": pushToken,
         "STATUS": "NOVO",
         "ENDERECO_ENTREGA": locationData.address.formatted,
         "LATITUDE": locationData.location.latitude,
         "LONGITUDE": locationData.location.longitude,
-        "itens": formattedBasket
+        "itens": formattedBasketItems(basket),
       };
 
-      // Salva os dados temporariamente e mostra o modal
+      // Save data temporary and show modal
       setTempOrderData(order);
       setTempAddress(locationData.address.formatted);
       setShowModal(true);
-
     } catch (error) {
       console.error('Erro ao finalizar pedido:', error);
       Alert.alert('Erro', 'Não foi possível criar o pedido');

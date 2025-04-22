@@ -12,18 +12,21 @@ import { AuthProvider } from './src/contexts/AuthContext';
 import { CartProvider } from './src/contexts/CartContext';
 import { OrderProvider } from './src/contexts/OrderContext';
 
+import { NotificationProvider } from './src/contexts/NotificationContext';
 import Routes from './src/routes';
 
 export default function App() {
   return (
     <NavigationContainer>
       <AuthProvider>
-        <CartProvider>
-          <OrderProvider>
-            <StatusBar backgroundColor='#FCC000' barStyle='dark-content'  />
-            <Routes />
-          </OrderProvider>
-        </CartProvider>
+        <NotificationProvider>
+          <CartProvider>
+            <OrderProvider>
+              <StatusBar backgroundColor='#FCC000' barStyle='dark-content'  />
+              <Routes />
+            </OrderProvider>
+          </CartProvider>
+        </NotificationProvider>
       </AuthProvider>
     </NavigationContainer>
   );

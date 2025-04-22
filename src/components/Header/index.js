@@ -2,14 +2,12 @@
  * src/components/Header/index.js
  */
 
-import { useContext, useEffect, useRef } from 'react';
+import { use, useContext, useRef } from 'react';
 import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { AuthContext } from '../../contexts/AuthContext';
 import { CartContext } from '../../contexts/CartContext';
-import { registerForPushNotificationsAsync } from '../Notifications';
+import { NotificationContext } from '../../contexts/NotificationContext';
 import * as Notifications from 'expo-notifications';
-import api from './src/config/apiAxios';
 
 import icon from '../../../assets/icon.png';
 import logomarca from '../../../assets/logomarca.png';
@@ -17,10 +15,26 @@ import sacola from '../../../assets/pedidos.png';
 
 export default function Header(props) {
   const navigation = useNavigation();
-  const { user } = useContext(AuthContext);
   const { basket } = useContext(CartContext);
+  const { pushToken }  = useContext(NotificationContext);  
   const notificationListener = useRef();
-  const responseListener = useRef();
+
+  useEffect(() => {
+    notificationListener.current = Notifications.addNotificationReceivedListener(
+      response => {
+        const { orderId } = response.request.content.data;
+        if (orderId) {
+          navigation.navigate('OrderDetailsNavigator', { orderId });
+        }
+      }       
+    );
+    return () => {
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      }
+    };
+
+  }, [navigation]);
 
   function GoToLink(link) {
     return (
@@ -28,41 +42,12 @@ export default function Header(props) {
     )
   }
 
-  useEffect(() => {
-    registerForPushNotificationsAsync().then(async token => {
-      if (token) {
-        console.log('Token de notificação:', token);
-        try {
-          await api.put('/api/usuario/push-token', { 
-            token,
-            userId: user?.UserID
-          });
-        } catch (error) {
-          console.error('Erro ao salvar token:', error);
-        }
-      }
-    });
-
-    notificationListener.current = Notifications.addNotificationReceivedListener(
-      response => {
-        const { orderId } = response.request.content.data;
-        navigation.navigate('OrderDetailsNavigator', { orderId });
-      }
-    );
-
-    // cleanup function to remove the listener
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
-      Notifications.removeNotificationSubscription(responseListener.current);
-    }
-  }, []);
-
   return (
     <View>
       <View style={styles.header}>
         <TouchableOpacity 
           onPress={()=> {
-            alert('psi-Delivery UserApp v1.0' + '\n' + '(31) 98410-7540 '); 
+            alert('psi-Delivery UserApp v1.0' + '\n' + '(31) 98410-7540 '+ '\n' + `pushToken: ${pushToken}`); 
             GoToLink("Home");
           }}
         >

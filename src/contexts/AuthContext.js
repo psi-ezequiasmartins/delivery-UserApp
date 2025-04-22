@@ -49,7 +49,7 @@ function AuthProvider({ children }) {
           ["vSobrenome", data?.Sobrenome],
           ["vTelefone", data?.Telefone],
           ["vEmail", data?.Email],
-          ["vToken", data?.TokenMSG],
+          ["vToken", data?.pushToken],
           ["vTokenDT", currentTime]
         ]);
         const userId = await AsyncStorage.getItem("vID");
@@ -103,7 +103,7 @@ function AuthProvider({ children }) {
       TELEFONE: telefone, EMAIL: email, 
       CEP: CEP, ENDERECO: endereco, NUMERO: numero, COMPLEMENTO: complemento, BAIRRO: bairro, CIDADE: cidade, UF: UF,
       URL_IMAGEM: "https://via.placeholder.com/300x400",
-      TOKEN_MSG: token_sms
+      PUSH_TOKEN: token_sms
     };
 
     api.post('/api/add/usuario/', json).then(result => {
@@ -123,7 +123,7 @@ function AuthProvider({ children }) {
           Bairro: result.data.BAIRRO,
           Cidade: result.data.CIDADE,
           UF: result.data.UF,
-          TOKEN_MSG: result.data.TOKEN_MSG
+          PUSH_TOKEN: result.data.PUSH_TOKEN
         });
 
         const response = await api.post('/api/authenticate', { USER_ID: result.data.USER_ID, CHV: 1});
@@ -134,7 +134,7 @@ function AuthProvider({ children }) {
             ["token", JSON.stringify(token)],
             ["vID", data.UserID.asString()], ["vNome", data.NOME], ["vSobrenome", data.SOBRENOME], 
             ["vTelefone", data.TELEFONE], ["vEmail", data.EMAIL], 
-            ["vTokenSMS", data.TOKEN_MSG]
+            ["vTokenSMS", data.PUSH_TOKEN]
           ]);
 
           api.defaults.headers['Authorization'] = `Bearer ${token}`;

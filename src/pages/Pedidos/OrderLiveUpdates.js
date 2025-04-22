@@ -6,7 +6,7 @@ import React, { useState, useEffect } from "react";
 import MapView, { Marker } from "react-native-maps";
 import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView } from "react-native";
 import { Fontisto, AntDesign } from "@expo/vector-icons";
-import { getCoordinatesFromAddress } from "../../components/gps/useGeolocation";
+import { getCoordinatesFromAddress } from "../../components/Gps/useGeolocation";
 
 import api from "../../config/apiAxios";
 
