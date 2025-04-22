@@ -12,13 +12,15 @@ import OrderListItem from './OrderListItem';
 
 import api from "../../config/apiAxios";
 
-export default function Pedidos() {
+export default function Pedidos(props) {
   const { user } = useContext(AuthContext); // incluir notify 
   const [ pedidos, setPedidos] = useState([]);
 
   const listRef = useRef(null);
 
   let id = user?.UserID;
+  let orderId = props.orderId; // orderId é o id do pedido que foi atualizado. Se for diferente de null, atualiza a lista de pedidos com seus status atualizados.
+  // let notify = props.route.params?.notify; // se notify = true, atualiza a lista de pedidos com seus status atualizados.}
 
   useEffect(() => {
     async function loadPedidos() {
@@ -26,7 +28,7 @@ export default function Pedidos() {
       setPedidos(response.data);
     }
     loadPedidos();
-  }, [id]);
+  }, [id, orderId]); // se orderId for diferente de null, atualiza a lista de pedidos com seus status atualizados.
   
   async function moveToTop() {
     await listRef.current.scrollToOffset({offset: 0, animated: true})

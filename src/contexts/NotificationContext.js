@@ -6,6 +6,15 @@ import { AuthContext } from './AuthContext';
 import { EXPO_PROJECT_ID } from '@env';
 import api from '../config/apiAxios';
 
+// Configuração global das notificações
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
 export const NotificationContext = createContext({});
 
 export function NotificationProvider({ children }) {

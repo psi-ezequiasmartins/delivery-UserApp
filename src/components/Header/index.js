@@ -2,7 +2,7 @@
  * src/components/Header/index.js
  */
 
-import { use, useContext, useRef } from 'react';
+import { useEffect, useContext, useRef } from 'react';
 import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { CartContext } from '../../contexts/CartContext';
@@ -21,13 +21,14 @@ export default function Header(props) {
 
   useEffect(() => {
     notificationListener.current = Notifications.addNotificationReceivedListener(
-      response => {
-        const { orderId } = response.request.content.data;
-        if (orderId) {
-          navigation.navigate('OrderDetailsNavigator', { orderId });
+      notification => {
+        const { orderId } = notification.request.content.data;
+        if (orderId) {          
+          GoToLink('Meus Pedidos');
         }
       }       
     );
+
     return () => {
       if (notificationListener.current) {
         Notifications.removeNotificationSubscription(notificationListener.current);
