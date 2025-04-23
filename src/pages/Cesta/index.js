@@ -5,7 +5,8 @@
 import { useState, useEffect, useContext } from 'react';
 import { NotificationContext } from '../../contexts/NotificationContext';
 import { Alert, View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
-import { getCurrentLocationStandalone } from '../../components/Gps/useGeolocation';
+// import { getCurrentLocationStandalone } from '../../components/Gps/useGeolocation';
+import { getCurrentLocationStandalone } from 'expo-location';
 import { ScrollView } from "react-native-virtualized-view";
 import { Fontisto } from '@expo/vector-icons';
 
