@@ -45,6 +45,7 @@ export async function getCurrentLocationStandalone() {
  * @param {string} address Endereço completo
  * @returns {Promise<{latitude: number, longitude: number} | null>}
  */
+
 export async function getCoordinatesFromAddress(address) {
   try {
     // Verifica permissões primeiro

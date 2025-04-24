@@ -6,30 +6,42 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import { View, Text, FlatList, TouchableOpacity, SafeAreaView, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AuthContext } from "../../contexts/AuthContext";
+import { NotificationContext } from "../../contexts/NotificationContext";
 
 import Header from '../../components/Header';
 import OrderListItem from './OrderListItem';
 
 import api from "../../config/apiAxios";
 
-export default function Pedidos(props) {
-  const { user } = useContext(AuthContext); // incluir notify 
-  const [ pedidos, setPedidos] = useState([]);
+export default function Pedidos({ route }) {
+  const [pedidos, setPedidos] = useState([]);
+
+  const { user } = useContext(AuthContext); 
+  const { notify, setNotify } = useContext(NotificationContext);
 
   const listRef = useRef(null);
+  const id = user?.UserID;
 
-  let id = user?.UserID;
-  let orderId = props.orderId; // orderId é o id do pedido que foi atualizado. Se for diferente de null, atualiza a lista de pedidos com seus status atualizados.
-  // let notify = props.route.params?.notify; // se notify = true, atualiza a lista de pedidos com seus status atualizados.}
-
-  useEffect(() => {
-    async function loadPedidos() {
+  async function loadPedidos() {
+    try {
       const response = await api.get(`/api/listar/pedidos/usuario/${id}`);
       setPedidos(response.data);
+    } catch (error) {
+      console.error('Erro ao carregar pedidos:', error);
     }
+  }
+
+  useEffect(() => {
     loadPedidos();
-  }, [id, orderId]); // se orderId for diferente de null, atualiza a lista de pedidos com seus status atualizados.
-  
+  }, [id]);
+
+  useEffect(() => {
+    if (notify) {
+      loadPedidos();
+      setNotify(false);
+    }
+  }, [notify, setNotify]);
+
   async function moveToTop() {
     await listRef.current.scrollToOffset({offset: 0, animated: true})
   }
@@ -58,7 +70,7 @@ export default function Pedidos(props) {
           showsVerticalScrollIndicator={ true }
           ListEmptyComponent={()=><Text style={styles.empty}>Ainda não há pedidos deste Usuário.</Text>}
           keyExtractor={(item)=>String(item?.PEDIDO_ID)}
-          renderItem={({item})=><OrderListItem order={item}/>}
+          renderItem={({ item })=><OrderListItem order={item}/>}
           ref={listRef}
         />
       </View>

@@ -19,14 +19,14 @@ export default function App() {
   return (
     <NavigationContainer>
       <AuthProvider>
-        <NotificationProvider>
-          <CartProvider>
-            <OrderProvider>
+        <CartProvider>
+          <OrderProvider>
+            <NotificationProvider>
               <StatusBar backgroundColor='#FCC000' barStyle='dark-content'  />
               <Routes />
-            </OrderProvider>
-          </CartProvider>
-        </NotificationProvider>
+            </NotificationProvider>
+          </OrderProvider>
+        </CartProvider>
       </AuthProvider>
     </NavigationContainer>
   );

@@ -9,7 +9,6 @@ export default function OrderPayment({ pedido }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null); // 'cartão de crédito ou 'pix'
 
-  // Ignore specific warning
   LogBox.ignoreLogs([
     'Warning: TextElement: Support for defaultProps will be removed from function components',
   ]);

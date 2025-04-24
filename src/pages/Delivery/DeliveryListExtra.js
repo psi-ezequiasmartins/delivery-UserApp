@@ -22,7 +22,6 @@ export default function ExtraListItem({ item_extra, add, remove }) {
   return (
     <View style={styles.card}>
       <Text style={styles.descricao}>{item_extra?.DESCRICAO}</Text>
-
       <View style={styles.info}>
         {checkbox ? (
           <Text>+ R$ {parseFloat(item_extra?.VR_UNITARIO).toFixed(2)}</Text>

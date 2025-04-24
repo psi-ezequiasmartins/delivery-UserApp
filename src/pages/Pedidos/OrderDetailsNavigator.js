@@ -14,16 +14,14 @@ import OrderPayment from "./OrderPayment";
 const Tab = createMaterialTopTabNavigator();
 
 export default function OrderDetailsNavigator({ route }) {
-  const { orderId } = route.params || {};
   const [pedido, setPedido] = useState(null);
 
-  console.log('ID do Pedido em OrderDetailsNavigator: ', orderId);
+  const { orderId } = route.params || {};
 
   useEffect(() => {
     async function fetchPedido() {
       await api.get(`/api/pedido/${orderId}`).then((response)=>{
         setPedido(response?.data);
-        console.log('Dados recuperados do pedido: ', response?.data);
       }).catch((error) =>{
         console.log('Error: ', error)
       });

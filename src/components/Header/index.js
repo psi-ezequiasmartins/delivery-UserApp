@@ -17,26 +17,21 @@ export default function Header(props) {
   const navigation = useNavigation();
   const { basket } = useContext(CartContext);
   const { pushToken }  = useContext(NotificationContext);  
+  const { setNotify } = useContext(NotificationContext); 
+  
   const notificationListener = useRef();
 
   useEffect(() => {
-    notificationListener.current = Notifications.addNotificationReceivedListener(
-      notification => {
-        const { orderId } = notification.request.content.data;
-        if (orderId) {          
-          GoToLink('Meus Pedidos');
-        }
-      }       
-    );
-
+    notificationListener.current = Notifications.addNotificationReceivedListener(() => {
+      setNotify(true);
+    })
     return () => {
       if (notificationListener.current) {
         Notifications.removeNotificationSubscription(notificationListener.current);
       }
     };
-
-  }, [navigation]);
-
+  }, [setNotify]);
+                                                                                                                                                                                 
   function GoToLink(link) {
     return (
       navigation.navigate(link)

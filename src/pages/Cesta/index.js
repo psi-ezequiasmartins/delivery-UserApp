@@ -5,8 +5,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { NotificationContext } from '../../contexts/NotificationContext';
 import { Alert, View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
-// import { getCurrentLocationStandalone } from '../../components/Gps/useGeolocation';
-import { getCurrentLocationStandalone } from 'expo-location';
+import { getCurrentLocationStandalone } from '../../components/Gps/useGeolocation';
 import { ScrollView } from "react-native-virtualized-view";
 import { Fontisto } from '@expo/vector-icons';
 
@@ -15,7 +14,7 @@ import { CartContext } from '../../contexts/CartContext';
 import { OrderContext } from '../../contexts/OrderContext';
 import { AuthContext } from '../../contexts/AuthContext';
 
-import AddressConfirmationModal from '../../components/Gps/AddressConfirmationDialog';
+import AddressConfirmationModal from '../../components/gps/AddressConfirmationDialog';
 
 import BasketItem from '../../components/Basket';
 
@@ -33,7 +32,6 @@ export default function Cesta() {
   const [tempOrderData, setTempOrderData] = useState(null);  
   const [tempAddress, setTempAddress] = useState('');
 
-  // Helper function to format basket items
   function formattedBasketItems(basketItems) {
     return basketItems.map((item) => ({
       ...item,
@@ -68,14 +66,12 @@ export default function Cesta() {
   async function handleFinalizarPedido() {
     try {
       setLoading(true); 
-
       const locationData = await getCurrentLocationStandalone();
       if (!locationData?.location || !locationData?.address) {
         Alert.alert('Erro', 'Não foi possível obter sua localização');
         return;
       }
 
-      // Get push token using the new context
       const pushToken = await getPushToken();
       if (!pushToken) {
         Alert.alert('Aviso', 'Não foi possível configurar as notificações');
@@ -96,7 +92,6 @@ export default function Cesta() {
         "itens": formattedBasketItems(basket),
       };
 
-      // Save data temporary and show modal
       setTempOrderData(order);
       setTempAddress(locationData.address.formatted);
       setShowModal(true);
@@ -118,24 +113,19 @@ export default function Cesta() {
         ENDERECO_ENTREGA: confirmedAddress
       };
 
-      console.log('Endereço confirmado, enviando pedido...');
       const response = await createOrder(finalOrder);
 
       if (response) {
-        console.log('Pedido criado com sucesso, limpando cesta...');
         await CleanBasket();
-
         navigation.reset({
           index: 0,
-          routes: [{ 
-            name: 'OrdersStack', 
-            params: { 
-              screen: 'Pedidos',
-              initial: false
-            } 
-          }]
+          routes: [{ name: 'OrdersStack', params: { screen: 'Pedidos', initial: false } }],    
         });
+        Alert.alert('Sucesso', 'Pedido enviado com sucesso!');
+      } else {
+        Alert.alert('Erro', 'Não foi possível criar o pedido');
       }
+
     } catch (error) {
       console.error('Erro ao processar pedido:', error);
       Alert.alert('Erro', 'Não foi possível criar o pedido');
@@ -159,8 +149,8 @@ export default function Cesta() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} focusable={true} >
-
         { basket.length === 0 && <Text style={styles.empty}>Cesta de Compras vazia!</Text> }
+
         { basket.length > 0 && <>
             <View style={{flexDirection: 'row'}}>
               <View style={{flexDirection: 'column', width: '100%'}}>

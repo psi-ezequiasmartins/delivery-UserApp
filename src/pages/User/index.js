@@ -16,7 +16,6 @@ export default function Perfil() {
   const navigation = useNavigation();
   const { user, setUser, pushToken, signOut } = useContext(AuthContext);
 
-  // const [ UserId, setUserId ] = useState(user?.UserID || "");
   const [ nome, setNome ] = useState(user?.Nome || "");
   const [ sobrenome, setSobrenome ] = useState(user?.Sobrenome || "");
   const [ url_imagem, setUrlImagem ] = useState(user?.url_imagem || "https://via.placeholder.com/250");
@@ -52,10 +51,9 @@ export default function Perfil() {
     <SafeAreaView style={{flex: 1}}>
       <Header/>
       <Text style={styles.subtitle}>PERFIL DO USUÁRIO</Text>
+
       <ScrollView contentContainerStyle={styles.content} focusable={true} >
-
-      <View style={styles.areaInput}>
-
+        <View style={styles.areaInput}>
           <Text>ID (Ficha Nº):</Text>
           <TextInput 
             value={user?.UserID}
@@ -66,7 +64,6 @@ export default function Perfil() {
             editable={false}
           />
         </View>
-
         <View style={styles.areaInput}>
           <Text>Nome:</Text>
           <TextInput 
@@ -78,7 +75,6 @@ export default function Perfil() {
             style={styles.input}
           />
         </View>
-
         <View style={styles.areaInput}>
           <Text>Sobrenome:</Text>
           <TextInput
@@ -89,7 +85,6 @@ export default function Perfil() {
             style={styles.input}
           />
         </View>
-
         <View style={styles.areaInput}>
           <Text>Telefone:</Text>
           <MaskedTextInput
@@ -101,7 +96,6 @@ export default function Perfil() {
             style={styles.input}
           />
         </View>
-
         <View style={styles.areaInput}>
           <Text>Email:</Text>
           <TextInput
@@ -116,6 +110,7 @@ export default function Perfil() {
           />
         </View>
       </ScrollView>
+
       <TouchableOpacity style={styles.btnSubmit} onPress={ onSave }>
         <Text style={styles.btnTxt}>ATUALIZAR DADOS</Text>
       </TouchableOpacity>

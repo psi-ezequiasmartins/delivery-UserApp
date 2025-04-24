@@ -12,14 +12,10 @@ import { useNavigation } from "@react-navigation/native";
 export default function OrderDetails({ pedido }) { 
   const navigation = useNavigation();
 
-  console.log('Dados do pedido: ', pedido);
-
-  // Ignore specific warning
   LogBox.ignoreLogs([
     'Warning: TextElement: Support for defaultProps will be removed from function components',
   ]);
 
-  // Validação adicional antes de renderizar
   if (!pedido || !pedido?.PEDIDO_ID) {
     return (
       <View style={styles.centerContainer}>
@@ -74,7 +70,6 @@ export default function OrderDetails({ pedido }) {
     }
   };
   
-  // Renderização principal com try/catch
   try {
     return (
       <ScrollView>
@@ -107,11 +102,9 @@ export default function OrderDetails({ pedido }) {
                 <ListItem.Content>
                   <ListItem.Title>{item?.PRODUTO}</ListItem.Title>
                   <ListItem.Subtitle>Quantidade: {item.QTD} x R$ {parseFloat(item.VR_UNITARIO).toFixed(2)}</ListItem.Subtitle>
-                  {/* Outros detalhes do item */}
                 </ListItem.Content>
               </ListItem>
   
-              {/* Acréscimos */}
               {item.Acrescimos && item.Acrescimos.length > 0 && (
                 <View>
                   <Text style={{ fontWeight: 'bold' }}>Acréscimos:</Text>
@@ -123,7 +116,6 @@ export default function OrderDetails({ pedido }) {
                 </View>
               )}
   
-              {/* Observações */}
               {item?.OBS && (
                 <Text style={styles.obs}>Obs.: {item?.OBS}</Text>
               )}
@@ -134,7 +126,6 @@ export default function OrderDetails({ pedido }) {
           )}
         />
 
-        {/* Exibição do sumário dos totais */}
         <Card>
           <Text style={{fontWeight: "bold"}}>RESUMO TOTAL</Text>
           <Divider />

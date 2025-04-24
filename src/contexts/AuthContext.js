@@ -41,17 +41,16 @@ function AuthProvider({ children }) {
         const data = snapshot.val();
         setUser(data);       
 
-        // recupera o token e os dados do usuário do dispositivo
         const currentTime = new Date().toISOString();
+
         AsyncStorage.multiSet([
           ["vID", String(data?.UserID)],
-          ["vNome", data?.Nome],
-          ["vSobrenome", data?.Sobrenome],
-          ["vTelefone", data?.Telefone],
-          ["vEmail", data?.Email],
-          ["vPushToken", data?.pushToken],
+          ["vNome", data?.Nome], ["vSobrenome", data?.Sobrenome],
+          ["vTelefone", data?.Telefone], ["vEmail", data?.Email],
+          ["vPushToken", data?.pushToken], 
           ["vTokenDT", currentTime]
         ]);
+
         const userId = await AsyncStorage.getItem("vID");
 
         try {
@@ -131,8 +130,9 @@ function AuthProvider({ children }) {
         const token = response.data?.token;
         if (token) {
           AsyncStorage.multiSet([
-            ["token", JSON.stringify(token)],
-            ["vID", data.UserID.asString()], ["vNome", data.NOME], ["vSobrenome", data.SOBRENOME], 
+            ["token", JSON.stringify(token)], 
+            ["vID", data.UserID.asString()], 
+            ["vNome", data.NOME], ["vSobrenome", data.SOBRENOME], 
             ["vTelefone", data.TELEFONE], ["vEmail", data.EMAIL], 
             ["vPushToken", data.PUSH_TOKEN]
           ]);

@@ -15,7 +15,6 @@ function CartProvider({ children }) {
   async function AddToBasket(produto, qtd, itensAcrescentar, valorAcrescentar, obs) {
     const i = basket.findIndex(item => item?.PRODUTO_ID === produto?.PRODUTO_ID);
     let updatedBasket = [...basket];  // Copia o estado original do basket
-  
     if (i !== -1) {
       updatedBasket[i] = {
         ...updatedBasket[i], // Mantém as propriedades do item original
@@ -30,15 +29,13 @@ function CartProvider({ children }) {
       };
       updatedBasket = [...updatedBasket, data]; // Adiciona o novo item
     }
-  
-    setBasket(updatedBasket);
     setBasketTotal(updatedBasket); // Atualiza o subtotal com a lista atualizada
+    setBasket(updatedBasket);
   }
   
   async function RemoveFromBasket(produto) {
     const i = basket.findIndex(item => item?.PRODUTO_ID === produto?.PRODUTO_ID);
     let updatedBasket = [...basket];  // Copia o estado original do basket
-  
     if (updatedBasket[i]?.QTD > 1) {
       updatedBasket[i] = {
         ...updatedBasket[i], // Mantém as propriedades do item original
@@ -48,9 +45,8 @@ function CartProvider({ children }) {
     } else {
       updatedBasket = updatedBasket.filter(item => item?.PRODUTO_ID !== produto?.PRODUTO_ID);
     }
-  
+    setBasketTotal(updatedBasket); // Atualiza o subtotal com a lista atualizada 
     setBasket(updatedBasket);
-    setBasketTotal(updatedBasket); // Atualiza o subtotal com a lista atualizada
   }
   
   function setBasketTotal(cart) {

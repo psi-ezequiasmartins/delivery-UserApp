@@ -13,7 +13,6 @@ import api from "../../config/apiAxios";
 export default function DeliveryItemToSelect({ produto, id, close }) {
   const { AddToBasket } = useContext(CartContext);
   const [ qtd, setQtd ] = useState(1);
-  // const [ total, setTotal] = useState(produto?.VR_UNITARIO);
   const [ acrescimos, setAcrescimos] = useState(null);
   const [ itensAcrescentar, setItensAcrescentar ] = useState([]);
   const [ valorAcrescentar, setValorAcrescentar ] = useState(0);

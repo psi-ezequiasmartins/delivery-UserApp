@@ -13,9 +13,9 @@ import api from "../../config/apiAxios";
 export default function OrderLiveUpdates({ pedido }) {
   const [ courier, setCourier ] = useState(null);
   const [ delivery_coords, setDeliveryCoords ] = useState(null);
-  // const [ courier_coords, setCourierCoords ] = useState(null);
-  // setCourierCoords({"latitude": -19.82628, "longitude": -43.98033});
-  // Os dados do Courier serão fornecidos posteriormente junto com a atualização do status (coleta/retirada e entrega)
+//const [ courier_coords, setCourierCoords ] = useState(null);
+//Os dados do Courier serão fornecidos posteriormente junto com a atualização do status (coleta/retirada e entrega)
+
   const courierId = 200001; 
   
   useEffect(() => {
@@ -39,7 +39,6 @@ export default function OrderLiveUpdates({ pedido }) {
     async function getCourier() {
       await api.get(`/api/courier/${courierId}`).then(response => {
         setCourier(response.data[0]);
-        console.log(courier);
       })
     }
     getCourier();
@@ -76,7 +75,7 @@ export default function OrderLiveUpdates({ pedido }) {
       <View style={{height: 70}}>
         {renderStatusMessage(pedido?.STATUS)}
       </View>
-      
+
       <View style={{flex: 1}}>
         <MapView
           style={styles.map}
@@ -163,4 +162,3 @@ const styles = StyleSheet.create({
     flex: 1,
   }
 });
-

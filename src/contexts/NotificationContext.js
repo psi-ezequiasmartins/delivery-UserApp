@@ -6,7 +6,6 @@ import { AuthContext } from './AuthContext';
 import { EXPO_PROJECT_ID } from '@env';
 import api from '../config/apiAxios';
 
-// Configuração global das notificações
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -19,6 +18,8 @@ export const NotificationContext = createContext({});
 
 export function NotificationProvider({ children }) {
   const [pushToken, setPushToken] = useState(null);
+  const [notify, setNotify] = useState(false);
+
   const { user } = useContext(AuthContext);
 
   async function registerForPushNotifications() {
@@ -29,27 +30,22 @@ export function NotificationProvider({ children }) {
     try {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
-      
       if (existingStatus !== 'granted') {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
-      
       if (finalStatus !== 'granted') {
         return null;
       }
-
       const token = (await Notifications.getExpoPushTokenAsync({
         projectId: EXPO_PROJECT_ID
       })).data;
-
       if (user?.UserID) {
         await api.put('/api/usuario/push-token', {
           userId: user?.UserID,
           token
         });
       }
-
       await AsyncStorage.setItem('@UserApp:pushToken', token);
       setPushToken(token);
       return token;
@@ -61,13 +57,11 @@ export function NotificationProvider({ children }) {
 
   async function getPushToken() {
     if (pushToken) return pushToken;
-    
     const storedToken = await AsyncStorage.getItem('@UserApp:pushToken');
     if (storedToken) {
       setPushToken(storedToken);
       return storedToken;
     }
-
     return await registerForPushNotifications();
   }
 
@@ -79,7 +73,7 @@ export function NotificationProvider({ children }) {
 
   return (
     <NotificationContext.Provider value={{
-      pushToken, getPushToken, registerForPushNotifications
+      pushToken, notify, setNotify, getPushToken, registerForPushNotifications
     }}>
       {children}
     </NotificationContext.Provider>
