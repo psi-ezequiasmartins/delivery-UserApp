@@ -36,11 +36,13 @@ api.ping = async () => {
 // Melhorando os interceptors
 api.interceptors.request.use(
   config => {
-    console.log('Enviando requisição:', {
-      method: config.method,
-      url: config.url,
-      data: config.data && JSON.stringify(config.data).substring(0, 500) // Limita o tamanho do log
-    });
+    if (config.data !== undefined) {
+      console.log('Enviando requisição:', {
+        method: config.method,
+        url: config.url,
+        data: config.data && JSON.stringify(config.data).substring(0, 500) // Limita o tamanho do log
+      });  
+    }   
     return config;
   },
   error => {
@@ -53,15 +55,14 @@ api.interceptors.response.use(
   response => {
     try {
       // Limpar/validar dados antes de logar
-      const cleanData = typeof response.data === 'string' 
-        ? JSON.parse(response.data)
-        : response.data;
-
-      console.log('Resposta recebida:', {
-        url: response.config.url,
-        status: response.status,
-        data: JSON.stringify(cleanData).substring(0, 500)
-      });
+      const cleanData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+      if (cleanData !== null) {
+        console.log('Resposta recebida:', {
+          url: response.config.url,
+          status: response.status,
+          data: JSON.stringify(cleanData).substring(0, 500)
+        });  
+      }
       return response;
     } catch (error) {
       console.warn('Erro ao processar resposta:', error);

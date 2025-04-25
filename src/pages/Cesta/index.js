@@ -14,8 +14,6 @@ import { CartContext } from '../../contexts/CartContext';
 import { OrderContext } from '../../contexts/OrderContext';
 import { AuthContext } from '../../contexts/AuthContext';
 
-import AddressConfirmationModal from '../../components/gps/AddressConfirmationDialog';
-
 import BasketItem from '../../components/Basket';
 
 export default function Cesta() {
