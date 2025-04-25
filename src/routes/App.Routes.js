@@ -20,18 +20,17 @@ const OrdersStack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
 export default function AppRoutes() {
-
   function getHeaderTitle(route) {
-    const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
+    const routeName = getFocusedRouteNameFromRoute(route) ?? 'HomeTab';
     switch (routeName) {
-      case 'Home' || 'HomeStack': return 'psi-Delivery';
+      case 'HomeTab': return 'psi-Delivery';
       case 'Deliveries': return 'Lista de Deliveries';
       case 'DeliveryDetails': return 'Delivery Info'
-      case 'Orders': return 'Meus Pedidos';
+      case 'OrdersTab': return 'Meus Pedidos';
       case 'OrderDetails': return 'Detalhes do Pedido';
-      case 'Profile': return 'Dados do Usuário';
+      case 'ProfileTab': return 'Dados do Usuário';
       case 'HomeStack': return 'psi-Delivery';
-      case 'OrdersStack': return 'Meus Pedidos';
+      default: return 'psi-Delivery';
     }
   };
 
@@ -42,59 +41,38 @@ export default function AppRoutes() {
           tabBarStyle: { height: 70 },
           tabBarActiveTintColor: '#FC0000',
           tabBarInactiveTintColor: '#999',
-          tabBarLabelStyle: {
-            fontSize: 12,
-          },
-          fontWeight: 'bold',
+          tabBarLabelStyle: { fontSize: 12, fontWeight: 'bold' },
           headerShown: false,
         }}
       >
         <Tab.Screen
-          name='Home'
+          name='HomeTab'
           component={HomeStackNavigator}
           options={({ route }) => ({
-            headerShown: false,
-            headerTitle: getHeaderTitle(route),
-            headerTintColor: '#FFF',
-            headerStyle: {
-              backgroundColor: '#000',
-              borderBottomWidth: 0,
-            },
-            tabBarIcon: ({ focused }) => {
-              return <Entypo name='shop' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
-            },
+            tabBarLabel: 'Deliveries', // Rótulo personalizado
+            tabBarIcon: ({ focused }) => (
+              <Entypo name='shop' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
+            ),
           })}
         />
         <Tab.Screen
-          name='Meus Pedidos'
+          name='OrdersTab'
           component={OrderStackNavigator}
           options={({ route }) => ({
-            headerShown: false,
-            headerTitle: getHeaderTitle(route),
-            headerTintColor: '#FFF',
-            headerStyle: {
-              backgroundColor: '#000',
-              borderBottomWidth: 0,
-            },
-            tabBarIcon: ({ focused }) => {
-              return <Fontisto name='shopping-bag-1' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
-            },
+            tabBarLabel: 'Meus Pedidos', // Rótulo personalizado
+            tabBarIcon: ({ focused }) => (
+              <Fontisto name='shopping-bag-1' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
+            ),
           })}
         />
         <Tab.Screen
-          name='Perfil'
+          name='ProfileTab'
           component={Perfil}
           options={({ route }) => ({
-            headerShown: false,
-            headerTitle: getHeaderTitle(route),
-            headerTintColor: '#FFF',
-            headerStyle: {
-              backgroundColor: '#000',
-              borderBottomWidth: 0,
-            },
-            tabBarIcon: ({ focused }) => {
-              return <FontAwesome5 name='user-cog' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
-            },
+            tabBarLabel: 'Perfil', // Rótulo personalizado
+            tabBarIcon: ({ focused }) => (
+              <FontAwesome5 name='user-cog' color={(focused !== true) ? '#5D5D5D' : '#000'} size={35} />
+            ),
           })}
         />
       </Tab.Navigator>
@@ -105,60 +83,35 @@ export default function AppRoutes() {
     return (
       <Stack.Navigator
         screenOptions={{
-          headerShown: false
+          headerShown: false,
+          headerTintColor: '#FFF',
+          headerStyle: { backgroundColor: '#000', borderBottomWidth: 0 },
         }}
       >
-        <Stack.Screen
-          name="Home"
-          component={Home}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Deliveries"
-          component={Deliveries}
-          options={{headerShown: true}}
-        />
-        <Stack.Screen
-          name="DeliveryInfo"
-          component={DeliveryInfo}
-          options={{headerShown: true}}
-        />
-        <Stack.Screen
-          name="Cesta"
-          component={Cesta}
-          options={{ headerShown: true}}
-        />
+        <Stack.Screen name="HomeStack" component={Home} />
+        <Stack.Screen name="Deliveries" component={Deliveries} />
+        <Stack.Screen name="DeliveryInfo" component={DeliveryInfo} />
+        <Stack.Screen name="Cesta" component={Cesta} />
       </Stack.Navigator>   
-    )
+    );
   }
 
   function OrderStackNavigator() {
     return (
       <OrdersStack.Navigator 
         screenOptions={{ 
-          headerShown: false 
+          headerShown: false,
+          headerTintColor: '#FFF',
+          headerStyle: { backgroundColor: '#000', borderBottomWidth: 0 },
         }}
       >
-        <OrdersStack.Screen
-          name="Orders"
-          component={Pedidos}
-          options={{ headerShown: false }}
-        />
+        <OrdersStack.Screen name="OrdersStack" component={Pedidos} />
         <OrdersStack.Screen
           name="OrderDetailsNavigator"
           component={OrderDetailsNavigator}
           options={{ 
             title: 'Detalhes do Pedido',  
             headerTitleAlign: 'center',
-            headerTintColor: '#FFF',
-            headerStyle: {
-              backgroundColor: '#000',
-              borderBottomWidth: 0,
-            },
-            tabBarIcon: {
-              color: '#000'
-            },
-
           }}
         />
       </OrdersStack.Navigator>
@@ -178,32 +131,24 @@ export default function AppRoutes() {
           borderTopRightRadius: 25,
           borderBottomRightRadius: 25,
         },
-        drawerLabelStyle: {
-          fontWeight: 'bold'
-        },
+        drawerLabelStyle: { fontWeight: 'bold' },
         drawerItemStyle: {
           activeTintColor: '#FCC000',
           activeBackgroundColor: '#FF0000',
           inactiveTintColor: '#5D5D5D',
           inactiveBackgroundColor: '#000',
-          marginVertical: 5
+          marginVertical: 5,
         },
       }}
     >
       <Drawer.Screen
-        name="Home"
+        name="HomeDrawer"
         component={HomeTabNavigator}
         options={({ route }) => ({
           headerShown: true,
           headerTitle: getHeaderTitle(route),
           headerTintColor: '#FFF',
-          headerStyle: {
-            backgroundColor: '#000',
-            borderBottomWidth: 0,
-          },
-          tabBarIcon: {
-            color: '#000'
-          }
+          headerStyle: { backgroundColor: '#000', borderBottomWidth: 0 },
         })}
       />
     </Drawer.Navigator>

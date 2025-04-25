@@ -7,8 +7,10 @@ import { SafeAreaView, View, Image, Text, TextInput, TouchableOpacity, ActivityI
 import { MaskedTextInput } from 'react-native-mask-text';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
+import { NotificationContext } from '../../contexts/NotificationContext';
 
 import icon from '../../../assets/icon.png';
+import { push } from 'firebase/database';
 
 export default function SignUp3(props) {
   const navigation = useNavigation();
@@ -27,6 +29,8 @@ export default function SignUp3(props) {
   const [password, setPassword] = useState('');
 
   const { signUp, loading } = useContext(AuthContext);
+  const { getPushToken } = useContext(NotificationContext);
+
 
   function checkEmptyField(field){
     if(field.trim()==='') {
@@ -44,6 +48,9 @@ export default function SignUp3(props) {
     if(!vTelefone || !vEmail || !vPassword) {
       alert('Dados obrigatórios');
     } else {
+      const pushToken = getPushToken();
+      console.log('pushToken: ', pushToken);
+      
       signUp(
         nome.trim(),
         sobrenome.trim(),
@@ -55,7 +62,8 @@ export default function SignUp3(props) {
         UF,
         telefone.trim(),
         email.trim(),
-        password.trim()
+        password.trim(),
+        pushToken
       );
     }
   }

@@ -2,26 +2,26 @@
 * src/contexts/OrderContext.js
 */
 
-import { useState, useEffect, useContext, createContext } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { NotificationContext } from './NotificationContext';
 import { AuthContext } from './AuthContext';
 import { CartContext } from './CartContext';
 
 import api from '../config/apiAxios';
 
-const OrderContext = createContext({});
+export const OrderContext = createContext();
 
-function OrderProvider({ children }) {
+export function OrderProvider({ children }) {
+  const { getPushToken } = useContext(NotificationContext);
   const { user } = useContext(AuthContext);
   const { delivery } = useContext(CartContext);
-  const { getPushToken } = useContext(NotificationContext);
   const [ pedido, setPedido ] = useState([]);
-  const [ pedidos, setPedidos] = useState([]);
+  const [ orders, setOrders] = useState([]);
 
   useEffect(() => {
     async function loadOrdersByUserID() {
       await api.get(`/api/listar/pedidos/usuario/${user?.UserID}`).then((snapshot) => {
-        setPedidos(snapshot.data)
+        setOrders(snapshot.data)
       });
     }
     loadOrdersByUserID();
@@ -30,6 +30,8 @@ function OrderProvider({ children }) {
   async function createOrder(orderData) {
     try {
       const pushToken = await getPushToken();
+      console.log('Push Token:', pushToken);
+
       const completeOrderData = {
         ...orderData,
         pushToken
@@ -52,10 +54,10 @@ function OrderProvider({ children }) {
   };
 
   return (
-    <OrderContext.Provider value={{ delivery, pedidos, createOrder, getOrder }}>
+    <OrderContext.Provider value={{ delivery, orders, createOrder, getOrder }}>
       {children}
     </OrderContext.Provider>
   );
 };
 
-export { OrderContext, OrderProvider };
+

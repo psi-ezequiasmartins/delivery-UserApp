@@ -65,7 +65,7 @@ export default function OrderLiveUpdates({ pedido }) {
   if (!courier) {
     return (
       <View style={styles.indicator}>
-        <ActivityIndicator size="large" color="#FFF" />
+        <ActivityIndicator size="small" color="#FFF" />
       </View>
     )
   }

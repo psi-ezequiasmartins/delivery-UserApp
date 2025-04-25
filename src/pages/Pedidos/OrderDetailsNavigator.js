@@ -3,7 +3,7 @@
 */
 
 import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native'
+import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import api from '../../config/apiAxios';
 
@@ -31,8 +31,8 @@ export default function OrderDetailsNavigator({ route }) {
 
   if (!pedido) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Erro ao carregar dados do pedido</Text>
+      <View style={styles.indicator}>
+        <ActivityIndicator size="large" color="#FFF" />
       </View>
     );
   } 
@@ -59,3 +59,16 @@ export default function OrderDetailsNavigator({ route }) {
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  indicator:{
+    flex:1, 
+    position: 'absolute', 
+    backgroundColor: '#000', 
+    opacity: 0.7, 
+    width: '100%', 
+    height: '100%', 
+    alignItems: 'center', 
+    justifyContent: 'center'
+  },
+});

@@ -24,7 +24,7 @@ export default function Header(props) {
   useEffect(() => {
     notificationListener.current = Notifications.addNotificationReceivedListener(() => {
       setNotify(true);
-      GoToLink('Meus Pedidos');
+      GoToLink('OrdersTab');
     })
     return () => {
       if (notificationListener.current) {

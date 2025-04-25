@@ -2,9 +2,9 @@
  * src/contexts/AuthContext.js
  */
 
-import { useState, useEffect, createContext } from 'react';
+import React, { createContext, useContext, useState, useEffect  } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut as firebaseSignOut } from "firebase/auth";
-import { getDatabase, ref, set, onValue } from "firebase/database";
+import { getDatabase, ref, set, onValue, push } from "firebase/database";
 import { auth, firebase_app } from '../config/apiFirebase';
 import { Alert } from 'react-native';
 
@@ -12,10 +12,11 @@ import api from '../config/apiAxios';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
-function AuthProvider({ children }) { 
+export function AuthProvider({ children }) { 
   const db = getDatabase(firebase_app);
+  
   const [ authenticated, setAuthenticated ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ user, setUser ] = useState(null);
@@ -33,56 +34,85 @@ function AuthProvider({ children }) {
     tokenAutorization();
   }, []);
 
-  function signIn(email, password) {
-    setLoading(true);
+  function signIn(email, password, pushToken) {
+    setLoading(true);    
+    console.log('pushToken recebido:', pushToken);
+
     signInWithEmailAndPassword(auth, email, password).then(async(result) => {
       const id = result.user.uid;
+
       onValue(ref(db, `users/${id}`), async(snapshot) => {
         const data = snapshot.val();
-        setUser(data);       
+        console.log('dados recuperados: ', data)
 
-        const currentTime = new Date().toISOString();
+        setUser(data);
 
+        // Verifica e atualiza o pushToken, se necessário
+        if (pushToken === null || pushToken === undefined) {
+          pushToken = data?.pushToken; // Usa o pushToken armazenado no Firebase
+          console.log('Push Token recuperado do Firebase:', pushToken);
+        } else if (pushToken !== data.pushToken) {
+          // Atualiza o pushToken no Firebase
+          console.log('Atualizando Push Token no Firebase...');
+          set(ref(db, `users/${id}`), {
+            ...data,
+            pushToken: pushToken,
+          });
+        }
+        
+        // Salva os dados no AsyncStorage
         AsyncStorage.multiSet([
           ["vID", String(data?.UserID)],
           ["vNome", data?.Nome], ["vSobrenome", data?.Sobrenome],
           ["vTelefone", data?.Telefone], ["vEmail", data?.Email],
-          ["vPushToken", data?.pushToken], 
-          ["vTokenDT", currentTime]
+          ["vPushToken", pushToken], 
+          ["vTokenDT", new Date().toISOString()]
         ]);
 
         const userId = await AsyncStorage.getItem("vID");
 
         try {
-          const response = await api.post('/api/authenticate', { USER_ID: userId, CHV: 1 });
+          const response = await api.post('/api/authenticate', { 
+            USER_ID: userId, 
+            CHV: 1 
+          });
+
           const token = response.data?.token; 
           if (token) {
             AsyncStorage.setItem('token', JSON.stringify(token)); 
             api.defaults.headers.Authorization = `Bearer ${token}`;
-            setAuthenticated(true);
-            setLoading(false)              
+            console.log('Autenticação bem-sucedida.');
           } else {
             throw new Error('Token não encontrado na resposta');
           }
+
+          // Registrar o pushToken no backend
+          await api.put('/api/usuario/push-token', {
+            userId: userId,
+            token: pushToken,
+          });
+
+          setAuthenticated(true);
         } catch (error) {
           console.log('Erro ao antenticar: ', error);
           Alert.alert('Erro ao autenticar. Verifique sua conexão e tente novamente.');
           setAuthenticated(false);
+        } finally {
           setLoading(false);
-        };
+        }
       });
     }).catch((error) => {
-      console.log('Erro no login com Firebase: ', error);
-      setAuthenticated(false);
-      setLoading(false)
+      console.error('Erro no login com Firebase:', error);
       Alert.alert('Email e/ou Senha inválidos!');
-    });   
+      setLoading(false);
+    });
   }
 
   async function signUp(
     nome, sobrenome, 
     CEP, endereco, numero, complemento, bairro, cidade, UF, 
-    telefone, email, password, confirm_password) {
+    telefone, email, password, confirm_password, pushToken
+  ) {
     setLoading(true);
 
     if (!email || !password) {
@@ -115,26 +145,21 @@ function AuthProvider({ children }) {
           Sobrenome: result.data.SOBRENOME,
           Email: result.data.EMAIL,
           Telefone: result.data.TELEFONE,
-          CEP: result.data.CEP,
-          Endereco: result.data.ENDERECO,
-          Numero: result.data.NUMERO,
-          Complemento: result.data.COMPLEMENTO,
-          Bairro: result.data.BAIRRO,
-          Cidade: result.data.CIDADE,
-          UF: result.data.UF,
-          pushToken: result.data.PUSH_TOKEN
+          pushToken: pushToken
         });
 
+        const currentTime = new Date().toISOString();
         const response = await api.post('/api/authenticate', { USER_ID: result.data.USER_ID, CHV: 1});
-
         const token = response.data?.token;
+
         if (token) {
           AsyncStorage.multiSet([
             ["token", JSON.stringify(token)], 
             ["vID", data.UserID.asString()], 
             ["vNome", data.NOME], ["vSobrenome", data.SOBRENOME], 
             ["vTelefone", data.TELEFONE], ["vEmail", data.EMAIL], 
-            ["vPushToken", data.PUSH_TOKEN]
+            ["vPushToken", pushToken],
+            ["vTokenDT", currentTime]
           ]);
 
           api.defaults.headers['Authorization'] = `Bearer ${token}`;
@@ -190,4 +215,3 @@ function AuthProvider({ children }) {
   )
 }
 
-export { AuthContext, AuthProvider }

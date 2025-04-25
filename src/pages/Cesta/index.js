@@ -6,6 +6,7 @@ import { useState, useEffect, useContext } from 'react';
 import { NotificationContext } from '../../contexts/NotificationContext';
 import { Alert, View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { getCurrentLocationStandalone } from '../../components/Gps/useGeolocation';
+import { AddressConfirmationModal } from '../../components/Gps/AddressConfirmationDialog';
 import { ScrollView } from "react-native-virtualized-view";
 import { Fontisto } from '@expo/vector-icons';
 
@@ -70,7 +71,9 @@ export default function Cesta() {
         return;
       }
 
-      const pushToken = await getPushToken();
+      const pushToken = getPushToken();
+      console.log('Push Token:', pushToken);
+      
       if (!pushToken) {
         Alert.alert('Aviso', 'Não foi possível configurar as notificações');
         return;
@@ -117,7 +120,7 @@ export default function Cesta() {
         await CleanBasket();
         navigation.reset({
           index: 0,
-          routes: [{ name: 'OrdersStack', params: { screen: 'Pedidos', initial: false } }],    
+          routes: [{ name: 'OrdersStack', params: { screen: 'OrdersStack', initial: false } }],    
         });
         Alert.alert('Sucesso', 'Pedido enviado com sucesso!');
       } else {

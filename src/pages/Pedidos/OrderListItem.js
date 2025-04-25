@@ -3,7 +3,7 @@
  */
 
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { Entypo } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
 export default function OrderListItem({ order }) {
@@ -21,14 +21,14 @@ export default function OrderListItem({ order }) {
         <Text style={{fontWeight: 'normal'}}>Qtd. de Itens: {order?.QTD_ITENS} &#8226; Total: R$ { parseFloat(order?.VR_TOTAL).toFixed(2) }</Text>
         <View style={{flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginBottom: 5}}>
           { order?.STATUS === "NOVO" ? <Text style={[styles.status, {backgroundColor: 'red'}]}> NOVO </Text> : null }
-          { order?.STATUS === "AGUARDANDO" ? <Text style={[styles.status, {backgroundColor: 'yellow', color: 'black'}]}> AGUARDANDO </Text> : null }
-          { order?.STATUS === "PREPARANDO" ? <Text style={[styles.status, {backgroundColor: 'orange', color: 'black'}]}> PREPARANDO </Text> : null }
-          { order?.STATUS === "PRONTO_PARA_RETIRADA" ? <Text style={[styles.status, {backgroundColor: 'green'}]}> PRONTO PARA RETIRADA </Text> : null }
-          { order?.STATUS === "SAIU_PARA_ENTREGA" ? <Text style={[styles.status, {backgroundColor: 'lime', color: 'black'}]}> SAIU PARA ENTREGA </Text> : null }
-          { order?.STATUS === "RECEBIDO" ? <Text style={[styles.status, {backgroundColor: 'purple'}]}> RECEBIDO </Text> : null }
-          { order?.STATUS === "FINALIZADO" ? <Text style={[styles.status, {backgroundColor: 'black'}]}> FINALIZADO </Text> : null }
-          { order?.STATUS === "CANCELADO" ? <Text style={[styles.status, {backgroundColor: 'gray'}]}> CANCELADO </Text> : null }
-          <Text><Entypo color="#000" name='shopping-bag' size={28}/></Text>
+          { order?.STATUS === "AGUARDANDO" ? <Text style={[styles.status, {backgroundColor: 'orange', color: 'black'}]}> AGUARDANDO </Text> : null }
+          { order?.STATUS === "PREPARANDO" ? <Text style={[styles.status, {backgroundColor: 'gray', color: 'white'}]}> PREPARANDO </Text> : null }
+          { order?.STATUS === "PRONTO_PARA_RETIRADA" ? <Text style={[styles.status, {backgroundColor: 'green', color: 'white'}]}> PRONTO PARA RETIRADA </Text> : null }
+          { order?.STATUS === "SAIU_PARA_ENTREGA" ? <Text style={[styles.status, {backgroundColor: 'blue', color: 'white'}]}> SAIU PARA ENTREGA </Text> : null }
+          { order?.STATUS === "RECEBIDO" ? <Text style={[styles.status, {backgroundColor: 'purple', color: 'white'}]}> RECEBIDO </Text> : null }
+          { order?.STATUS === "FINALIZADO" ? <Text style={[styles.status, {backgroundColor: 'black', color: 'white'}]}> FINALIZADO </Text> : null }
+          { order?.STATUS === "CANCELADO" ? <Text style={[styles.status, {backgroundColor: 'gray', color: 'white'}]}> CANCELADO </Text> : null }
+          <Text><AntDesign color="#000" name='ellipsis1' size={28}/></Text>
         </View>
       </TouchableOpacity>
     </View>

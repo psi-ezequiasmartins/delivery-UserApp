@@ -2,17 +2,24 @@
  * src/contexts/CartContext.js
  */
 
-import { useState, createContext } from 'react';
+import React, { createContext, useContext, useState,  } from 'react';
+import { NotificationContext } from './NotificationContext';
 
-const CartContext = createContext({});
+export const CartContext = createContext();
 
-function CartProvider({ children }) {
-
+export function CartProvider({ children }) {
+  const { getPushToken } = useContext(NotificationContext);
   const [ basket, setBasket ] = useState([]);
   const [ delivery, setDelivery ] = useState([]);
   const [ subtotal, setSubTotal] = useState(0);
 
   async function AddToBasket(produto, qtd, itensAcrescentar, valorAcrescentar, obs) {
+    const pushToken = await getPushToken();
+    console.log('Push Token:', pushToken);
+    
+    if (qtd <= 0) return; // Se a quantidade for menor ou igual a zero, não adiciona ao carrinho
+    if (qtd > 99) qtd = 99; // Limita a quantidade máxima a 99
+
     const i = basket.findIndex(item => item?.PRODUTO_ID === produto?.PRODUTO_ID);
     let updatedBasket = [...basket];  // Copia o estado original do basket
     if (i !== -1) {
@@ -69,4 +76,3 @@ function CartProvider({ children }) {
   )
 }
 
-export { CartContext, CartProvider }

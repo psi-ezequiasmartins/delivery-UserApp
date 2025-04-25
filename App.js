@@ -9,24 +9,27 @@ import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 
 import { AuthProvider } from './src/contexts/AuthContext';
+import { NotificationProvider } from './src/contexts/NotificationContext';
 import { CartProvider } from './src/contexts/CartContext';
 import { OrderProvider } from './src/contexts/OrderContext';
 
-import { NotificationProvider } from './src/contexts/NotificationContext';
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs(true); // Ignora todos os logs de aviso
+
 import Routes from './src/routes';
 
 export default function App() {
   return (
     <NavigationContainer>
       <AuthProvider>
-        <CartProvider>
-          <OrderProvider>
-            <NotificationProvider>
+        <NotificationProvider>
+          <CartProvider>
+            <OrderProvider>
               <StatusBar backgroundColor='#FCC000' barStyle='dark-content'  />
               <Routes />
-            </NotificationProvider>
-          </OrderProvider>
-        </CartProvider>
+            </OrderProvider>
+          </CartProvider>
+        </NotificationProvider>
       </AuthProvider>
     </NavigationContainer>
   );

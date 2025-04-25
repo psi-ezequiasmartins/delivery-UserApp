@@ -6,6 +6,7 @@ import React, { useState, useContext } from 'react';
 import { SafeAreaView, View, Text, TextInput, Image, TouchableOpacity, ActivityIndicator, Keyboard, Platform, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
+import { NotificationContext } from '../../contexts/NotificationContext';
 
 import icon from '../../../assets/icon.png';
 import marca from '../../../assets/logomarca.png';
@@ -13,10 +14,17 @@ import marca from '../../../assets/logomarca.png';
 export default function SignIn() {
   const navigation = useNavigation();
   const { signIn, loading } = useContext(AuthContext);
+  const { getPushToken } = useContext(NotificationContext);
 
   const [ email, setEmail ] = useState('');
   const [ password, setPassword]  = useState('');
 
+  async function handleLogin(email, password) {
+    const pushToken = getPushToken();
+    console.log('Push Token:', pushToken);
+    signIn(email, password, pushToken);
+  }
+  
   return (
     <SafeAreaView style={styles.background}>
       <View style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
@@ -58,7 +66,7 @@ export default function SignIn() {
           />
         </View>
 
-        <TouchableOpacity style={styles.btnSubmit} onPress={()=>signIn(email, password)}>
+        <TouchableOpacity style={styles.btnSubmit} onPress={()=>handleLogin(email, password)}>
           {loading ? (
             <View style={styles.indicator}>
               <Text style={styles.btnTxt}>Aguarde... </Text>
