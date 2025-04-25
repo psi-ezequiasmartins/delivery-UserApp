@@ -46,14 +46,14 @@ export default function OrderLiveUpdates({ pedido }) {
 
   function renderStatusMessage(status) {
     const statusStyle = {
-      "NOVO": { backgroundColor: 'red' },
-      "AGUARDANDO": { backgroundColor: 'pink', color: 'black' },
-      "PREPARANDO": { backgroundColor: 'orange', color: 'black' },
-      "PRONTO_PARA_RETIRADA": { backgroundColor: 'green' },
-      "SAIU_PARA_ENTREGA": { backgroundColor: 'lime', color: 'black' },
-      "RECEBIDO": { backgroundColor: 'purple' },
-      "FINALIZADO": { backgroundColor: 'black' },
-      "CANCELADO": { backgroundColor: 'gray' },
+      "NOVO": { backgroundColor: 'red', color: 'white' },
+      "AGUARDANDO": { backgroundColor: 'orange', color: 'black' },
+      "PREPARANDO": { backgroundColor: 'gray', color: 'white' },
+      "PRONTO_PARA_RETIRADA": { backgroundColor: 'green', color: 'white' },
+      "SAIU_PARA_ENTREGA": { backgroundColor: 'blue', color: 'white' },
+      "RECEBIDO": { backgroundColor: 'purple', color: 'white' },
+      "FINALIZADO": { backgroundColor: 'black', color: 'white' },
+      "CANCELADO": { backgroundColor: 'gray', color: 'white' },
     };
     if (status in statusStyle) {
       return <Text style={[styles.status, statusStyle[status]]}>{pedido?.STATUS.replace(/_/g, ' ')}</Text>
