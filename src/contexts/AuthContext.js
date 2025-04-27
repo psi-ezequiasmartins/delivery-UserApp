@@ -7,6 +7,8 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswor
 import { getDatabase, ref, set, onValue } from "firebase/database";
 import { auth, firebase_app } from '../config/apiFirebase';
 import { Alert } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 
 import api from '../config/apiAxios';
 
@@ -33,6 +35,34 @@ export function AuthProvider({ children }) {
     }
     tokenAutorization();
   }, []);
+
+  async function registerForPushNotifications() {
+    if (!Device.isDevice) {
+      console.warn('Notificações push só estão disponíveis em dispositivos físicos.');
+      return null;
+    }
+  
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+  
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+  
+    if (finalStatus !== 'granted') {
+      console.warn('Permissão para notificações push não concedida.');
+      return null;
+    }
+  
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    if (!token) {
+      console.error('Falha ao gerar o pushToken.');
+      return null;
+    }
+  
+    return token;
+  }
 
   function signIn(email, password) {
     setLoading(true);   
@@ -111,7 +141,7 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const pushToken = await registerForPushNotificationsAsync();
+      const pushToken = await registerForPushNotifications();
       if (!pushToken) {
         Alert.alert('Erro ao obter o Push Token. Verifique as permissões de notificação.');
         setLoading(false);
