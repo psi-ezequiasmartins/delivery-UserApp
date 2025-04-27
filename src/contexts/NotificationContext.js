@@ -22,7 +22,21 @@ export function NotificationProvider({ children }) {
   const [notify, setNotify] = useState(false);
   const { user } = useContext(AuthContext);
  
-  const getPushToken = () => pushToken;
+  async function getPushToken() {
+    if (pushToken) return pushToken; // Retorna o token se já estiver armazenado
+    const storedToken = await AsyncStorage.getItem('@UserApp:pushToken');
+    if (storedToken) { 
+      setPushToken(storedToken);  // Atualiza o estado com o token armazenado
+      return storedToken;
+    }
+    const newToken = await registerForPushNotifications();
+    setPushToken(newToken); // Atualiza o estado com o novo token
+    await AsyncStorage.setItem('@UserApp:pushToken', newToken);
+    if (isDevelopment) {
+      console.log('Push Token armazenado no AsyncStorage:', newToken);
+    }
+    return newToken;
+  }
 
   async function registerForPushNotifications() {
     if (!Device.isDevice) {
@@ -30,48 +44,32 @@ export function NotificationProvider({ children }) {
       return null;
     }
 
-    try {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
 
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
 
-      if (finalStatus !== 'granted') {
-        console.warn('Permissão para notificações push não concedida.');
-        return null;
-      }
-
-      const token = (await Notifications.getExpoPushTokenAsync({
-        projectId: EXPO_PROJECT_ID
-      })).data;
-
-      if (!token) {
-        console.error('Falha ao gerar o pushToken.');
-        return null;
-      }
-  
-      setPushToken(token);
-      if (isDevelopment) {
-        console.log('Push Token gerado:', token);
-      }
-    } catch (error) {
-      console.error('Erro ao registrar push token:', error);
+    if (finalStatus !== 'granted') {
+      console.warn('Permissão para notificações push não concedida.');
       return null;
     }
-  }
 
-  // async function getPushToken() {
-  //   if (pushToken) return pushToken;
-  //   const storedToken = await AsyncStorage.getItem('@UserApp:pushToken');
-  //   if (storedToken) {
-  //     setPushToken(storedToken);
-  //     return storedToken;
-  //   }
-  //   return await registerForPushNotifications();
-  // }
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+
+    // const token = (await Notifications.getExpoPushTokenAsync({
+    //   projectId: EXPO_PROJECT_ID
+    // })).data;
+
+    if (!token) {
+      console.error('Falha ao gerar o pushToken.');
+      return null;
+    }
+
+    return token;
+  }
 
   useEffect(() => {
     if (user?.UserID) {

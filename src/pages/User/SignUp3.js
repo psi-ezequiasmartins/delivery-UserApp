@@ -10,7 +10,6 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { NotificationContext } from '../../contexts/NotificationContext';
 
 import icon from '../../../assets/icon.png';
-import { push } from 'firebase/database';
 
 export default function SignUp3(props) {
   const navigation = useNavigation();
@@ -31,7 +30,6 @@ export default function SignUp3(props) {
   const { signUp, loading } = useContext(AuthContext);
   const { getPushToken } = useContext(NotificationContext);
 
-
   function checkEmptyField(field){
     if(field.trim()==='') {
       return false;
@@ -40,34 +38,30 @@ export default function SignUp3(props) {
     }
   }
 
-  function AddNewUser(){
+  async function handleSignUp(){
     const vTelefone = checkEmptyField(telefone);
     const vEmail = checkEmptyField(email);
     const vPassword = checkEmptyField(password);
 
-    if(!vTelefone || !vEmail || !vPassword) {
+    if (!vTelefone || !vEmail || !vPassword) {
       alert('Dados obrigatórios');
-    } else {
-      const pushToken = getPushToken();
-      if (isDevelopment) {
-        console.log('pushToken: ', pushToken);
-      }
-      
-      signUp(
-        nome.trim(),
-        sobrenome.trim(),
-        CEP,
-        endereco.trim(),
-        complemento.trim(),
-        bairro.trim(),
-        cidade.trim(),
-        UF,
-        telefone.trim(),
-        email.trim(),
-        password.trim(),
-        pushToken
-      );
+      return;
     }
+
+    const pushToken = await getPushToken();
+    if (!pushToken) {
+      Alert.alert('Erro ao obter o Push Token. Verifique as permissões de notificação.');
+      return;
+    }
+
+    await signUp(      
+      nome.trim(), sobrenome.trim(),
+      CEP, endereco.trim(), complemento.trim(), bairro.trim(),
+      cidade.trim(), UF,
+      telefone.trim(), email.trim(),
+      password.trim(),
+      pushToken
+    );
   }
 
   return (
@@ -126,7 +120,7 @@ export default function SignUp3(props) {
           (*) Ao clicar em "Registrar Usuário", você estará concordando automaticamente com a nossa Política de Uso e Privacidade. Dúvidas: acesse https://deliverybairro.com
         </Text>
 
-        <TouchableOpacity style={styles.btnSubmit} onPress={AddNewUser}>
+        <TouchableOpacity style={styles.btnSubmit} onPress={handleSignUp}>
           {loading ? (
             <View style={styles.indicator}>
               <Text style={styles.btnTxt}>Aguarde... </Text>

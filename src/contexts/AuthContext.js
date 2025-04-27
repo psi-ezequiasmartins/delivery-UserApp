@@ -2,7 +2,7 @@
  * src/contexts/AuthContext.js
  */
 
-import React, { createContext, useContext, useState, useEffect  } from 'react';
+import React, { createContext, useState, useEffect  } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut as firebaseSignOut } from "firebase/auth";
 import { getDatabase, ref, set, onValue, push } from "firebase/database";
 import { auth, firebase_app } from '../config/apiFirebase';
@@ -34,11 +34,8 @@ export function AuthProvider({ children }) {
     tokenAutorization();
   }, []);
 
-  function signIn(email, password, pushToken) {
+  function signIn(email, password) {
     setLoading(true);   
-    if (isDevelopment) {
-      console.log('pushToken recebido:', pushToken);
-    } 
    
     signInWithEmailAndPassword(auth, email, password).then(async(result) => {
       const id = result.user.uid;
@@ -51,21 +48,12 @@ export function AuthProvider({ children }) {
 
         setUser(data);
 
-        // Verifica e atualiza o pushToken, se necessário
-        if (pushToken === null || pushToken === undefined) {
-          pushToken = data?.pushToken; // Usa o pushToken armazenado no Firebase
-          if (isDevelopment) {
-            console.log('Push Token recuperado do Firebase:', pushToken);
-          }
-        } else if (pushToken !== data.pushToken) {
-          // Atualiza o pushToken no Firebase
-          if (isDevelopment) {
-            console.log('Atualizando Push Token no Firebase...');
-          }
-          set(ref(db, `users/${id}`), {
-            ...data,
-            pushToken: pushToken,
-          });
+        // Recupera o pushToken do Firebase
+        const pushToken = data?.pushToken;
+        if (!pushToken) {
+          console.warn('Push Token não encontrado no Firebase.');
+        } else if (isDevelopment) {
+          console.log('Push Token recuperado do Firebase:', pushToken);
         }
         
         // Salva os dados no AsyncStorage
@@ -107,7 +95,7 @@ export function AuthProvider({ children }) {
         } catch (error) {
           if (isDevelopment) {
             console.error('Erro ao autenticar:', error);
-          }          
+          }
           Alert.alert('Erro ao autenticar. Verifique sua conexão e tente novamente.');
           setAuthenticated(false);
         } finally {
@@ -152,6 +140,7 @@ export function AuthProvider({ children }) {
       createUserWithEmailAndPassword(auth, email, password).then(async(value) => {
         // Signed In
         const id = value.user.uid;
+
         set(ref(db, 'users/'+id), {
           UserID: result.data.USER_ID,
           Nome: result.data.NOME,

@@ -3,6 +3,7 @@
  */
 
 import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL, NODE_ENV } from '@env';
 
 const isDevelopment = NODE_ENV === 'development';
@@ -23,39 +24,36 @@ const api = axios.create({
   }
 });
 
-// Modificando o ping para usar uma rota existente
 api.ping = async () => {
   try {
-    // Usando uma rota pública que sabemos que existe
     const response = await api.get('/api/ping');
     console.log('Conectividade com o servidor:', {
-      status: response.status, data: response.data
+      status: response.status, data: response.data,
     });
     return response.status === 200;
   } catch (error) {
-    console.error('Erro de conectividade:', {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data
-    });
+    if (error.response?.status === 401) {
+      console.warn('Acesso não autorizado à rota /api/ping. Verifique a autenticação.');
+    } else {
+      console.error('Erro de conectividade:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    }
     return false;
   }
 };
 
-// Interceptores de requisição
 api.interceptors.request.use(
-  config => {
-    if (isDevelopment && config.data !== undefined) {
-      console.log('Enviando requisição:', {
-        method: config.method,
-        url: config.url,
-        data: config.data && JSON.stringify(config.data).substring(0, 500) // Limita o tamanho do log
-      });
+  async (config) => {
+    const token = await AsyncStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  error => {
-    console.error('Erro na requisição:', error.message); // Mantenha logs de erro
+  (error) => {
     return Promise.reject(error);
   }
 );
