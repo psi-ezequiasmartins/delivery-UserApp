@@ -4,7 +4,7 @@
 
 import React, { createContext, useState, useEffect  } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut as firebaseSignOut } from "firebase/auth";
-import { getDatabase, ref, set, onValue, push } from "firebase/database";
+import { getDatabase, ref, set, onValue } from "firebase/database";
 import { auth, firebase_app } from '../config/apiFirebase';
 import { Alert } from 'react-native';
 
@@ -40,62 +40,44 @@ export function AuthProvider({ children }) {
     signInWithEmailAndPassword(auth, email, password).then(async(result) => {
       const id = result.user.uid;
 
-      onValue(ref(db, `users/${id}`), async(snapshot) => {
+      // Recupere o UserID do Firebase
+      onValue(ref(db, `users/${id}`), async (snapshot) => {
         const data = snapshot.val();
-        if (isDevelopment) {
-          console.log('dados recuperados: ', data)
+        const userId = String(data?.UserID);
+
+        if (!userId) {
+          Alert.alert('Erro ao recuperar o UserID. Tente novamente.');
+          setLoading(false);
+          return;
         }
-
-        setUser(data);
-
-        // Recupera o pushToken do Firebase
-        const pushToken = data?.pushToken;
-        if (!pushToken) {
-          console.warn('Push Token não encontrado no Firebase.');
-        } else if (isDevelopment) {
-          console.log('Push Token recuperado do Firebase:', pushToken);
-        }
-        
-        // Salva os dados no AsyncStorage
-        AsyncStorage.multiSet([
-          ["vID", String(data?.UserID)],
-          ["vNome", data?.Nome], ["vSobrenome", data?.Sobrenome],
-          ["vTelefone", data?.Telefone], ["vEmail", data?.Email],
-          ["vPushToken", pushToken], 
-          ["vTokenDT", new Date().toISOString()]
-        ]);
-
-        const userId = await AsyncStorage.getItem("vID");
 
         try {
-          const response = await api.post('/api/authenticate', { 
-            USER_ID: userId, 
-            CHV: 1 
-          });
+          // Recupere os dados do usuário no backend
+          const response = await api.get(`/api/usuario/${userId}`);
+          const userData = response.data;
 
-          const token = response.data?.token; 
+          // Armazene os dados no AsyncStorage
+          AsyncStorage.multiSet([
+            ["vID", String(userData?.UserID)],
+            ["vNome", userData?.NOME],
+            ["vSobrenome", userData?.SOBRENOME],
+            ["vTelefone", userData?.TELEFONE],
+            ["vEmail", userData?.EMAIL],
+            ["vPushToken", userData?.PUSH_TOKEN],
+            ["vTokenDT", new Date().toISOString()]
+          ]);
+
+          // Configure o token de autenticação
+          const token = response.data?.token;
           if (token) {
-            AsyncStorage.setItem('token', JSON.stringify(token)); 
+            AsyncStorage.setItem('token', JSON.stringify(token));
             api.defaults.headers.Authorization = `Bearer ${token}`;
-            if (isDevelopment) {
-              console.log('Autenticação bem-sucedida.');
-              console.log('Token recebido:', token);
-            }
-          } else {
-            throw new Error('Token não encontrado na resposta');
           }
 
-          // Registrar o pushToken no backend
-          await api.put('/api/usuario/push-token', {
-            userId: userId,
-            token: pushToken,
-          });
-
-          setAuthenticated(true);
+          setUser(userData);
+          setAuthenticated(true);          
         } catch (error) {
-          if (isDevelopment) {
-            console.error('Erro ao autenticar:', error);
-          }
+          console.error('Erro ao recuperar dados do usuário:', error);
           Alert.alert('Erro ao autenticar. Verifique sua conexão e tente novamente.');
           setAuthenticated(false);
         } finally {
@@ -108,7 +90,7 @@ export function AuthProvider({ children }) {
       setLoading(false);
     });
   }
-
+ 
   async function signUp(
     nome, sobrenome, 
     CEP, endereco, numero, complemento, bairro, cidade, UF, 
@@ -121,71 +103,54 @@ export function AuthProvider({ children }) {
       setLoading(false); 
       return;
     }
+
     if (password !== confirm_password) {
       Alert.alert('As senhas não conferem! Digite-as novamente');
       setLoading(false); 
       return;
     }
 
-    const json = {
-      USER_ID: null, 
-      NOME: nome, SOBRENOME: sobrenome,
-      TELEFONE: telefone, EMAIL: email, 
-      CEP: CEP, ENDERECO: endereco, NUMERO: numero, COMPLEMENTO: complemento, BAIRRO: bairro, CIDADE: cidade, UF: UF,
-      URL_IMAGEM: "https://via.placeholder.com/300x400",
-      PUSH_TOKEN: pushToken
-    };
-
-    api.post('/api/add/usuario/', json).then(result => {
-      createUserWithEmailAndPassword(auth, email, password).then(async(value) => {
-        // Signed In
-        const id = value.user.uid;
-
-        set(ref(db, 'users/'+id), {
-          UserID: result.data.USER_ID,
-          Nome: result.data.NOME,
-          Sobrenome: result.data.SOBRENOME,
-          Email: result.data.EMAIL,
-          Telefone: result.data.TELEFONE,
-          pushToken: pushToken
-        });
-
-        const currentTime = new Date().toISOString();
-        const response = await api.post('/api/authenticate', { USER_ID: result.data.USER_ID, CHV: 1});
-        const token = response.data?.token;
-
-        if (token) {
-          AsyncStorage.multiSet([
-            ["token", JSON.stringify(token)], 
-            ["vID", data.UserID.asString()], 
-            ["vNome", data.NOME], ["vSobrenome", data.SOBRENOME], 
-            ["vTelefone", data.TELEFONE], ["vEmail", data.EMAIL], 
-            ["vPushToken", pushToken],
-            ["vTokenDT", currentTime]
-          ]);
-
-          api.defaults.headers['Authorization'] = `Bearer ${token}`;
-
-          setUser(result.data);
-          setAuthenticated(true);
-          setLoading(false);
-        } else {
-          throw new Error('Token não encontrado na resposta');
-        }
-      }).catch(error => {
-        setAuthenticated(false);
+    try {
+      const pushToken = await registerForPushNotificationsAsync();
+      if (!pushToken) {
+        Alert.alert('Erro ao obter o Push Token. Verifique as permissões de notificação.');
         setLoading(false);
-        if (error.message === 'Password should be at least 6 characters') {
-          Alert.alert('A senha deverá conter pelo menos 6 caracteres'); 
-        } else if (error.message === 'The email address is badly formatted.') {
-          Alert.alert('O formato do E-mail está incorreto') 
-        } else if (error.message === 'The email address is already in use by another account.') {
-          Alert.alert('E-mail já em uso por outra conta');
-        } else {
-          Alert.alert('Erro ao criar conta: ' + error.message);
-        }
-      })
-    });
+        return;  
+      }
+
+      const json = {
+        USER_ID: null, 
+        NOME: nome, SOBRENOME: sobrenome,
+        TELEFONE: telefone, EMAIL: email, 
+        CEP: CEP, ENDERECO: endereco, NUMERO: numero, COMPLEMENTO: complemento, BAIRRO: bairro, CIDADE: cidade, UF: UF,
+        URL_IMAGEM: "https://via.placeholder.com/300x400",
+        PUSH_TOKEN: pushToken
+      };
+
+      const result = await api.post('/api/add/usuario/', json);
+
+      // Crie o usuário no Firebase
+      const value = await createUserWithEmailAndPassword(auth, email, password);
+      const id = value.user.uid;
+
+      // Armazene o UserID no Firebase
+      await set(ref(db, 'users/' + id), {
+        UserID: result.data.USER_ID,
+        Nome: result.data.NOME,
+        Sobrenome: result.data.SOBRENOME,
+        Email: result.data.EMAIL,
+        Telefone: result.data.TELEFONE,
+        pushToken: pushToken
+      });    
+    
+      Alert.alert('Usuário registrado com sucesso!');
+      setLoading(false);
+
+    } catch (error) {
+      console.error('Erro ao registrar usuário:', error);
+      Alert.alert('Erro ao registrar usuário. Tente novamente.');
+      setLoading(false);        
+    }
   }
 
   function changePassword(email) {
