@@ -54,7 +54,7 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
     if (result !== -1) {
         itensAcrescentar.splice(result, 1);
         atualizaTotal(itensAcrescentar);
-      } else {
+    } else {
         console.log("Item não encontrado!");
     }
   }
@@ -254,3 +254,9 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
 })
+
+try {
+  
+} catch (error) {
+  
+}

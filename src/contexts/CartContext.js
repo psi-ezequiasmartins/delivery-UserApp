@@ -15,7 +15,7 @@ export function CartProvider({ children }) {
 
   async function AddToBasket(produto, qtd, itensAcrescentar, valorAcrescentar, obs) {
     const pushToken = await getPushToken();
-    console.log('Push Token:', pushToken);
+    // console.log('Push Token:', pushToken);
     
     if (qtd <= 0) return; // Se a quantidade for menor ou igual a zero, não adiciona ao carrinho
     if (qtd > 99) qtd = 99; // Limita a quantidade máxima a 99

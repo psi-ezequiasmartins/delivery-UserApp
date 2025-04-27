@@ -72,7 +72,7 @@ export default function Cesta() {
       }
 
       const pushToken = getPushToken();
-      console.log('Push Token:', pushToken);
+      // console.log('Push Token:', pushToken);
       
       if (!pushToken) {
         Alert.alert('Aviso', 'Não foi possível configurar as notificações');
@@ -118,11 +118,8 @@ export default function Cesta() {
 
       if (response) {
         await CleanBasket();
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'OrdersStack', params: { screen: 'OrdersStack', initial: false } }],    
-        });
         Alert.alert('Sucesso', 'Pedido enviado com sucesso!');
+        GoToLink('OrdersStack');
       } else {
         Alert.alert('Erro', 'Não foi possível criar o pedido');
       }
@@ -138,6 +135,12 @@ export default function Cesta() {
   async function handleCancelarPedido() {
     await CleanBasket();
     navigation.goBack();
+  }
+
+  function GoToLink(link) {
+    return (
+      navigation.navigate(link)
+    )
   }
 
   {loading && (

@@ -3,7 +3,13 @@
  */
 
 import axios from "axios";
-import { BASE_URL } from '@env';
+import { BASE_URL, NODE_ENV } from '@env';
+
+const isDevelopment = NODE_ENV; // Verifica se o ambiente é de desenvolvimento ou produção
+  
+if (isDevelopment === 'development') {  
+  console.log('Ambiente de desenvolvimento detectado. Habilitando logs detalhados.');
+}
 
 const api = axios.create({
   baseURL: BASE_URL, // servidor de produção
@@ -21,7 +27,7 @@ const api = axios.create({
 api.ping = async () => {
   try {
     // Usando uma rota pública que sabemos que existe
-    const response = await api.get('/api/listar/categorias');
+    const response = await api.get('/api/listar/deliveries');
     return response.status === 200;
   } catch (error) {
     console.error('Erro de conectividade:', {
@@ -33,43 +39,46 @@ api.ping = async () => {
   }
 };
 
-// Melhorando os interceptors
+// Interceptores de requisição
 api.interceptors.request.use(
   config => {
-    if (config.data !== undefined) {
+    if (isDevelopment && config.data !== undefined) {
       console.log('Enviando requisição:', {
         method: config.method,
         url: config.url,
         data: config.data && JSON.stringify(config.data).substring(0, 500) // Limita o tamanho do log
-      });  
-    }   
+      });
+    }
     return config;
   },
   error => {
-    console.error('Erro na requisição:', error.message);
+    console.error('Erro na requisição:', error.message); // Mantenha logs de erro
     return Promise.reject(error);
   }
 );
 
 api.interceptors.response.use(
   response => {
-    try {
-      // Limpar/validar dados antes de logar
-      const cleanData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
-      if (cleanData !== null) {
-        console.log('Resposta recebida:', {
-          url: response.config.url,
-          status: response.status,
-          data: JSON.stringify(cleanData).substring(0, 500)
-        });  
+    if (isDevelopment) {
+      try {
+        const cleanData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+        if (cleanData !== null) {
+          console.log('Resposta recebida:', {
+            url: response.config.url,
+            status: response.status,
+            data: JSON.stringify(cleanData).substring(0, 500)
+          });
+        }
+      } catch (error) {
+        console.warn('Erro ao processar resposta:', error);
       }
-      return response;
-    } catch (error) {
-      console.warn('Erro ao processar resposta:', error);
-      return response;
     }
+    return response;
   },
-  // ...existing error handler...
+  error => {
+    console.error('Erro na resposta:', error.message); // Mantenha logs de erro
+    return Promise.reject(error);
+  }
 );
 
 export default api;

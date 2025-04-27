@@ -36,24 +36,24 @@ export function AuthProvider({ children }) {
 
   function signIn(email, password, pushToken) {
     setLoading(true);    
-    console.log('pushToken recebido:', pushToken);
+    // console.log('pushToken recebido:', pushToken);
 
     signInWithEmailAndPassword(auth, email, password).then(async(result) => {
       const id = result.user.uid;
 
       onValue(ref(db, `users/${id}`), async(snapshot) => {
         const data = snapshot.val();
-        console.log('dados recuperados: ', data)
+        // console.log('dados recuperados: ', data)
 
         setUser(data);
 
         // Verifica e atualiza o pushToken, se necessário
         if (pushToken === null || pushToken === undefined) {
           pushToken = data?.pushToken; // Usa o pushToken armazenado no Firebase
-          console.log('Push Token recuperado do Firebase:', pushToken);
+          // console.log('Push Token recuperado do Firebase:', pushToken);
         } else if (pushToken !== data.pushToken) {
           // Atualiza o pushToken no Firebase
-          console.log('Atualizando Push Token no Firebase...');
+          // console.log('Atualizando Push Token no Firebase...');
           set(ref(db, `users/${id}`), {
             ...data,
             pushToken: pushToken,
@@ -81,7 +81,7 @@ export function AuthProvider({ children }) {
           if (token) {
             AsyncStorage.setItem('token', JSON.stringify(token)); 
             api.defaults.headers.Authorization = `Bearer ${token}`;
-            console.log('Autenticação bem-sucedida.');
+            // console.log('Autenticação bem-sucedida.');
           } else {
             throw new Error('Token não encontrado na resposta');
           }
@@ -94,7 +94,7 @@ export function AuthProvider({ children }) {
 
           setAuthenticated(true);
         } catch (error) {
-          console.log('Erro ao antenticar: ', error);
+          // console.log('Erro ao antenticar: ', error);
           Alert.alert('Erro ao autenticar. Verifique sua conexão e tente novamente.');
           setAuthenticated(false);
         } finally {
