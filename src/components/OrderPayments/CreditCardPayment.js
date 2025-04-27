@@ -22,7 +22,15 @@ export default function OrderCreditCardPayment({ orderId }) {
     async function getOrder() {
       await api.get(`/api/pedido/${orderId}`).then((response) => {
         setPedido(response.data);
-        // console.log(pedido);
+        if (isDevelopment) {
+          console.log('Pedido:', {
+            id: response.data.PEDIDO_ID,
+            data: response.data.DATA,
+            valor: response.data.VR_TOTAL,
+            taxaEntrega: response.data.TAXA_ENTREGA,
+            nome: response.data.DELIVERY_NOME
+          });         
+        }
       })
     }
     getOrder();

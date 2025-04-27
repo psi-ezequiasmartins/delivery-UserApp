@@ -54,7 +54,9 @@ export function NotificationProvider({ children }) {
       }
   
       setPushToken(token);
-      // console.log('Push Token gerado:', token);
+      if (isDevelopment) {
+        console.log('Push Token gerado:', token);
+      }
     } catch (error) {
       console.error('Erro ao registrar push token:', error);
       return null;

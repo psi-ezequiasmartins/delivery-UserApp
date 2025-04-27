@@ -24,7 +24,9 @@ export default function OrderLiveUpdates({ pedido }) {
         if (pedido?.DELIVERY_ENDERECO) {
           const coords = await getCoordinatesFromAddress(pedido.DELIVERY_ENDERECO);
           if (coords?.latitude && coords?.longitude) {
-            // console.log('Coordenadas do Delivery: ', coords);
+            if (isDevelopment) {
+              console.log('Coordenadas do Delivery: ', coords);
+            }
             setDeliveryCoords(coords);
           }
         }

@@ -5,9 +5,9 @@
 import axios from "axios";
 import { BASE_URL, NODE_ENV } from '@env';
 
-const isDevelopment = NODE_ENV; // Verifica se o ambiente é de desenvolvimento ou produção
+const isDevelopment = NODE_ENV === 'development';
   
-if (isDevelopment === 'development') {  
+if (isDevelopment) {
   console.log('Ambiente de desenvolvimento detectado. Habilitando logs detalhados.');
 }
 
@@ -27,7 +27,10 @@ const api = axios.create({
 api.ping = async () => {
   try {
     // Usando uma rota pública que sabemos que existe
-    const response = await api.get('/api/listar/deliveries');
+    const response = await api.get('/api/ping');
+    console.log('Conectividade com o servidor:', {
+      status: response.status, data: response.data
+    });
     return response.status === 200;
   } catch (error) {
     console.error('Erro de conectividade:', {
@@ -63,6 +66,26 @@ api.interceptors.response.use(
       try {
         const cleanData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
         if (cleanData !== null) {
+          if (isDevelopment && response.data !== undefined) {
+            console.log('Recebendo resposta:', {
+              status: response.status,
+              url: response.config.url,
+              data: JSON.stringify(cleanData).substring(0, 500) // Limita o tamanho do log
+            });
+          }
+          if (response.status === 200) {
+            console.log('Resposta bem-sucedida:', {
+              url: response.config.url,
+              status: response.status,
+              data: JSON.stringify(cleanData).substring(0, 500)
+            });
+          } else {
+            console.warn('Resposta com erro:', {
+              url: response.config.url,
+              status: response.status,
+              data: JSON.stringify(cleanData).substring(0, 500)
+            });
+          }
           console.log('Resposta recebida:', {
             url: response.config.url,
             status: response.status,

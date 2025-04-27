@@ -49,7 +49,9 @@ export default function SignUp3(props) {
       alert('Dados obrigatórios');
     } else {
       const pushToken = getPushToken();
-      // console.log('pushToken: ', pushToken);
+      if (isDevelopment) {
+        console.log('pushToken: ', pushToken);
+      }
       
       signUp(
         nome.trim(),

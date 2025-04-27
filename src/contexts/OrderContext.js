@@ -30,8 +30,11 @@ export function OrderProvider({ children }) {
   async function createOrder(orderData) {
     try {
       const pushToken = await getPushToken();
-      // console.log('Push Token:', pushToken);
-
+      if (isDevelopment) {
+        console.log('Push Token:', pushToken);
+        console.log('Dados do pedido:', orderData);
+      }
+     
       const completeOrderData = {
         ...orderData,
         pushToken

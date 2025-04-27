@@ -72,7 +72,15 @@ export default function Cesta() {
       }
 
       const pushToken = getPushToken();
-      // console.log('Push Token:', pushToken);
+      if (isDevelopment) {
+        console.log('Localização:', locationData.location);
+        console.log('Endereço:', locationData.address.formatted);
+        console.log('Dados do pedido:', basket);
+        console.log('Subtotal:', subtotal);
+        console.log('Total:', total);
+        console.log('Dados de Entrega:', delivery);
+        console.log('Push Token:', pushToken);
+      }
       
       if (!pushToken) {
         Alert.alert('Aviso', 'Não foi possível configurar as notificações');
