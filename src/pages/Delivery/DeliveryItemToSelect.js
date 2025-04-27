@@ -82,35 +82,42 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
                 <Text style={styles.summary}>R$ {parseFloat(item?.VR_UNITARIO).toFixed(2)}</Text>
               </View>
 
-              <FlatList
-                data={acrescimos}
-                ListHeaderComponent={<Text style={{ marginBottom: 5, fontWeight: "bold" }}>Deseja acrescentar?</Text>}
-                ListEmptyComponent={()=><Text style={styles.empty}>Não há produtos nesta categoria.</Text>}
-                ListFooterComponent={()=>(
-                  <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <Text style={styles.resumo}>VALOR A ACRESCENTAR:</Text>
-                    <Text style={styles.resumo}>R$ {parseFloat(valorAcrescentar).toFixed(2)}</Text>
-                  </View>
-                )}
-                keyExtractor={(item)=>item.EXTRA_ID}
-                renderItem={({item})=> (
-                  <DeliveryListExtra item_extra={item} add={()=>AddToAcrescimos(item)} remove={()=>RemoveFromAcrescimos(item)} />
-                )}
-                style={styles.extras}
-              />
+              {/* Exibe os itens extras do produto, se houver */}
 
-              <View style={styles.areaInput}>
-                <Text style={{ marginLeft: 10, marginBottom: 10, fontWeight: "bold" }}>Alguma observação?</Text>
-                <TextInput
-                  value={obs}
-                  placeholder="Ex.: sem alface e tomate, etc"
-                  onChangeText={(text)=>setObs(text)}
-                  autoCapitalize="sentences"
-                  multiline={true}
-                  numberOfLines={3}
-                  style={styles.input}
+              {produto?.ITENS_EXTRAS === 'S' && (
+                <FlatList
+                  data={acrescimos}
+                  ListHeaderComponent={<Text style={{ marginBottom: 5, fontWeight: "bold" }}>Deseja acrescentar?</Text>}
+                  ListEmptyComponent={()=><Text style={styles.empty}>Não há itens extras neste produto.</Text>}
+                  ListFooterComponent={()=>(
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                      <Text style={styles.resumo}>VALOR A ACRESCENTAR:</Text>
+                      <Text style={styles.resumo}>R$ {parseFloat(valorAcrescentar).toFixed(2)}</Text>
+                    </View>
+                  )}
+                  keyExtractor={(item)=>item.EXTRA_ID}
+                  renderItem={({item})=> (
+                    <DeliveryListExtra item_extra={item} add={()=>AddToAcrescimos(item)} remove={()=>RemoveFromAcrescimos(item)} />
+                  )}
+                  style={styles.extras}
                 />
-              </View>
+              )}
+
+              {/* Exibe o campo de observação, se houver */}
+              {produto?.ITENS_OBS === 'S' && (
+                <View style={styles.areaInput}>
+                  <Text style={{ marginLeft: 10, marginBottom: 10, fontWeight: "bold" }}>Alguma observação?</Text>
+                  <TextInput
+                    value={obs}
+                    placeholder="Ex.: sem alface e tomate, etc"
+                    onChangeText={(text)=>setObs(text)}
+                    autoCapitalize="sentences"
+                    multiline={true}
+                    numberOfLines={3}
+                    style={styles.input}
+                  />
+                </View>
+              )}
 
               <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
                 <View style={{ width: 150, flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
