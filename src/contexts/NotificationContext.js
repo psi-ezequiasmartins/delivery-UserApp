@@ -1,10 +1,10 @@
+import { EXPO_PROJECT_ID } from '@env';
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { AuthContext } from './AuthContext';
 
-import { EXPO_PROJECT_ID } from '@env';
 import api from '../config/apiAxios';
 
 Notifications.setNotificationHandler({
@@ -35,6 +35,18 @@ export function NotificationProvider({ children }) {
     if (isDevelopment) {
       console.log('Push Token armazenado no AsyncStorage:', newToken);
     }
+
+    // Envia o novo pushToken para o servidor
+    await api.post('/api/push-token', { token: newToken, userId: user?.UserID }).then((response) => {
+      if (response.status === 200) {
+        console.log('Push Token enviado com sucesso:', response.data);
+      } else {
+        console.error('Erro ao enviar Push Token:', response.status, response.data);
+      }
+    }).catch((error) => {
+      console.error('Erro ao enviar Push Token:', error.message);
+    });
+
     return newToken;
   }
 
@@ -57,11 +69,11 @@ export function NotificationProvider({ children }) {
       return null;
     }
 
-    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    // const token = (await Notifications.getExpoPushTokenAsync()).data;
 
-    // const token = (await Notifications.getExpoPushTokenAsync({
-    //   projectId: EXPO_PROJECT_ID
-    // })).data;
+    const token = (await Notifications.getExpoPushTokenAsync({
+      projectId: EXPO_PROJECT_ID
+    })).data;
 
     if (!token) {
       console.error('Falha ao gerar o pushToken.');

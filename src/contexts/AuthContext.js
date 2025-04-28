@@ -2,6 +2,7 @@
  * src/contexts/AuthContext.js
  */
 
+import { EXPO_PROJECT_ID } from '@env';
 import React, { createContext, useState, useEffect  } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut as firebaseSignOut } from "firebase/auth";
 import { getDatabase, ref, set, onValue } from "firebase/database";
@@ -55,7 +56,12 @@ export function AuthProvider({ children }) {
       return null;
     }
   
-    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    // const token = (await Notifications.getExpoPushTokenAsync()).data;
+    
+    const token = (await Notifications.getExpoPushTokenAsync({
+      projectId: EXPO_PROJECT_ID
+    })).data;
+
     if (!token) {
       console.error('Falha ao gerar o pushToken.');
       return null;
@@ -68,7 +74,7 @@ export function AuthProvider({ children }) {
     setLoading(true);   
    
     signInWithEmailAndPassword(auth, email, password).then(async(result) => {
-      const id = result.user.uid;
+      const id = result.user.uid; //x1OFq9mZLjWLBYSe37EksjjEzVd2
 
       // Recupere o UserID do Firebase
       onValue(ref(db, `users/${id}`), async (snapshot) => {

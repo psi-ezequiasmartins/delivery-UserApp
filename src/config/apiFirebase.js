@@ -18,10 +18,7 @@ const firebaseConfig = {
   appId: APP_ID
 };
 
-// Inicialize o Firebase App
 const firebase_app = initializeApp(firebaseConfig);
-
-// Inicialize o Firebase Auth com persistência no AsyncStorage
 const auth = initializeAuth(firebase_app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
