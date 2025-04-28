@@ -27,9 +27,7 @@ const api = axios.create({
 api.ping = async () => {
   try {
     const response = await api.get('/api/ping');
-    console.log('Conectividade com o servidor:', {
-      status: response.status, data: response.data,
-    });
+    console.log('Conexão com o servidor:', { data: response.data });
     return response.status === 200;
   } catch (error) {
     if (error.response?.status === 401) {
@@ -52,8 +50,7 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
-  },
-  (error) => {
+  }, (error) => {
     return Promise.reject(error);
   }
 );
@@ -65,18 +62,10 @@ api.interceptors.response.use(
         const cleanData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
         if (cleanData !== null) {
           if (isDevelopment && response.data !== undefined) {
-            console.log('Recebendo resposta:', {
-              status: response.status,
-              url: response.config.url,
-              data: JSON.stringify(cleanData).substring(0, 500) // Limita o tamanho do log
-            });
+            console.log('Recebendo resposta...');
           }
           if (response.status === 200) {
-            console.log('Resposta bem-sucedida:', {
-              url: response.config.url,
-              status: response.status,
-              data: JSON.stringify(cleanData).substring(0, 500)
-            });
+            console.log('Resposta bem-sucedida');
           } else {
             console.warn('Resposta com erro:', {
               url: response.config.url,
@@ -95,11 +84,10 @@ api.interceptors.response.use(
       }
     }
     return response;
-  },
-  error => {
+  }, error => {
     console.error('Erro na resposta:', error.message); // Mantenha logs de erro
     return Promise.reject(error);
   }
 );
-
+r
 export default api;

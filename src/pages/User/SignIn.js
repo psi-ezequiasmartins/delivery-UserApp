@@ -6,23 +6,19 @@ import React, { useState, useContext } from 'react';
 import { SafeAreaView, View, Text, TextInput, Image, TouchableOpacity, ActivityIndicator, Keyboard, Platform, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
-import { NotificationContext } from '../../contexts/NotificationContext';
 
 import icon from '../../../assets/icon.png';
 import marca from '../../../assets/logomarca.png';
 
 export default function SignIn() {
   const navigation = useNavigation();
-  const { signIn, loading } = useContext(AuthContext);
-  const { getPushToken } = useContext(NotificationContext);
-
   const [ email, setEmail ] = useState('');
   const [ password, setPassword]  = useState('');
 
+  const { signIn, loading } = useContext(AuthContext);
+
   async function handleLogin(email, password) {
-    const pushToken = getPushToken();
-    console.log('Push Token:', pushToken);
-    signIn(email, password, pushToken);
+    signIn(email, password);
   }
   
   return (

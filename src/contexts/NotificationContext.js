@@ -39,12 +39,12 @@ export function NotificationProvider({ children }) {
     // Envia o novo pushToken para o servidor
     await api.post('/api/push-token', { token: newToken, userId: user?.UserID }).then((response) => {
       if (response.status === 200) {
-        console.log('Push Token enviado com sucesso:', response.data);
+        console.log('pushToken enviado com sucesso:', response.data);
       } else {
-        console.error('Erro ao enviar Push Token:', response.status, response.data);
+        console.error('Erro ao enviar o pushToken:', response.status, response.data);
       }
     }).catch((error) => {
-      console.error('Erro ao enviar Push Token:', error.message);
+      console.error('Erro ao enviar o pushToken:', error.message);
     });
 
     return newToken;

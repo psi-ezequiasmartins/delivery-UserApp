@@ -74,27 +74,26 @@ export function AuthProvider({ children }) {
     setLoading(true);   
    
     signInWithEmailAndPassword(auth, email, password).then(async(result) => {
-      const id = result.user.uid; //x1OFq9mZLjWLBYSe37EksjjEzVd2
+      const id = result.user.uid; 
+      // console.log('ID do Usuário/Firebase:', id);
 
-      // Recupere o UserID do Firebase
       onValue(ref(db, `users/${id}`), async (snapshot) => {
         const data = snapshot.val();
-        const userId = String(data?.UserID);
+        console.log('Dados do usuário (recuperado do Firebase):', data);
 
-        if (!userId) {
-          Alert.alert('Erro ao recuperar o UserID. Tente novamente.');
-          setLoading(false);
-          return;
-        }
+        const userId = data?.UserID;
+        console.log('UserID:', userId);
 
         try {
           // Recupere os dados do usuário no backend
           const response = await api.get(`/api/usuario/${userId}`);
           const userData = response.data;
 
+          console.log('Dados do usuário:', userData);
+
           // Armazene os dados no AsyncStorage
           AsyncStorage.multiSet([
-            ["vID", String(userData?.UserID)],
+            // ["vID", String(userData?.UserID)],
             ["vNome", userData?.NOME],
             ["vSobrenome", userData?.SOBRENOME],
             ["vTelefone", userData?.TELEFONE],

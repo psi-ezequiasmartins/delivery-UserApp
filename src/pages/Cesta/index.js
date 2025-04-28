@@ -73,13 +73,7 @@ export default function Cesta() {
 
       const pushToken = getPushToken();
       if (isDevelopment) {
-        console.log('Localização:', locationData.location);
-        console.log('Endereço:', locationData.address.formatted);
-        console.log('Dados do pedido:', basket);
-        console.log('Subtotal:', subtotal);
-        console.log('Total:', total);
-        console.log('Dados de Entrega:', delivery);
-        console.log('Push Token:', pushToken);
+        console.log('pushToken:', pushToken);
       }
       
       if (!pushToken) {

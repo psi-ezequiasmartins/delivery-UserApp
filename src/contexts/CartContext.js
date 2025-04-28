@@ -8,20 +8,18 @@ import { NotificationContext } from './NotificationContext';
 export const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  const { getPushToken } = useContext(NotificationContext);
   const [ basket, setBasket ] = useState([]);
   const [ delivery, setDelivery ] = useState([]);
   const [ subtotal, setSubTotal] = useState(0);
 
+  const { getPushToken } = useContext(NotificationContext);
+
   async function AddToBasket(produto, qtd, itensAcrescentar, valorAcrescentar, obs) {
     const pushToken = await getPushToken();
     if (isDevelopment) {
-      console.log('Push Token:', pushToken);
+      console.log('pushToken:', pushToken);
     }
     
-    if (qtd <= 0) return; // Se a quantidade for menor ou igual a zero, não adiciona ao carrinho
-    if (qtd > 99) qtd = 99; // Limita a quantidade máxima a 99
-
     const i = basket.findIndex(item => item?.PRODUTO_ID === produto?.PRODUTO_ID);
     let updatedBasket = [...basket];  // Copia o estado original do basket
     if (i !== -1) {

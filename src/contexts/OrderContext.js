@@ -31,7 +31,7 @@ export function OrderProvider({ children }) {
     try {
       const pushToken = await getPushToken();
       if (isDevelopment) {
-        console.log('Push Token:', pushToken);
+        console.log('pushToken:', pushToken);
         console.log('Dados do pedido:', orderData);
       }
      
