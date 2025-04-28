@@ -72,7 +72,7 @@ export function NotificationProvider({ children }) {
     // const token = (await Notifications.getExpoPushTokenAsync()).data;
 
     const token = (await Notifications.getExpoPushTokenAsync({
-      projectId: EXPO_PROJECT_ID
+      'projectId': EXPO_PROJECT_ID || Constants.easConfig?.projectId || Constants.expoConfig?.extra.eas?.projectId
     })).data;
 
     if (!token) {

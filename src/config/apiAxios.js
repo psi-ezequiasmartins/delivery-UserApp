@@ -89,5 +89,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-r
+
 export default api;

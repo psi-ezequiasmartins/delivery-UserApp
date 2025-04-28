@@ -59,7 +59,7 @@ export function AuthProvider({ children }) {
     // const token = (await Notifications.getExpoPushTokenAsync()).data;
     
     const token = (await Notifications.getExpoPushTokenAsync({
-      projectId: EXPO_PROJECT_ID
+      'projectId': EXPO_PROJECT_ID || Constants.easConfig?.projectId || Constants.expoConfig?.extra.eas?.projectId
     })).data;
 
     if (!token) {
@@ -70,7 +70,7 @@ export function AuthProvider({ children }) {
     return token;
   }
 
-  function signIn(email, password) {
+  async function signIn(email, password) {
     setLoading(true);   
    
     signInWithEmailAndPassword(auth, email, password).then(async(result) => {
