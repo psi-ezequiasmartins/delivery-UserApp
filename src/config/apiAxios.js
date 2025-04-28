@@ -13,8 +13,10 @@ if (isDevelopment) {
   console.log('URL base do servidor:', BASE_URL);
 }
 
+API_URL = BASE_URL || 'http://localhost:3357' || 'https://srv.deliverybairro.com';
+
 const api = axios.create({
-  baseURL: BASE_URL, // servidor de produção
+  baseURL: API_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
