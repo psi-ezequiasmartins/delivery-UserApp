@@ -10,6 +10,7 @@ const isDevelopment = NODE_ENV === 'development';
   
 if (isDevelopment) {
   console.log('Ambiente de desenvolvimento detectado. Habilitando logs detalhados.');
+  console.log('URL base do servidor:', BASE_URL);
 }
 
 const api = axios.create({
