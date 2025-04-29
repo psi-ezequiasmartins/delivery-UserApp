@@ -16,11 +16,11 @@ export default function Perfil() {
   const navigation = useNavigation();
   const { user, setUser, pushToken, signOut } = useContext(AuthContext);
 
-  const [ nome, setNome ] = useState(user?.Nome || "");
-  const [ sobrenome, setSobrenome ] = useState(user?.Sobrenome || "");
-  const [ url_imagem, setUrlImagem ] = useState(user?.url_imagem || "https://via.placeholder.com/250");
-  const [ telefone, setTelefone ] = useState(user?.Telefone || "");
-  const [ email, setEmail ] = useState(user?.Email || "");
+  const [ nome, setNome ] = useState(user?.NOME || "");
+  const [ sobrenome, setSobrenome ] = useState(user?.SOBRENOME || "");
+  const [ url_imagem, setUrlImagem ] = useState(user?.URL_IMAGEM || "https://via.placeholder.com/250");
+  const [ telefone, setTelefone ] = useState(user?.TELEFONE || "");
+  const [ email, setEmail ] = useState(user?.EMAIL || "");
 
   async function onSave() {
     await updateUser();
@@ -29,7 +29,7 @@ export default function Perfil() {
 
   async function updateUser() {
     const json = {
-      "USER_ID": user?.UserID, 
+      "USER_ID": user?.USER_ID, 
       "NOME": nome, 
       "SOBRENOME": sobrenome,
       "URL_IMAGEM": url_imagem, 
@@ -56,8 +56,8 @@ export default function Perfil() {
         <View style={styles.areaInput}>
           <Text>ID (Ficha Nº):</Text>
           <TextInput 
-            value={user?.UserID}
-            placeholder={String(user?.UserID)}
+            value={user?.USER_ID}
+            placeholder={String(user?.USER_ID)}
             autoCorrect={false}
             autoCapitalize="words"
             style={styles.input}

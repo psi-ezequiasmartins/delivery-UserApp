@@ -20,7 +20,7 @@ export function OrderProvider({ children }) {
 
   useEffect(() => {
     async function loadOrdersByUserID() {
-      await api.get(`/api/listar/pedidos/usuario/${user?.UserID}`).then((snapshot) => {
+      await api.get(`/api/listar/pedidos/usuario/${user?.USER_ID}`).then((snapshot) => {
         setOrders(snapshot.data)
       });
     }

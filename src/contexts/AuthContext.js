@@ -26,56 +26,42 @@ export function AuthProvider({ children }) {
 
   useEffect(()=>{
     setLoading(true);
-    async function tokenAutorization() {
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        api.defaults.headers.Authorization = `Bearer ${token}`;
-        setAuthenticated(true);
+    async function checkTokenValidity() {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const expiresAt = await AsyncStorage.getItem('expiresAt');
+  
+        if (token && expiresAt) {
+          const now = Date.now();
+          if (now >= Number(expiresAt)) {
+            console.warn('Token expirado. Usuário será desconectado.');
+            await AsyncStorage.multiRemove(['token', 'expiresAt']);
+            setAuthenticated(false);
+            setUser(null);
+            Alert.alert('Sessão expirada. Faça login novamente.');
+          } else {
+            api.defaults.headers.Authorization = `Bearer ${token}`;
+            setAuthenticated(true);
+          }
+        } else {
+          console.warn('Token não encontrado ou inválido.');
+          setAuthenticated(false);
+        }                
+      } catch (error) {
+        console.error('Erro ao verificar a validade do token:', error);
+        setAuthenticated(false);
+      } finally { 
+        setLoading(false);
       }
-      setLoading(false); 
     }
-    tokenAutorization();
+    checkTokenValidity();
   }, []);
 
-  async function registerForPushNotifications() {
-    if (!Device.isDevice) {
-      console.warn('Notificações push só estão disponíveis em dispositivos físicos.');
-      return null;
-    }
-  
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-  
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-  
-    if (finalStatus !== 'granted') {
-      console.warn('Permissão para notificações push não concedida.');
-      return null;
-    }
-  
-    // const token = (await Notifications.getExpoPushTokenAsync()).data;
-    
-    const token = (await Notifications.getExpoPushTokenAsync({
-      'projectId': EXPO_PROJECT_ID || Constants.easConfig?.projectId || Constants.expoConfig?.extra.eas?.projectId
-    })).data;
-
-    if (!token) {
-      console.error('Falha ao gerar o pushToken.');
-      return null;
-    }
-  
-    return token;
-  }
-
   async function signIn(email, password) {
-    setLoading(true);   
-   
-    signInWithEmailAndPassword(auth, email, password).then(async(result) => {
-      const id = result.user.uid; 
-      // console.log('ID do Usuário/Firebase:', id);
+    setLoading(true);     
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      const id = result.user.uid;
 
       onValue(ref(db, `users/${id}`), async (snapshot) => {
         const data = snapshot.val();
@@ -84,48 +70,69 @@ export function AuthProvider({ children }) {
         const userId = data?.UserID;
         console.log('UserID:', userId);
 
+        if (!userId) {
+          Alert.alert('Erro ao recuperar o UserID. Tente novamente.');
+          setLoading(false);
+          return;
+        }
+
         try {
-          // Recupere os dados do usuário no backend
+          // Chama a rota /api/authenticate para gerar o token
+          const authResponse = await api.post('/api/authenticate', {
+            USER_ID: userId,
+            CHV: 1,
+            timezoneOffset: new Date().getTimezoneOffset(),
+          });
+  
+          const token = authResponse.data?.token;
+          const expiresAt = Date.now() + authResponse.data.expiresIn * 1000; // Converte para milissegundos
+  
+          if (token) {
+            // Armazena o token no AsyncStorage
+            await AsyncStorage.setItem('token', token);
+            await AsyncStorage.setItem('expiresAt', expiresAt.toString());
+            console.log('Token armazenado no AsyncStorage:', token);
+            console.log('Token expira em:', new Date(expiresAt).toLocaleString());            
+
+            // Configura o cabeçalho Authorization
+            api.defaults.headers.Authorization = `Bearer ${token}`;
+          } else {
+            throw new Error('Token não encontrado na resposta do backend.');
+          }
+  
+          // Recupera os dados do usuário no backend
           const response = await api.get(`/api/usuario/${userId}`);
-          const userData = response.data;
-
+          const userData = response.data[0];
+  
           console.log('Dados do usuário:', userData);
-
-          // Armazene os dados no AsyncStorage
+  
+          // Armazena os dados no AsyncStorage
           AsyncStorage.multiSet([
-            // ["vID", String(userData?.UserID)],
+            ["vUserID", String(userData?.USER_ID)],
             ["vNome", userData?.NOME],
             ["vSobrenome", userData?.SOBRENOME],
             ["vTelefone", userData?.TELEFONE],
             ["vEmail", userData?.EMAIL],
             ["vPushToken", userData?.PUSH_TOKEN],
-            ["vTokenDT", new Date().toISOString()]
           ]);
-
-          // Configure o token de autenticação
-          const token = response.data?.token;
-          if (token) {
-            AsyncStorage.setItem('token', JSON.stringify(token));
-            api.defaults.headers.Authorization = `Bearer ${token}`;
-          }
-
+          console.log('Dados do Usuário retornados pelo backend:', userData);
           setUser(userData);
-          setAuthenticated(true);          
+          setAuthenticated(true);
         } catch (error) {
-          console.error('Erro ao recuperar dados do usuário:', error);
+          console.error('Erro ao autenticar ou recuperar dados do usuário:', error);
           Alert.alert('Erro ao autenticar. Verifique sua conexão e tente novamente.');
           setAuthenticated(false);
         } finally {
           setLoading(false);
         }
       });
-    }).catch((error) => {
+    } catch (error) {
       console.error('Erro no login com Firebase:', error);
       Alert.alert('Email e/ou Senha inválidos!');
       setLoading(false);
-    });
+    }
   }
- 
+
   async function signUp(
     nome, sobrenome, 
     CEP, endereco, numero, complemento, bairro, cidade, UF, 
@@ -173,9 +180,8 @@ export function AuthProvider({ children }) {
         UserID: result.data.USER_ID,
         Nome: result.data.NOME,
         Sobrenome: result.data.SOBRENOME,
-        Email: result.data.EMAIL,
         Telefone: result.data.TELEFONE,
-        pushToken: pushToken
+        Email: result.data.EMAIL,
       });    
     
       Alert.alert('Usuário registrado com sucesso!');
@@ -188,6 +194,15 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function signOut() {
+    await firebaseSignOut(auth);
+    setAuthenticated(false);
+    api.defaults.headers['Authorization'] = undefined;
+    AsyncStorage.multiRemove(["token", "vID", "vNome", "vSobrenome", "vTelefone", "vEmail", "vPushToken"]);
+    console.clear();
+    setUser(null);
+  }
+
   function changePassword(email) {
     sendPasswordResetEmail(auth, email).then(() => {
       Alert.alert("Email de Recuperação enviado com sucesso! Confira sua caixa de Entrada.");
@@ -198,14 +213,39 @@ export function AuthProvider({ children }) {
     })
   }
 
-  async function signOut() {
-    await firebaseSignOut(auth);
-    setAuthenticated(false);
-    api.defaults.headers['Authorization'] = undefined;
-    AsyncStorage.multiRemove(["token", "vID", "vNome", "vSobrenome", "vTelefone", "vEmail", "vPushToken"]);
-    console.clear();
-    setUser(null);
+  async function registerForPushNotifications() {
+    if (!Device.isDevice) {
+      console.warn('Notificações push só estão disponíveis em dispositivos físicos.');
+      return null;
+    }
+  
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+  
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+  
+    if (finalStatus !== 'granted') {
+      console.warn('Permissão para notificações push não concedida.');
+      return null;
+    }
+  
+    // const token = (await Notifications.getExpoPushTokenAsync()).data;
+    
+    const push_token = (await Notifications.getExpoPushTokenAsync({
+      'projectId': EXPO_PROJECT_ID || Constants.easConfig?.projectId || Constants.expoConfig?.extra.eas?.projectId
+    })).data;
+
+    if (!push_token) {
+      console.error('Falha ao gerar o pushToken.');
+      return null;
+    }
+  
+    return push_token;
   }
+
 
   return(
     <AuthContext.Provider value={{

@@ -83,7 +83,7 @@ export default function Cesta() {
 
       const order = {
         "DELIVERY_ID": delivery?.DELIVERY_ID,
-        "USER_ID": user?.UserID,
+        "USER_ID": user?.USER_ID,
         "VR_SUBTOTAL": subtotal,
         "TAXA_ENTREGA": delivery?.TAXA_ENTREGA,
         "VR_TOTAL": total,

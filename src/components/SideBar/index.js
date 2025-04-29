@@ -27,8 +27,8 @@ export default function SideBar(props) {
       <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 15, marginBottom: 15 }}>
         <Image source={logotipo} style={{ width: 120, height: 120 }} resizeMode="contain" />
         <Text style={{ color: '#5D5D5D', fontSize: 18, marginTop: 25 }}>Bem vindo!</Text>
-        <Text style={{ color: '#000000', fontSize: 17, fontWeight: 'bold' }}>{user?.Nome} {user?.Sobrenome}</Text>
-        <Text style={{ color: '#000000', fontSize: 17 }}>UserID {user?.UserID}</Text>
+        <Text style={{ color: '#000000', fontSize: 17, fontWeight: 'bold' }}>{user?.NOME} {user?.SOBRENOME}</Text>
+        <Text style={{ color: '#000000', fontSize: 17 }}>UserID {user?.USER_ID}</Text>
       </View>
 
       <DrawerItem

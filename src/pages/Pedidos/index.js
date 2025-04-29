@@ -20,7 +20,7 @@ export default function Pedidos({ route }) {
   const { notify, setNotify } = useContext(NotificationContext);
 
   const listRef = useRef(null);
-  const id = user?.UserID;
+  const id = user?.USER_ID;
 
   async function loadPedidos() {
     try {

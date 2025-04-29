@@ -37,7 +37,7 @@ export function NotificationProvider({ children }) {
     }
 
     // Envia o novo pushToken para o servidor
-    await api.post('/api/push-token', { token: newToken, userId: user?.UserID }).then((response) => {
+    await api.post('/api/push-token', { token: newToken, userId: user?.USER_ID }).then((response) => {
       if (response.status === 200) {
         console.log('pushToken enviado com sucesso:', response.data);
       } else {
@@ -84,7 +84,7 @@ export function NotificationProvider({ children }) {
   }
 
   useEffect(() => {
-    if (user?.UserID) {
+    if (user?.USER_ID) {
       registerForPushNotifications();
     }
   }, [user]);
