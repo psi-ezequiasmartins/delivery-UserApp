@@ -39,10 +39,8 @@ api.ping = async () => {
     return response.status === 200;
   } catch (error) {
     if (error.response?.status === 401) {
-      if (isDevelopment) {
         console.warn('Acesso não autorizado à rota /api/ping. Verifique a autenticação.');
-      }
-    } else if (isDevelopment) {
+    } else {
         console.error('Erro de conectividade:', {
           message: error.message,
           status: error.response?.status,
@@ -71,18 +69,18 @@ api.interceptors.response.use(
       try {
         const cleanData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
         if (cleanData !== null) {
-          if (isDevelopment && response.data !== undefined) {
+          if (response.data !== undefined) {
             console.log('Recebendo resposta...');
           }
-          if (isDevelopment && response.status === 200) {
+          if (response.status === 200) {
             console.log('Resposta bem-sucedida');
-          } else if (isDevelopment && response.status !== 200) {
+          } else if (response.status !== 200) {
             console.warn('Resposta com erro:', {
               url: response.config.url,
               status: response.status,
               data: JSON.stringify(cleanData).substring(0, 500)
             });
-          } else if (isDevelopment && response.status === 401) {
+          } else if (response.status === 401) {
             console.warn('Acesso não autorizado:', {
               url: response.config.url,
               status: response.status,
