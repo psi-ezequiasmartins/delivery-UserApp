@@ -8,7 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { CartContext } from "../../contexts/CartContext";
 
 import DeliveryListExtra from './DeliveryListExtra';
-import api from "../../config/apiAxios";
+import api, { isDevelopment } from "../../config/apiAxios";
 
 export default function DeliveryItemToSelect({ produto, id, close }) {
   const { AddToBasket } = useContext(CartContext);
@@ -54,8 +54,8 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
     if (result !== -1) {
         itensAcrescentar.splice(result, 1);
         atualizaTotal(itensAcrescentar);
-    } else {
-        console.log("Item não encontrado!");
+    } else if (isDevelopment) {
+        console.log("Item não encontrado!");      
     }
   }
 
@@ -135,7 +135,7 @@ export default function DeliveryItemToSelect({ produto, id, close }) {
                   <Text style={styles.summary}>R$ {(qtd * (parseFloat(item?.VR_UNITARIO)+parseFloat(valorAcrescentar))).toFixed(2)}</Text>
                 </View>
 
-                <TouchableOpacity style={styles.btnAdd} onPress={() => AddItem()}>
+                <TouchableOpacity style={styles.btnAdd} onPress={()=>AddItem()}>
                   <Text style={{ color: '#FFF', fontSize: 18 }}>Adiciona Item</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btnClose} onPress={close}>

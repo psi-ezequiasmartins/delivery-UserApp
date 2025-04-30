@@ -7,32 +7,49 @@ import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { CartContext } from '../../contexts/CartContext';
 import { NotificationContext } from '../../contexts/NotificationContext';
+import { isDevelopment } from '../../config/apiAxios';
+
 import * as Notifications from 'expo-notifications';
 
 import icon from '../../../assets/icon.png';
 import logomarca from '../../../assets/logomarca.png';
 import sacola from '../../../assets/pedidos.png';
 
-export default function Header(props) {
+export default function Header() {
   const navigation = useNavigation();
   const { basket } = useContext(CartContext);
-  const { pushToken }  = useContext(NotificationContext);  
+  const { pushToken, getPushToken }  = useContext(NotificationContext);  
   const { setNotify } = useContext(NotificationContext); 
-  
+
   const notificationListener = useRef();
 
   useEffect(() => {
+    if (!pushToken) {
+      getPushToken().then((token) => {
+        if (isDevelopment) {
+          if (token) {
+            console.log('pushToken:', token);
+          } else {
+            console.warn('Falha ao obter o pushToken.');
+          }  
+        }
+      });
+    } else if (isDevelopment) {  
+      console.log('pushToken já obtido:', pushToken);
+    }
+
     notificationListener.current = Notifications.addNotificationReceivedListener(() => {
       setNotify(true);
       GoToLink('OrdersTab');
     })
+
     return () => {
       if (notificationListener.current) {
         Notifications.removeNotificationSubscription(notificationListener.current);
       }
     };
   }, [setNotify]);
-                                                                                                                                                                                 
+
   function GoToLink(link) {
     return (
       navigation.navigate(link)

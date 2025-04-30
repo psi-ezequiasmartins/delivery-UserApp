@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import api from '../../config/apiAxios';
+import api, { isDevelopment } from '../../config/apiAxios';
 
 import OrderDetails from "./OrderDetails";
 import OrderLiveUpdates from "./OrderLiveUpdates";
@@ -23,7 +23,9 @@ export default function OrderDetailsNavigator({ route }) {
       await api.get(`/api/pedido/${orderId}`).then((response)=>{
         setPedido(response?.data);
       }).catch((error) =>{
-        console.log('Error: ', error)
+        if (isDevelopment) {
+          console.log('Error: ', error.message)
+        }
       });
     }
     fetchPedido();

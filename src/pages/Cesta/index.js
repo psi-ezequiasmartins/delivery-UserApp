@@ -11,18 +11,22 @@ import { ScrollView } from "react-native-virtualized-view";
 import { Fontisto } from '@expo/vector-icons';
 
 import { useNavigation } from '@react-navigation/native';
+
 import { CartContext } from '../../contexts/CartContext';
 import { OrderContext } from '../../contexts/OrderContext';
 import { AuthContext } from '../../contexts/AuthContext';
+
+import { isDevelopment } from '../../config/apiAxios';
 
 import BasketItem from '../../components/Basket';
 
 export default function Cesta() {
   const navigation = useNavigation();
+
   const { delivery, basket, AddToBasket, RemoveFromBasket, CleanBasket } = useContext(CartContext);
   const { createOrder } = useContext(OrderContext);
   const { user } = useContext(AuthContext);
-  const { getPushToken } = useContext(NotificationContext);
+  const { pushToken } = useContext(NotificationContext);
 
   const [subtotal, setSubTotal] = useState(0);
   const [total, setTotal] = useState(0);
@@ -71,7 +75,6 @@ export default function Cesta() {
         return;
       }
 
-      const pushToken = getPushToken();
       if (isDevelopment) {
         console.log('pushToken:', pushToken);
       }
@@ -190,11 +193,15 @@ export default function Cesta() {
               )}
             />
 
-            <TouchableOpacity style={styles.btnAdd} onPress={handleFinalizarPedido}>
-              <Text style={{color: '#FFF', fontSize: 18}}>FINALIZAR PEDIDO</Text>
+            <TouchableOpacity style={styles.btnGoBack} onPress={()=>navigation.goBack()}>
+              <Text style={{color: '#000', fontSize: 18}}>CONTINUE COMPRANDO...</Text>
             </TouchableOpacity>
           </>
         }
+
+        <TouchableOpacity style={styles.btnOk} onPress={handleFinalizarPedido}>
+          <Text style={{color: '#FFF', fontSize: 18}}>FINALIZAR PEDIDO</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.btnCancel} onPress={handleCancelarPedido}>
           <Text style={{color: '#FFF', fontSize: 18}}>CANCELAR</Text>
@@ -283,11 +290,21 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: "#000",
   },
-  btnAdd: {
+  btnGoBack: {
     width: '100%',
     height: 45,
     borderRadius: 7,
-    backgroundColor: '#145E7D',
+    backgroundColor: '#8CB',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
+    marginTop: 10
+  },
+  btnOk: {
+    width: '100%',
+    height: 45,
+    borderRadius: 7,
+    backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10

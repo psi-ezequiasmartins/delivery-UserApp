@@ -5,7 +5,7 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { AuthContext } from './AuthContext';
 
-import api from '../config/apiAxios';
+import api, { isDevelopment } from '../config/apiAxios';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -20,6 +20,7 @@ export const NotificationContext = createContext();
 export function NotificationProvider({ children }) {
   const [pushToken, setPushToken] = useState(null);
   const [notify, setNotify] = useState(false);
+
   const { user } = useContext(AuthContext);
  
   async function getPushToken() {
@@ -38,10 +39,12 @@ export function NotificationProvider({ children }) {
 
     // Envia o novo pushToken para o servidor
     await api.post('/api/push-token', { token: newToken, userId: user?.USER_ID }).then((response) => {
-      if (response.status === 200) {
-        console.log('pushToken enviado com sucesso:', response.data);
-      } else {
-        console.error('Erro ao enviar o pushToken:', response.status, response.data);
+      if (isDevelopment) {
+        if (response.status === 200) {
+          console.log('pushToken enviado com sucesso:', response.data);
+        } else {
+          console.error('Erro ao enviar o pushToken:', response.status, response.data);
+        }  
       }
     }).catch((error) => {
       console.error('Erro ao enviar o pushToken:', error.message);
@@ -72,7 +75,7 @@ export function NotificationProvider({ children }) {
     // const token = (await Notifications.getExpoPushTokenAsync()).data;
 
     const token = (await Notifications.getExpoPushTokenAsync({
-      'projectId': EXPO_PROJECT_ID || Constants.easConfig?.projectId || Constants.expoConfig?.extra.eas?.projectId
+      "projectId": EXPO_PROJECT_ID || Constants.easConfig?.projectId || Constants.expoConfig?.extra.eas?.projectId
     })).data;
 
     if (!token) {
@@ -91,7 +94,7 @@ export function NotificationProvider({ children }) {
 
   return (
     <NotificationContext.Provider value={{
-      pushToken, notify, setNotify, setPushToken, getPushToken, registerForPushNotifications
+      pushToken, notify, getPushToken, setNotify, registerForPushNotifications
     }}>
       {children}
     </NotificationContext.Provider>

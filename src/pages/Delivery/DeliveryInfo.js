@@ -7,7 +7,7 @@ import { View, Text, FlatList, ActivityIndicator, Modal, StyleSheet, SafeAreaVie
 import { CartContext } from '../../contexts/CartContext';
 
 import Header from '../../components/Header';
-import api from '../../config/apiAxios';
+import api, { isDevelopment } from '../../config/apiAxios';
 
 import DeliveryHeader from './DeliveryHeader';
 import DeliveryItemToSelect from './DeliveryItemToSelect';
@@ -43,7 +43,9 @@ export default function DeliveryInfo({ route }) {
         }
         setDelivery(info);
       }).catch(error => {
-        console.log('ERROR: ' + error);
+        if (isDevelopment) {
+          console.log('ERROR: ' + error.message);
+        } 
       })
     }
 
@@ -51,7 +53,9 @@ export default function DeliveryInfo({ route }) {
       await api.get(`/api/listar/produtos/delivery/${route.params.id}`).then((response) => {
         setListaDeProdutos(response.data);
       }).catch(error => {
-        console.log('ERROR: ' + error);
+        if (isDevelopment) {
+          console.log('ERROR: ' + error.message);
+        }
       })
     }
 

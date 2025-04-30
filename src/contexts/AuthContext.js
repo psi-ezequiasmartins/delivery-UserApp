@@ -11,9 +11,10 @@ import { Alert } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 
-import api from '../config/apiAxios';
+import api, { isDevelopment } from '../config/apiAxios';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { is } from 'date-fns/locale';
 
 export const AuthContext = createContext();
 
@@ -34,7 +35,10 @@ export function AuthProvider({ children }) {
         if (token && expiresAt) {
           const now = Date.now();
           if (now >= Number(expiresAt)) {
-            console.warn('Token expirado. Usuário será desconectado.');
+            if (isDevelopment) {
+              console.log('Token expirado. Usuário será desconectado.');  
+            }
+            // Desconecta o usuário
             await AsyncStorage.multiRemove(['token', 'expiresAt']);
             setAuthenticated(false);
             setUser(null);
@@ -44,7 +48,9 @@ export function AuthProvider({ children }) {
             setAuthenticated(true);
           }
         } else {
-          console.warn('Token não encontrado ou inválido.');
+          if (isDevelopment) {
+            console.warn('Token não encontrado ou inválido.');
+          } 
           setAuthenticated(false);
         }                
       } catch (error) {
@@ -65,11 +71,15 @@ export function AuthProvider({ children }) {
 
       onValue(ref(db, `users/${id}`), async (snapshot) => {
         const data = snapshot.val();
-        console.log('Dados do usuário (recuperado do Firebase):', data);
+        if (isDevelopment) {
+          console.log('Dados do usuário (recuperado do Firebase):', data);
+        }
 
         const userId = data?.UserID;
-        console.log('UserID:', userId);
-
+        if (isDevelopment) {
+          console.log('UserID (recuperado do Firebase):', userId);
+        }
+        
         if (!userId) {
           Alert.alert('Erro ao recuperar o UserID. Tente novamente.');
           setLoading(false);
@@ -79,9 +89,9 @@ export function AuthProvider({ children }) {
         try {
           // Chama a rota /api/authenticate para gerar o token
           const authResponse = await api.post('/api/authenticate', {
-            USER_ID: userId,
-            CHV: 1,
-            timezoneOffset: new Date().getTimezoneOffset(),
+            "USER_ID": userId,
+            "CHV": 1,
+            "timezoneOffset": new Date().getTimezoneOffset(),
           });
   
           const token = authResponse.data?.token;
@@ -91,9 +101,10 @@ export function AuthProvider({ children }) {
             // Armazena o token no AsyncStorage
             await AsyncStorage.setItem('token', token);
             await AsyncStorage.setItem('expiresAt', expiresAt.toString());
-            console.log('Token armazenado no AsyncStorage:', token);
-            console.log('Token expira em:', new Date(expiresAt).toLocaleString());            
-
+            if (isDevelopment) {
+              console.log('Token armazenado no AsyncStorage:', token);
+              console.log('Token expira em:', new Date(expiresAt).toLocaleString());            
+            }
             // Configura o cabeçalho Authorization
             api.defaults.headers.Authorization = `Bearer ${token}`;
           } else {
@@ -103,8 +114,10 @@ export function AuthProvider({ children }) {
           // Recupera os dados do usuário no backend
           const response = await api.get(`/api/usuario/${userId}`);
           const userData = response.data[0];
-  
-          console.log('Dados do usuário:', userData);
+
+          if (isDevelopment) {
+            console.log('Dados do usuário:', userData);
+          }
   
           // Armazena os dados no AsyncStorage
           AsyncStorage.multiSet([
@@ -115,7 +128,9 @@ export function AuthProvider({ children }) {
             ["vEmail", userData?.EMAIL],
             ["vPushToken", userData?.PUSH_TOKEN],
           ]);
-          console.log('Dados do Usuário retornados pelo backend:', userData);
+          if (isDevelopment) {
+            console.log('Dados do Usuário retornados pelo backend:', userData);
+          }
           setUser(userData);
           setAuthenticated(true);
         } catch (error) {
@@ -161,12 +176,12 @@ export function AuthProvider({ children }) {
       }
 
       const json = {
-        USER_ID: null, 
-        NOME: nome, SOBRENOME: sobrenome,
-        TELEFONE: telefone, EMAIL: email, 
-        CEP: CEP, ENDERECO: endereco, NUMERO: numero, COMPLEMENTO: complemento, BAIRRO: bairro, CIDADE: cidade, UF: UF,
-        URL_IMAGEM: "https://via.placeholder.com/300x400",
-        PUSH_TOKEN: pushToken
+        "USER_ID": null, 
+        "NOME": nome, "SOBRENOME": sobrenome,
+        "TELEFONE": telefone, EMAIL: email, 
+        "CEP": CEP, "ENDERECO": endereco, "NUMERO": numero, "COMPLEMENTO": complemento, "BAIRRO": bairro, "CIDADE": cidade, "UF": UF,
+        "URL_IMAGEM": "https://via.placeholder.com/300x400",
+        "PUSH_TOKEN": pushToken
       };
 
       const result = await api.post('/api/add/usuario/', json);
@@ -177,11 +192,11 @@ export function AuthProvider({ children }) {
 
       // Armazene o UserID no Firebase
       await set(ref(db, 'users/' + id), {
-        UserID: result.data.USER_ID,
-        Nome: result.data.NOME,
-        Sobrenome: result.data.SOBRENOME,
-        Telefone: result.data.TELEFONE,
-        Email: result.data.EMAIL,
+        "UserID": result.data.USER_ID,
+        "Nome": result.data.NOME,
+        "Sobrenome": result.data.SOBRENOME,
+        "Telefone": result.data.TELEFONE,
+        "Email": result.data.EMAIL,
       });    
     
       Alert.alert('Usuário registrado com sucesso!');
@@ -235,7 +250,7 @@ export function AuthProvider({ children }) {
     // const token = (await Notifications.getExpoPushTokenAsync()).data;
     
     const push_token = (await Notifications.getExpoPushTokenAsync({
-      'projectId': EXPO_PROJECT_ID || Constants.easConfig?.projectId || Constants.expoConfig?.extra.eas?.projectId
+      "projectId": EXPO_PROJECT_ID || Constants.easConfig?.projectId || Constants.expoConfig?.extra.eas?.projectId
     })).data;
 
     if (!push_token) {
@@ -245,7 +260,6 @@ export function AuthProvider({ children }) {
   
     return push_token;
   }
-
 
   return(
     <AuthContext.Provider value={{

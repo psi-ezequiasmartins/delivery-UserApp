@@ -10,15 +10,18 @@ const isDevelopment = NODE_ENV === 'development';
   
 if (isDevelopment) {
   console.log('Ambiente de desenvolvimento detectado. Habilitando logs detalhados.');
-  console.log('URL base do servidor:', BASE_URL);
 }
 
 API_URL = BASE_URL || 'http://localhost:3357' || 'https://srv.deliverybairro.com';
 
+if (isDevelopment) {
+  console.log('URL da API:', API_URL);
+}
+
 const api = axios.create({
-  baseURL: API_URL,
-  timeout: 10000,
-  headers: {
+  "baseURL": API_URL,
+  "timeout": 10000,
+  "headers": {
     'Content-Type': 'application/json',
     'Accept': '*'
   },
@@ -30,17 +33,21 @@ const api = axios.create({
 api.ping = async () => {
   try {
     const response = await api.get('/api/ping');
-    console.log('Conexão com o servidor:', { data: response.data });
+    if (isDevelopment) {
+      console.log('Conexão com o servidor:', { data: response.data });
+    }
     return response.status === 200;
   } catch (error) {
     if (error.response?.status === 401) {
-      console.warn('Acesso não autorizado à rota /api/ping. Verifique a autenticação.');
-    } else {
-      console.error('Erro de conectividade:', {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-      });
+      if (isDevelopment) {
+        console.warn('Acesso não autorizado à rota /api/ping. Verifique a autenticação.');
+      }
+    } else if (isDevelopment) {
+        console.error('Erro de conectividade:', {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+        });      
     }
     return false;
   }
@@ -67,20 +74,21 @@ api.interceptors.response.use(
           if (isDevelopment && response.data !== undefined) {
             console.log('Recebendo resposta...');
           }
-          if (response.status === 200) {
+          if (isDevelopment && response.status === 200) {
             console.log('Resposta bem-sucedida');
-          } else {
+          } else if (isDevelopment && response.status !== 200) {
             console.warn('Resposta com erro:', {
               url: response.config.url,
               status: response.status,
               data: JSON.stringify(cleanData).substring(0, 500)
             });
+          } else if (isDevelopment && response.status === 401) {
+            console.warn('Acesso não autorizado:', {
+              url: response.config.url,
+              status: response.status,
+              data: JSON.stringify(cleanData).substring(0, 500)
+            });
           }
-          console.log('Resposta recebida:', {
-            url: response.config.url,
-            status: response.status,
-            data: JSON.stringify(cleanData).substring(0, 500)
-          });
         }
       } catch (error) {
         console.warn('Erro ao processar resposta:', error);

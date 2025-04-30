@@ -28,7 +28,7 @@ export default function SignUp3(props) {
   const [password, setPassword] = useState('');
 
   const { signUp, loading } = useContext(AuthContext);
-  const { getPushToken } = useContext(NotificationContext);
+  const { pushToken } = useContext(NotificationContext);
 
   function checkEmptyField(field){
     if(field.trim()==='') {
@@ -48,7 +48,6 @@ export default function SignUp3(props) {
       return;
     }
 
-    const pushToken = await getPushToken();
     if (!pushToken) {
       Alert.alert('Erro ao obter o Push Token. Verifique as permissões de notificação.');
       return;

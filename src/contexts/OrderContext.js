@@ -7,12 +7,12 @@ import { NotificationContext } from './NotificationContext';
 import { AuthContext } from './AuthContext';
 import { CartContext } from './CartContext';
 
-import api from '../config/apiAxios';
+import api, { isDevelopment } from '../config/apiAxios';
 
 export const OrderContext = createContext();
 
 export function OrderProvider({ children }) {
-  const { getPushToken } = useContext(NotificationContext);
+  const { pushToken } = useContext(NotificationContext);
   const { user } = useContext(AuthContext);
   const { delivery } = useContext(CartContext);
   const [ pedido, setPedido ] = useState([]);
@@ -29,7 +29,6 @@ export function OrderProvider({ children }) {
 
   async function createOrder(orderData) {
     try {
-      const pushToken = await getPushToken();
       if (isDevelopment) {
         console.log('pushToken:', pushToken);
         console.log('Dados do pedido:', orderData);
@@ -37,7 +36,7 @@ export function OrderProvider({ children }) {
      
       const completeOrderData = {
         ...orderData,
-        pushToken
+        "pushToken": pushToken,
       };
       const response = await api.post('/api/add/pedido/', completeOrderData);
       return response.data;
@@ -62,5 +61,3 @@ export function OrderProvider({ children }) {
     </OrderContext.Provider>
   );
 };
-
-

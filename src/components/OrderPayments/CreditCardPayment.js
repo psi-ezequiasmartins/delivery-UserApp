@@ -6,7 +6,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Keyboard, TouchableOpacity, ActivityIndicator, SafeAreaView, StyleSheet } from "react-native";
 import { MaskedTextInput } from "react-native-mask-text";
 
-import api from "../../config/apiAxios";
+import api, { isDevelopment } from "../../config/apiAxios";
 
 export default function OrderCreditCardPayment({ orderId }) {
   const [email, setEmail] = useState('');
@@ -78,9 +78,9 @@ export default function OrderCreditCardPayment({ orderId }) {
           placeholder="Email"
           value={email}
           onChangeText={setEmail} 
-          autoCapitalize='none'
-          keyboardType='email-address'
-          textContentType='emailAddress'
+          autoCapitalize="none"
+          keyboardType="email-address"
+          textContentType="emailAddress"
           onSubmitEditing={() => Keyboard.dismiss()}
           style={styles.input}
         />

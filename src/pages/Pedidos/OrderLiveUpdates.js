@@ -8,7 +8,7 @@ import { View, Text, StyleSheet, ActivityIndicator, SafeAreaView } from "react-n
 import { Fontisto, AntDesign } from "@expo/vector-icons";
 import { getCoordinatesFromAddress } from "../../components/Gps/useGeolocation";
 
-import api from "../../config/apiAxios";
+import api, { isDevelopment } from "../../config/apiAxios";
 
 export default function OrderLiveUpdates({ pedido }) {
   const [ courier, setCourier ] = useState(null);

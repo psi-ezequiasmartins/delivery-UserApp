@@ -1,22 +1,18 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
-export function AddressConfirmationModal(props) {
-  const [editedAddress, setEditedAddress] = useState(props.address || '');
+export function AddressConfirmationModal({ visible, address, onConfirm, onCancel }) {
+  const [editedAddress, setEditedAddress] = useState(address);
 
   return (
-    <Modal
-      visible={props.visible}
-      transparent
-      animationType="slide"
-    >
+    <Modal visible={visible} transparent animationType="slide">
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.title}>Confirmar Endereço da Entrega</Text>
 
           <TextInput
             style={styles.input}
-            value={props.address}
+            value={editedAddress}
             onChangeText={setEditedAddress}
             multiline
             numberOfLines={2}
@@ -24,20 +20,14 @@ export function AddressConfirmationModal(props) {
           />
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity 
-              style={[styles.button, styles.cancelButton]} 
-              onPress={props.onCancel}
-            >
+            <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={onCancel}>
               <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.button, styles.confirmButton]} 
-              onPress={() => props.onConfirm(editedAddress)}
-            >
+            <TouchableOpacity style={[styles.button, styles.confirmButton]} onPress={() => onConfirm(editedAddress)}>
               <Text style={styles.buttonText}>Confirmar</Text>
             </TouchableOpacity>
           </View>
+
         </View>
       </View>
     </Modal>

@@ -2,8 +2,7 @@
  * src/contexts/CartContext.js
  */
 
-import React, { createContext, useContext, useState,  } from 'react';
-import { NotificationContext } from './NotificationContext';
+import React, { createContext, useState,  } from 'react';
 
 export const CartContext = createContext();
 
@@ -12,21 +11,15 @@ export function CartProvider({ children }) {
   const [ delivery, setDelivery ] = useState([]);
   const [ subtotal, setSubTotal] = useState(0);
 
-  const { getPushToken } = useContext(NotificationContext);
-
   async function AddToBasket(produto, qtd, itensAcrescentar, valorAcrescentar, obs) {
-    const pushToken = await getPushToken();
-    if (isDevelopment) {
-      console.log('pushToken:', pushToken);
-    }
     
     const i = basket.findIndex(item => item?.PRODUTO_ID === produto?.PRODUTO_ID);
     let updatedBasket = [...basket];  // Copia o estado original do basket
     if (i !== -1) {
       updatedBasket[i] = {
         ...updatedBasket[i], // Mantém as propriedades do item original
-        QTD: updatedBasket[i].QTD + qtd,
-        TOTAL: updatedBasket[i].TOTAL + (qtd * (produto?.VR_UNITARIO + valorAcrescentar)),
+        "QTD": updatedBasket[i].QTD + qtd,
+        "TOTAL": updatedBasket[i].TOTAL + (qtd * (produto?.VR_UNITARIO + valorAcrescentar)),
       };
     } else {
       let data = {
@@ -46,8 +39,8 @@ export function CartProvider({ children }) {
     if (updatedBasket[i]?.QTD > 1) {
       updatedBasket[i] = {
         ...updatedBasket[i], // Mantém as propriedades do item original
-        QTD: updatedBasket[i].QTD - 1,
-        TOTAL: updatedBasket[i].TOTAL - (updatedBasket[i].VR_UNITARIO + updatedBasket[i].VR_ACRESCIMOS),
+        "QTD": updatedBasket[i].QTD - 1,
+        "TOTAL": updatedBasket[i].TOTAL - (updatedBasket[i].VR_UNITARIO + updatedBasket[i].VR_ACRESCIMOS),
       };
     } else {
       updatedBasket = updatedBasket.filter(item => item?.PRODUTO_ID !== produto?.PRODUTO_ID);
