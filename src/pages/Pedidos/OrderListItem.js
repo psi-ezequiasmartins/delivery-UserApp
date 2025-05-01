@@ -25,7 +25,9 @@ export default function OrderListItem({ order }) {
           { order?.STATUS === "PREPARANDO" ? <Text style={[styles.status, {backgroundColor: 'gray', color: 'white'}]}> PREPARANDO </Text> : null }
           { order?.STATUS === "PRONTO_PARA_RETIRADA" ? <Text style={[styles.status, {backgroundColor: 'green', color: 'white'}]}> PRONTO PARA RETIRADA </Text> : null }
           { order?.STATUS === "SAIU_PARA_ENTREGA" ? <Text style={[styles.status, {backgroundColor: 'blue', color: 'white'}]}> SAIU PARA ENTREGA </Text> : null }
-          { order?.STATUS === "RECEBIDO" ? <Text style={[styles.status, {backgroundColor: 'purple', color: 'white'}]}> RECEBIDO </Text> : null }
+          { order?.STATUS === "ENTREGUE" ? <Text style={[styles.status, {backgroundColor: 'purple', color: 'white'}]}> PEDIDO ENTREGUE </Text> : null }
+          { order?.STATUS === "PGTO_PENDENTE" ? <Text style={[styles.status, {backgroundColor: 'red', color: 'white'}]}> PGTO PENDENTE </Text> : null }
+          { order?.STATUS === "PGTO_OK" ? <Text style={[styles.status, {backgroundColor: 'green', color: 'white'}]}> PGTO OK </Text> : null }
           { order?.STATUS === "FINALIZADO" ? <Text style={[styles.status, {backgroundColor: 'black', color: 'white'}]}> FINALIZADO </Text> : null }
           { order?.STATUS === "CANCELADO" ? <Text style={[styles.status, {backgroundColor: 'gray', color: 'white'}]}> CANCELADO </Text> : null }
           <Text><AntDesign color="#000" name='ellipsis1' size={28}/></Text>

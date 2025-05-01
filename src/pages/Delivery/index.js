@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, SafeAreaView, ActivityIndicator, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { isDevelopment } from '../../config/apiAxios';
 
 import Header from '../../components/Header';
 import api from '../../config/apiAxios';
@@ -12,6 +13,11 @@ import api from '../../config/apiAxios';
 export default function Deliveries({ route }) {
   const navigation = useNavigation();
   const [deliveries, setDeliveries] = useState([]);
+
+  if (isDevelopment) {
+    console.log('ID:', route.params.id);
+    console.log('CATEGORIA:', route.params.categoria);
+  }
 
   useEffect(() => {
     async function loadDeliveries() {

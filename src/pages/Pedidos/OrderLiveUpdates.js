@@ -53,7 +53,9 @@ export default function OrderLiveUpdates({ pedido }) {
       "PREPARANDO": { backgroundColor: 'gray', color: 'white' },
       "PRONTO_PARA_RETIRADA": { backgroundColor: 'green', color: 'white' },
       "SAIU_PARA_ENTREGA": { backgroundColor: 'blue', color: 'white' },
-      "RECEBIDO": { backgroundColor: 'purple', color: 'white' },
+      "ENTREGUE": { backgroundColor: 'purple', color: 'white' },
+      "PGTO_PENDENTE": { backgroundColor: 'red', color: 'white' },
+      "PGTO_OK": { backgroundColor: 'green', color: 'white' },
       "FINALIZADO": { backgroundColor: 'black', color: 'white' },
       "CANCELADO": { backgroundColor: 'gray', color: 'white' },
     };

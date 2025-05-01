@@ -13,7 +13,7 @@ import OrderListItem from './OrderListItem';
 
 import api from "../../config/apiAxios";
 
-export default function Pedidos({ route }) {
+export default function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
 
   const { user } = useContext(AuthContext); 
