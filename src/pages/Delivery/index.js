@@ -18,7 +18,7 @@ export default function Deliveries({ route }) {
     console.log('ID:', route.params.id);
     console.log('CATEGORIA:', route.params.categoria);
   }
-
+  
   useEffect(() => {
     async function loadDeliveries() {
       try {

@@ -14,7 +14,6 @@ import * as Device from 'expo-device';
 import api, { isDevelopment } from '../config/apiAxios';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { is } from 'date-fns/locale';
 
 export const AuthContext = createContext();
 
@@ -88,7 +87,7 @@ export function AuthProvider({ children }) {
 
         try {
           // Chama a rota /api/authenticate para gerar o token
-          const authResponse = await api.post('/api/authenticate', {
+          const authResponse = await api.post('/api/user/authenticate', {
             "USER_ID": userId,
             "CHV": 1,
             "timezoneOffset": new Date().getTimezoneOffset(),
@@ -270,4 +269,3 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider> 
   )
 }
-
