@@ -68,83 +68,73 @@ export function AuthProvider({ children }) {
       const result = await signInWithEmailAndPassword(auth, email, password);
       const id = result.user.uid;
 
-      onValue(ref(db, `users/${id}`), async (snapshot) => {
-        const data = snapshot.val();
-        if (isDevelopment) {
-          console.log('Dados do usuário (recuperado do Firebase):', data);
-        }
+      // Leitura única do Realtime Database
+      const snapshot = await get(ref(db, `users/${id}`));
+      const data = snapshot.val();
 
-        const userId = data?.UserID;
-        if (isDevelopment) {
-          console.log('UserID (recuperado do Firebase):', userId);
-        }
+      if (isDevelopment) {
+        console.log('UserID (recuperado do Firebase):', userId);
+      }
         
-        if (!userId) {
-          Alert.alert('Erro ao recuperar o UserID. Tente novamente.');
-          setLoading(false);
-          return;
-        }
+      const userId = data?.UserID;
 
-        try {
-          // Chama a rota /api/authenticate para gerar o token
-          const authResponse = await api.post('/api/user/authenticate', {
-            "USER_ID": userId,
-            "CHV": 1,
-            "timezoneOffset": new Date().getTimezoneOffset(),
-          });
-  
-          const token = authResponse.data?.token;
-          const expiresAt = Date.now() + authResponse.data.expiresIn * 1000; // Converte para milissegundos
-  
-          if (token) {
-            // Armazena o token no AsyncStorage
-            await AsyncStorage.setItem('token', token);
-            await AsyncStorage.setItem('expiresAt', expiresAt.toString());
-            if (isDevelopment) {
-              console.log('Token armazenado no AsyncStorage:', token);
-              console.log('Token expira em:', new Date(expiresAt).toLocaleString());            
-            }
-            // Configura o cabeçalho Authorization
-            api.defaults.headers.Authorization = `Bearer ${token}`;
-          } else {
-            throw new Error('Token não encontrado na resposta do backend.');
-          }
-  
-          // Recupera os dados do usuário no backend
-          const response = await api.get(`/api/usuario/${userId}`);
-          const userData = response.data[0];
+      if (!userId) {
+        Alert.alert('Erro ao recuperar o UserID. Tente novamente.');
+        setLoading(false);
+        return;
+      }
 
-          if (isDevelopment) {
-            console.log('Dados do usuário:', userData);
-          }
-  
-          // Armazena os dados no AsyncStorage
-          AsyncStorage.multiSet([
-            ["vUserID", String(userData?.USER_ID)],
-            ["vNome", userData?.NOME],
-            ["vSobrenome", userData?.SOBRENOME],
-            ["vTelefone", userData?.TELEFONE],
-            ["vEmail", userData?.EMAIL],
-            ["vPushToken", userData?.PUSH_TOKEN],
-          ]);
-          if (isDevelopment) {
-            console.log('Dados do Usuário retornados pelo backend:', userData);
-          }
-          setUser(userData);
-          setAuthenticated(true);
-        } catch (error) {
-          console.error('Erro ao autenticar ou recuperar dados do usuário:', error);
-          Alert.alert('Erro ao autenticar. Verifique sua conexão e tente novamente.');
-          setAuthenticated(false);
-        } finally {
-          setLoading(false);
-        }
+      // Chama à API backend para autenticação com JWT
+      const authResponse = await api.post('/api/user/authenticate', {
+        "USER_ID": userId,
+        "CHV": 1,
+        "timezoneOffset": new Date().getTimezoneOffset(),
       });
+  
+      const token = authResponse.data?.token;
+      const expiresAt = Date.now() + authResponse.data.expiresIn * 1000; 
+  
+      if (!token) {
+        throw new Error('Token não encontrado na resposta do backend.');
+      }
+
+
+      // Armazena o token no AsyncStorage
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('expiresAt', expiresAt.toString());
+
+      if (isDevelopment) {
+        console.log('Token armazenado no AsyncStorage:', token);
+        console.log('Token expira em:', new Date(expiresAt).toLocaleString());            
+      }
+
+      // Buscar dados completos do usuário via API
+      const response = await api.get(`/api/usuario/${userId}`);
+      const userData = response.data[0];
+
+      if (isDevelopment) {
+        console.log('Dados do usuário:', userData);
+      }
+
+
+      await AsyncStorage.multiSet([
+        ["vUserID", String(userData?.USER_ID)],
+        ["vNome", userData?.NOME],
+        ["vSobrenome", userData?.SOBRENOME],
+        ["vTelefone", userData?.TELEFONE],
+        ["vEmail", userData?.EMAIL],
+        ["vPushToken", userData?.PUSH_TOKEN],
+      ]);
+
+      setUser(userData);
+      setAuthenticated(true);
     } catch (error) {
-      console.error('Erro no login com Firebase:', error);
-      Alert.alert('Email e/ou Senha inválidos!');
-      setLoading(false);
-    }
+      console.error('Erro no login:', error);
+      Alert.alert('Email e/ou Senha inválidos ou erro na autenticação.');
+      setAuthenticated(false);
+    } finally {
+        setLoading(false);
+    } 
   }
 
   async function signUp(
