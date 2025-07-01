@@ -2,18 +2,19 @@
  * src/routes/index.js
  */
 
-import { useContext } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
+// import { useContext } from 'react';
+// import { AuthContext } from '../contexts/AuthContext';
 
-import AuthRoutes from './Auth.Routes';
+// import AuthRoutes from './Auth.Routes';
 import AppRoutes from './App.Routes';
 
 function Routes() {
-  const { signed } = useContext(AuthContext);
+  // const { signed } = useContext(AuthContext);
 
-  return (
-    signed ? <AppRoutes/> : <AuthRoutes/> 
-  )
+  // return (
+  //   signed ? <AppRoutes/> : <AuthRoutes/> 
+  // )
+  return <AppRoutes />;
 }
 
 export default Routes;
