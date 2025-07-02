@@ -20,12 +20,29 @@ export const AuthContext = createContext();
 export function AuthProvider({ children }) { 
   const db = getDatabase(firebase_app);
   
-  const [ authenticated, setAuthenticated ] = useState(false);
   const [ loading, setLoading ] = useState(false);
-  const [ user, setUser ] = useState(null);
+
+  const demoPreviewMode = true; // ⚠️ desative após demonstração
+  const demoPreviewUser = {
+    USER_ID: 100001,
+    NOME: 'Ezequias',
+    SOBRENOME: 'Martins',
+    EMAIL: 'ezequiasmartins@gmail.com',
+    TELEFONE: '(31) 98410-7540',
+    PUSH_TOKEN: 'ExponentPushToken[NORKdoBG3OuOFfyf3Ma6i3]'
+  };
+
+  const [ authenticated, setAuthenticated ] = useState(demoPreviewMode);
+  const [ user, setUser ] = useState(demoPreviewMode ? demoPreviewUser : null);
 
   useEffect(()=>{
     setLoading(true);
+
+    if (demoPreviewMode) {
+      AsyncStorage.setItem('@delivery/user', JSON.stringify(demoPreviewUser));
+      return; // pula verificação de token
+    }
+
     async function checkTokenValidity() {
       try {
         const token = await AsyncStorage.getItem('token');
