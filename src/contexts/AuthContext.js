@@ -39,7 +39,9 @@ export function AuthProvider({ children }) {
     setLoading(true);
 
     if (demoPreviewMode) {
-      AsyncStorage.setItem('@delivery/user', JSON.stringify(demoPreviewUser));
+      const user = demoPreviewUser;
+      AsyncStorage.setItem('@delivery/user', JSON.stringify(user));
+      setUser(user); // ✅ Define o user com o PUSH_TOKEN imediatamente
       return; // pula verificação de token
     }
 
