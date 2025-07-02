@@ -12,7 +12,7 @@ if (isDevelopment) {
   console.log('Ambiente de desenvolvimento detectado. Habilitando logs detalhados.');
 }
 
-API_URL = BASE_URL || 'https://srv.deliverybairro.com'|| 'http://localhost:3357' ;
+API_URL = BASE_URL || 'https://srv.deliverybairro.com'|| 'http://localhost:33570' ;
 
 if (isDevelopment) {
   console.log('URL da API:', API_URL);
